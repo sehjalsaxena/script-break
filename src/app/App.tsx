@@ -1,85 +1,35 @@
-// Minimal check page: runs all 28 behaviour checks live in the browser, the same way as
-// reference/run_cases.py (pack v0.3 must give `expected`; pack v0.2 must give
-// `expected_v02` if present, otherwise `expected`).
-import { assess, type Session, type Tier } from '../engine/engine'
-import { PACK_V02, PACK_V03 } from '../engine/rulepacks'
-import cases from '../../tests/cases.json'
+// App shell: a demo page (mock UPI flow + scenario panel) and the live checks page.
+// Hash routing (#/ and #/checks) so the build works on any static host.
+import { useEffect, useState } from 'react'
+import { CHECKS_PASSED, CHECKS_TOTAL, ChecksPage } from './ChecksPage'
+import { DemoPage } from './DemoPage'
 
-interface Case {
-  id: string
-  kind: string
-  title: string
-  session: Session
-  expected: Tier
-  expected_v02?: Tier
-  note?: string
+function useHashRoute(): string {
+  const [hash, setHash] = useState(window.location.hash)
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+  return hash.replace(/^#\/?/, '')
 }
 
-const rows = (cases as Case[]).map((c) => {
-  const a2 = assess(c.session, PACK_V02)
-  const a3 = assess(c.session, PACK_V03)
-  const expectedV02 = c.expected_v02 ?? c.expected
-  const pass = a3.tier === c.expected && a2.tier === expectedV02
-  return { c, a2, a3, expectedV02, pass }
-})
-
-const passed = rows.filter((r) => r.pass).length
-
 export default function App() {
-  const allPass = passed === rows.length
+  const route = useHashRoute()
+  const link = (href: string, active: boolean, label: string) => (
+    <a href={href} className={active ? 'font-bold text-brand' : 'text-muted hover:text-ink'}>{label}</a>
+  )
   return (
-    <main className="p-6 font-sans text-sm">
-      <h1 className="text-2xl font-bold">ScriptBreak behaviour checks</h1>
-      <p className="mt-1 font-semibold text-gray-700">All data synthetic</p>
-      <p className={`mt-4 text-xl font-bold ${allPass ? 'text-green-700' : 'text-red-700'}`}>
-        {passed} / {rows.length} checks pass
-      </p>
-      <p className="mt-1 text-gray-600">
-        Computed live in this browser with rule packs v{PACK_V02.version} and v{PACK_V03.version}.
-      </p>
-      <div className="mt-4 overflow-x-auto">
-        <table className="border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="border px-2 py-1">ID</th>
-              <th className="border px-2 py-1">Title</th>
-              <th className="border px-2 py-1">Expected</th>
-              <th className="border px-2 py-1">v0.2 result</th>
-              <th className="border px-2 py-1">v0.3 result</th>
-              <th className="border px-2 py-1">Pass</th>
-              <th className="border px-2 py-1">Reasons (v0.3)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(({ c, a2, a3, expectedV02, pass }) => (
-              <tr key={c.id} className="align-top">
-                <td className="border px-2 py-1 font-mono">{c.id}</td>
-                <td className="border px-2 py-1">
-                  {c.title}
-                  {c.note && <div className="text-xs text-gray-500">{c.note}</div>}
-                </td>
-                <td className="border px-2 py-1 font-mono">
-                  {c.expected}
-                  {c.expected_v02 && <div className="text-xs text-gray-500">v0.2: {expectedV02}</div>}
-                </td>
-                <td className="border px-2 py-1 font-mono">{a2.tier}</td>
-                <td className="border px-2 py-1 font-mono">
-                  {a3.tier}
-                  <div className="text-xs text-gray-500">{a3.rules.join(', ')}</div>
-                </td>
-                <td className={`border px-2 py-1 font-bold ${pass ? 'text-green-700' : 'text-red-700'}`}>
-                  {pass ? 'PASS' : 'FAIL'}
-                </td>
-                <td className="border px-2 py-1">
-                  <ul className="list-disc pl-4">
-                    {a3.reasons.map((r, i) => <li key={i}>{r}</li>)}
-                  </ul>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <div className="min-h-screen">
+      <header className="flex items-center gap-4 border-b border-line bg-white px-4 py-2.5 text-sm">
+        <span className="font-bold text-ink">ScriptBreak</span>
+        <nav className="flex gap-4">
+          {link('#/', route !== 'checks', 'Demo')}
+          {link('#/checks', route === 'checks', `Checks ${CHECKS_PASSED}/${CHECKS_TOTAL}`)}
+        </nav>
+        <span className="ml-auto text-xs font-semibold text-muted">All data synthetic</span>
+      </header>
+      {route === 'checks' ? <ChecksPage /> : <DemoPage />}
+    </div>
   )
 }

@@ -23,3 +23,10 @@ Team RUNTIME (Sambhav Jain, Sehjal Saxena, Deepak Rawat), RAKSHAM AI Cybersecuri
 | tailwindcss | 4.3.3 | CSS utility classes |
 | @tailwindcss/vite | 4.3.3 | Tailwind plugin for Vite (dev only) |
 | vitest | 5.0.5 | Test runner (dev only) |
+| lucide-react | 1.61.0 | Icons in the mock UPI app (ISC licence) |
+
+## Design note
+
+The mock UPI app ("DemoPay") borrows the general layout of common Indian UPI apps (header,
+quick-action grid, raised Scan button). It uses its own name and no real app's logo or branding.
+All names, phone numbers, UPI IDs, banks and amounts in it are fictional.
