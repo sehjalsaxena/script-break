@@ -4,6 +4,9 @@ This is the rulebook of the ScriptBreak decision engine, written **only from the
 `reference/engine.py`, `reference/rulepack_v0.3.json` and `reference/cases.json`. If this document
 and `engine.py` ever disagree, `engine.py` wins and this document is wrong.
 
+The Round 1 slide deck is in `docs/ScriptBreak_Round1_deck.pdf`. It is the reference for screen
+wording, the 48-hour MVP scope (page 10) and the demo script. For engine behaviour, the code wins.
+
 ScriptBreak runs inside the UPI app after the payee and amount are entered and before the PIN
 screen. It looks for the shape of a *coached* payment: someone guiding the victim live, a payee
 never paid before, and an amount out of character.
