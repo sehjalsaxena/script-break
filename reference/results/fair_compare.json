@@ -1,0 +1,171 @@
+[
+ {
+  "rule": "ScriptBreak v0.3",
+  "legit_per_1000": 6.550000000000001,
+  "scam_avg": 0.6783888888888888,
+  "by": {
+   "digital_arrest": 0.8796666666666667,
+   "customer_care": 0.6676666666666666,
+   "kyc_official": 0.6216666666666667,
+   "courier": 0.8026666666666666,
+   "voice_clone": 0.761,
+   "hang_up_and_pay": 0.33766666666666667
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 10,000",
+  "legit_per_1000": 3.73,
+  "scam_avg": 0.3171111111111111,
+  "by": {
+   "digital_arrest": 0.431,
+   "customer_care": 0.11166666666666666,
+   "kyc_official": 0.07766666666666666,
+   "courier": 0.37333333333333335,
+   "voice_clone": 0.3463333333333333,
+   "hang_up_and_pay": 0.5626666666666666
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 10,000",
+  "legit_per_1000": 5.305,
+  "scam_avg": 0.3602222222222222,
+  "by": {
+   "digital_arrest": 0.49433333333333335,
+   "customer_care": 0.15833333333333333,
+   "kyc_official": 0.10166666666666667,
+   "courier": 0.43266666666666664,
+   "voice_clone": 0.3463333333333333,
+   "hang_up_and_pay": 0.628
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 7,500",
+  "legit_per_1000": 5.695,
+  "scam_avg": 0.38655555555555554,
+  "by": {
+   "digital_arrest": 0.4866666666666667,
+   "customer_care": 0.161,
+   "kyc_official": 0.11366666666666667,
+   "courier": 0.46066666666666667,
+   "voice_clone": 0.451,
+   "hang_up_and_pay": 0.6463333333333333
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 7,500",
+  "legit_per_1000": 8.57,
+  "scam_avg": 0.44133333333333336,
+  "by": {
+   "digital_arrest": 0.557,
+   "customer_care": 0.232,
+   "kyc_official": 0.14966666666666667,
+   "courier": 0.5373333333333333,
+   "voice_clone": 0.451,
+   "hang_up_and_pay": 0.721
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 5,000",
+  "legit_per_1000": 9.84,
+  "scam_avg": 0.48561111111111116,
+  "by": {
+   "digital_arrest": 0.549,
+   "customer_care": 0.24666666666666667,
+   "kyc_official": 0.192,
+   "courier": 0.584,
+   "voice_clone": 0.597,
+   "hang_up_and_pay": 0.745
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 5,000",
+  "legit_per_1000": 15.51,
+  "scam_avg": 0.5577777777777778,
+  "by": {
+   "digital_arrest": 0.629,
+   "customer_care": 0.3596666666666667,
+   "kyc_official": 0.249,
+   "courier": 0.6766666666666666,
+   "voice_clone": 0.597,
+   "hang_up_and_pay": 0.8353333333333334
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 4,000",
+  "legit_per_1000": 12.72,
+  "scam_avg": 0.534611111111111,
+  "by": {
+   "digital_arrest": 0.58,
+   "customer_care": 0.2986666666666667,
+   "kyc_official": 0.24766666666666667,
+   "courier": 0.633,
+   "voice_clone": 0.6646666666666666,
+   "hang_up_and_pay": 0.7836666666666666
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 4,000",
+  "legit_per_1000": 20.485,
+  "scam_avg": 0.6151666666666666,
+  "by": {
+   "digital_arrest": 0.6643333333333333,
+   "customer_care": 0.432,
+   "kyc_official": 0.31866666666666665,
+   "courier": 0.735,
+   "voice_clone": 0.6646666666666666,
+   "hang_up_and_pay": 0.8763333333333333
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 3,000",
+  "legit_per_1000": 17.44,
+  "scam_avg": 0.5948333333333333,
+  "by": {
+   "digital_arrest": 0.609,
+   "customer_care": 0.37566666666666665,
+   "kyc_official": 0.31266666666666665,
+   "courier": 0.6976666666666667,
+   "voice_clone": 0.7443333333333333,
+   "hang_up_and_pay": 0.8296666666666667
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 3,000",
+  "legit_per_1000": 29.025,
+  "scam_avg": 0.6867222222222221,
+  "by": {
+   "digital_arrest": 0.6983333333333334,
+   "customer_care": 0.5416666666666666,
+   "kyc_official": 0.398,
+   "courier": 0.8116666666666666,
+   "voice_clone": 0.7443333333333333,
+   "hang_up_and_pay": 0.9263333333333333
+  }
+ },
+ {
+  "rule": "first payment to a person >= Rs 2,000",
+  "legit_per_1000": 25.915,
+  "scam_avg": 0.6660555555555555,
+  "by": {
+   "digital_arrest": 0.6326666666666667,
+   "customer_care": 0.479,
+   "kyc_official": 0.418,
+   "courier": 0.769,
+   "voice_clone": 0.8326666666666667,
+   "hang_up_and_pay": 0.865
+  }
+ },
+ {
+  "rule": "first payment to anyone >= Rs 2,000",
+  "legit_per_1000": 44.56,
+  "scam_avg": 0.7711666666666667,
+  "by": {
+   "digital_arrest": 0.7246666666666667,
+   "customer_care": 0.6786666666666666,
+   "kyc_official": 0.5286666666666666,
+   "courier": 0.8973333333333333,
+   "voice_clone": 0.8326666666666667,
+   "hang_up_and_pay": 0.965
+  }
+ }
+]

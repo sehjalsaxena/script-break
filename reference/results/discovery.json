@@ -1,0 +1,359 @@
+{
+ "reports": 1200,
+ "paused_by_v02": 751,
+ "misses": 449,
+ "vocab_size": 16,
+ "cut_height": 0.45,
+ "silhouette": 0.2934907090618779,
+ "n_clusters_all": 19,
+ "clusters": [
+  {
+   "size": 131,
+   "top_workflow": "hang_up_and_pay",
+   "purity": 0.5648854961832062,
+   "composition": {
+    "digital_arrest": 7,
+    "customer_care": 4,
+    "kyc_official": 3,
+    "courier": 12,
+    "voice_clone": 7,
+    "hang_up_and_pay": 74,
+    "chat_task": 24
+   },
+   "common_tokens": [
+    "amount_big",
+    "app_switch",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "rule": null,
+   "best_unconstrained": {
+    "all": [
+     "amount_big",
+     "app_switch",
+     "payee_new"
+    ],
+    "none": [],
+    "recall": 0.7557251908396947,
+    "added_per_1000": 2.83
+   },
+   "decision": "reject"
+  },
+  {
+   "size": 73,
+   "top_workflow": "sent_by_mistake",
+   "purity": 1.0,
+   "composition": {
+    "sent_by_mistake": 73
+   },
+   "common_tokens": [
+    "amount_matches_credit",
+    "credit_unknown_48h",
+    "payee_new"
+   ],
+   "rule": {
+    "all": [
+     "amount_matches_credit",
+     "payee_new"
+    ],
+    "none": [
+     "payee_is_sender"
+    ],
+    "recall": 1.0,
+    "added_per_1000": 0.05
+   },
+   "best_unconstrained": {
+    "all": [
+     "amount_matches_credit",
+     "payee_new"
+    ],
+    "none": [
+     "payee_is_sender"
+    ],
+    "recall": 1.0,
+    "added_per_1000": 0.05
+   },
+   "decision": "approve",
+   "rule_id": "R5"
+  },
+  {
+   "size": 55,
+   "top_workflow": "customer_care",
+   "purity": 0.38181818181818183,
+   "composition": {
+    "digital_arrest": 2,
+    "customer_care": 21,
+    "kyc_official": 12,
+    "courier": 9,
+    "voice_clone": 11
+   },
+   "common_tokens": [
+    "call_now",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "rule": null,
+   "best_unconstrained": {
+    "all": [
+     "call_now",
+     "payee_new",
+     "payee_pasted"
+    ],
+    "none": [],
+    "recall": 0.9818181818181818,
+    "added_per_1000": 6.66
+   },
+   "decision": "reject"
+  },
+  {
+   "size": 43,
+   "top_workflow": "kyc_official",
+   "purity": 0.3953488372093023,
+   "composition": {
+    "digital_arrest": 2,
+    "customer_care": 14,
+    "kyc_official": 17,
+    "courier": 6,
+    "voice_clone": 4
+   },
+   "common_tokens": [
+    "app_switch",
+    "call_now",
+    "payee_new"
+   ],
+   "rule": null,
+   "best_unconstrained": {
+    "all": [
+     "call_now",
+     "payee_new"
+    ],
+    "none": [],
+    "recall": 1.0,
+    "added_per_1000": 23.830000000000002
+   },
+   "decision": "reject"
+  },
+  {
+   "size": 41,
+   "top_workflow": "chat_task",
+   "purity": 0.6097560975609756,
+   "composition": {
+    "kyc_official": 3,
+    "courier": 1,
+    "voice_clone": 1,
+    "hang_up_and_pay": 11,
+    "chat_task": 25
+   },
+   "common_tokens": [
+    "app_switch",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "rule": null,
+   "best_unconstrained": {
+    "all": [
+     "app_switch",
+     "payee_new",
+     "payee_pasted"
+    ],
+    "none": [],
+    "recall": 0.7804878048780488,
+    "added_per_1000": 6.49
+   },
+   "decision": "reject"
+  },
+  {
+   "size": 27,
+   "top_workflow": "chat_task",
+   "purity": 1.0,
+   "composition": {
+    "chat_task": 27
+   },
+   "common_tokens": [
+    "app_switch",
+    "many_new_payees",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "rule": {
+    "all": [
+     "app_switch",
+     "many_new_payees",
+     "payee_new",
+     "payee_pasted"
+    ],
+    "none": [],
+    "recall": 0.9259259259259259,
+    "added_per_1000": 0.02
+   },
+   "best_unconstrained": {
+    "all": [
+     "app_switch",
+     "many_new_payees",
+     "payee_new",
+     "payee_pasted"
+    ],
+    "none": [],
+    "recall": 0.9259259259259259,
+    "added_per_1000": 0.02
+   },
+   "decision": "approve",
+   "rule_id": "R6"
+  },
+  {
+   "size": 20,
+   "top_workflow": "courier",
+   "purity": 0.3,
+   "composition": {
+    "digital_arrest": 1,
+    "customer_care": 5,
+    "kyc_official": 5,
+    "courier": 6,
+    "voice_clone": 3
+   },
+   "common_tokens": [
+    "call_now",
+    "low_history",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "rule": {
+    "all": [
+     "call_now",
+     "low_history",
+     "payee_new",
+     "payee_pasted"
+    ],
+    "none": [],
+    "recall": 0.55,
+    "added_per_1000": 0.37
+   },
+   "best_unconstrained": {
+    "all": [
+     "call_now",
+     "low_history",
+     "payee_new"
+    ],
+    "none": [],
+    "recall": 0.95,
+    "added_per_1000": 1.56
+   },
+   "decision": "shadow mode"
+  }
+ ],
+ "approved": [
+  {
+   "id": "R5",
+   "name": "same amount as that money + new payee, not payee is that sender",
+   "all": [
+    "amount_matches_credit",
+    "payee_new"
+   ],
+   "none": [
+    "payee_is_sender"
+   ],
+   "then": "PAUSE",
+   "explain": "This sends back money you received from someone you have never paid, but to a different account. Real mistaken payments are reversed by the sender's bank, not by you.",
+   "source": {
+    "cluster_size": 73,
+    "recall_on_cluster": 1.0,
+    "backtest_added_per_1000": 0.05
+   },
+   "approved_by": [
+    "analyst 1",
+    "analyst 2"
+   ]
+  },
+  {
+   "id": "R6",
+   "name": "left and returned to the app + 3rd new payee in an hour + new payee + payee ID pasted",
+   "all": [
+    "app_switch",
+    "many_new_payees",
+    "payee_new",
+    "payee_pasted"
+   ],
+   "none": [],
+   "then": "PAUSE",
+   "explain": "This is your third payment to a new account within an hour, using details copied from another app. Online 'task' and 'investment' scams ask for payments exactly like this.",
+   "source": {
+    "cluster_size": 27,
+    "recall_on_cluster": 0.9259259259259259,
+    "backtest_added_per_1000": 0.02
+   },
+   "approved_by": [
+    "analyst 1",
+    "analyst 2"
+   ]
+  }
+ ],
+ "backtest_base_per_1000": 6.680000000000001,
+ "held_out": {
+  "digital_arrest": {
+   "label": "Digital arrest",
+   "v02_flagged": 0.8835,
+   "v03_flagged": 0.885,
+   "v03_nudge": 0.1065,
+   "v03_none": 0.0085,
+   "shifted": false
+  },
+  "customer_care": {
+   "label": "Fake customer care / refund",
+   "v02_flagged": 0.676,
+   "v03_flagged": 0.677,
+   "v03_nudge": 0.2165,
+   "v03_none": 0.1065,
+   "shifted": false
+  },
+  "kyc_official": {
+   "label": "Fake KYC / bank official",
+   "v02_flagged": 0.636,
+   "v03_flagged": 0.637,
+   "v03_nudge": 0.2015,
+   "v03_none": 0.1615,
+   "shifted": false
+  },
+  "courier": {
+   "label": "Courier / customs",
+   "v02_flagged": 0.7875,
+   "v03_flagged": 0.788,
+   "v03_nudge": 0.1755,
+   "v03_none": 0.0365,
+   "shifted": false
+  },
+  "voice_clone": {
+   "label": "AI voice clone of a relative",
+   "v02_flagged": 0.7605,
+   "v03_flagged": 0.761,
+   "v03_nudge": 0.2,
+   "v03_none": 0.039,
+   "shifted": false
+  },
+  "hang_up_and_pay": {
+   "label": "Hang up, then pay (adaptation)",
+   "v02_flagged": 0.2155,
+   "v03_flagged": 0.2415,
+   "v03_nudge": 0.621,
+   "v03_none": 0.1375,
+   "shifted": true
+  },
+  "sent_by_mistake": {
+   "label": "'Sent by mistake' return",
+   "v02_flagged": 0.173,
+   "v03_flagged": 1.0,
+   "v03_nudge": 0.0,
+   "v03_none": 0.0,
+   "shifted": true
+  },
+  "chat_task": {
+   "label": "Task scam over chat (out of scope)",
+   "v02_flagged": 0.048,
+   "v03_flagged": 0.2745,
+   "v03_nudge": 0.206,
+   "v03_none": 0.5195,
+   "shifted": true
+  }
+ },
+ "legit_fresh_v02_per_1000": 6.46,
+ "legit_fresh_v03_per_1000": 6.550000000000001
+}

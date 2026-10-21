@@ -1,0 +1,125 @@
+{
+ "budget_per_1000": 8.0,
+ "legit": {
+  "interrupt_per_1000": 6.550000000000001,
+  "nudge_per_1000": 33.085,
+  "naive_per_1000": 3.73,
+  "by_rule_per_1000": {
+   "R1": 6.025,
+   "R5": 0.06999999999999999,
+   "R4": 0.06499999999999999,
+   "R6": 0.025,
+   "R2": 0.375,
+   "R3": 0.02
+  }
+ },
+ "scams": {
+  "digital_arrest": {
+   "label": "Digital arrest",
+   "flagged": 0.8796666666666667,
+   "critical": 0.7513333333333333,
+   "nudge": 0.11033333333333334,
+   "none": 0.01,
+   "naive": 0.431
+  },
+  "customer_care": {
+   "label": "Fake customer care / refund",
+   "flagged": 0.6676666666666666,
+   "critical": 0.4676666666666667,
+   "nudge": 0.22333333333333333,
+   "none": 0.109,
+   "naive": 0.11166666666666666
+  },
+  "kyc_official": {
+   "label": "Fake KYC / bank official",
+   "flagged": 0.6216666666666667,
+   "critical": 0.4653333333333333,
+   "nudge": 0.20066666666666666,
+   "none": 0.17766666666666667,
+   "naive": 0.07766666666666666
+  },
+  "courier": {
+   "label": "Courier / customs",
+   "flagged": 0.8026666666666666,
+   "critical": 0.6216666666666667,
+   "nudge": 0.165,
+   "none": 0.03233333333333333,
+   "naive": 0.37333333333333335
+  },
+  "voice_clone": {
+   "label": "AI voice clone of a relative",
+   "flagged": 0.761,
+   "critical": 0.3933333333333333,
+   "nudge": 0.201,
+   "none": 0.038,
+   "naive": 0.3463333333333333
+  },
+  "hang_up_and_pay": {
+   "label": "Hang up, then pay (adaptation)",
+   "flagged": 0.33766666666666667,
+   "critical": 0.22566666666666665,
+   "nudge": 0.6176666666666667,
+   "none": 0.04466666666666667,
+   "naive": 0.5626666666666666
+  },
+  "sent_by_mistake": {
+   "label": "'Sent by mistake' return",
+   "flagged": 1.0,
+   "critical": 0.28833333333333333,
+   "nudge": 0.0,
+   "none": 0.0,
+   "naive": 0.03133333333333333
+  },
+  "chat_task": {
+   "label": "Task scam over chat (out of scope)",
+   "flagged": 0.38466666666666666,
+   "critical": 0.144,
+   "nudge": 0.19866666666666666,
+   "none": 0.4166666666666667,
+   "naive": 0.042333333333333334
+  }
+ },
+ "sensitivity_call_scale": [
+  {
+   "call_scale": 0.5,
+   "interrupt_per_1000": 4.52
+  },
+  {
+   "call_scale": 1.0,
+   "interrupt_per_1000": 6.550000000000001
+  },
+  {
+   "call_scale": 1.5,
+   "interrupt_per_1000": 8.63
+  },
+  {
+   "call_scale": 2.0,
+   "interrupt_per_1000": 10.72
+  },
+  {
+   "call_scale": 3.0,
+   "interrupt_per_1000": 14.875
+  }
+ ],
+ "fallback_breakeven_call_scale": 2.5812133072407044,
+ "blanket_new_payee_notice_share": 0.20754,
+ "breakeven_call_scale": 1.348557692307692,
+ "screen_share_x5_interrupt_per_1000": 8.149999999999999,
+ "fallback_floor_5000": {
+  "legit_by_call_scale": {
+   "1.0": 4.0600000000000005,
+   "2.0": 6.515,
+   "3.0": 9.07
+  },
+  "scams_flagged": {
+   "digital_arrest": 0.8293333333333334,
+   "customer_care": 0.5723333333333334,
+   "kyc_official": 0.5706666666666667,
+   "courier": 0.6886666666666666,
+   "voice_clone": 0.61,
+   "hang_up_and_pay": 0.312,
+   "sent_by_mistake": 1.0,
+   "chat_task": 0.381
+  }
+ }
+}
