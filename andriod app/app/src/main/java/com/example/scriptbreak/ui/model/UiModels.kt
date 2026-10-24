@@ -44,6 +44,8 @@ data class AmountUi(
     val aiLevel: String? = null,          // demo view: what the AI decided for this amount
     val aiScore: Double? = null,
     val aiFacts: List<String> = emptyList(),
+    val payeeUpiId: String = "",
+    val aiCutoffs: List<Double>? = null,  // the model's score cut-offs: Nudge, Pause, Critical
 )
 
 data class PauseUi(

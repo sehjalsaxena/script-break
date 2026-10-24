@@ -175,7 +175,7 @@ private fun ResultCard(r: Result?, modelVersion: String, story: String?) {
                     Text(r.level, color = fg, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
                 }
                 Spacer(Modifier.width(12.dp))
-                Text("AI scam score ${String.format(Locale.ENGLISH, "%.3f", r.score)}", fontSize = 16.sp, color = InkDark, fontWeight = FontWeight.SemiBold)
+                Text("AI scam score ${String.format(Locale.ENGLISH, "%.3f (%.1f%%)", r.score, r.score * 100)}", fontSize = 16.sp, color = InkDark, fontWeight = FontWeight.SemiBold)
             }
             LinearProgressIndicator(progress = { r.score.toFloat() }, color = fg, trackColor = PanelBg, modifier = Modifier.fillMaxWidth().height(8.dp))
             if (r.reasons.isEmpty()) Text("No warning signs pushed the score up.", fontSize = 15.sp, color = MutedText)
@@ -370,6 +370,6 @@ private fun RowLine(r: KitRow) {
             fontSize = 14.sp, color = MutedText, modifier = Modifier.weight(1f))
         Text("₹${r.amount.toLong()}", fontSize = 14.sp, color = InkDark, modifier = Modifier.width(80.dp))
         Text(r.level, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = fg, modifier = Modifier.width(76.dp))
-        Text(String.format(Locale.ENGLISH, "%.2f", r.score), fontSize = 14.sp, color = InkDark)
+        Text(String.format(Locale.ENGLISH, "%.2f (%d%%)", r.score, Math.round(r.score * 100)), fontSize = 13.sp, color = InkDark)
     }
 }

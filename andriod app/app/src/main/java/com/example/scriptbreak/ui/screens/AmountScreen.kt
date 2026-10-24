@@ -28,6 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,6 +85,12 @@ fun AmountScreen(
             showScriptBreakBadge = true
         )
 
+        // Everything above the keypad scrolls, so the keypad and Continue never get pushed off screen
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
         // Payee header preview (Avatar + Name + UPI ID)
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -112,7 +120,7 @@ fun AmountScreen(
                     color = InkDark
                 )
                 Text(
-                    text = "ramesh.k@demoupi",
+                    text = state.payeeUpiId,
                     fontSize = 14.sp,
                     color = MutedText
                 )
@@ -185,7 +193,7 @@ fun AmountScreen(
             ) {
                 Row(
                     verticalAlignment = Alignment.Top,
-                    modifier = Modifier.padding(14.dp)
+                    modifier = Modifier.padding(12.dp)
                 ) {
                     Icon(
                         imageVector = AppIcons.Warning,
@@ -198,10 +206,10 @@ fun AmountScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = state.nudge,
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Medium,
                         color = NudgeAmberInk,
-                        lineHeight = 22.sp
+                        lineHeight = 21.sp
                     )
                 }
             }
@@ -209,7 +217,7 @@ fun AmountScreen(
         }
 
         if (state.aiLevel != null) {
-            AiSeesCard(state.aiLevel, state.aiScore, state.aiFacts)
+            AiSeesCard(state.aiLevel, state.aiScore, state.aiFacts, state.aiCutoffs)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
@@ -237,8 +245,9 @@ fun AmountScreen(
             ),
             modifier = Modifier.fillMaxWidth()
         )
+        }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Keypad
         NumericKeypad(
@@ -260,7 +269,7 @@ fun AmountScreen(
 
 /** Demo view: the facts the AI was given and its decision, updated on every key press. Tap to open. */
 @Composable
-private fun AiSeesCard(level: String, score: Double?, facts: List<String>) {
+private fun AiSeesCard(level: String, score: Double?, facts: List<String>, cutoffs: List<Double>?) {
     var open by remember { mutableStateOf(false) }
     val color = when (level) {
         "CRITICAL" -> CritRed
@@ -271,9 +280,10 @@ private fun AiSeesCard(level: String, score: Double?, facts: List<String>) {
     }
     val label = when (level) {
         "NONE" -> "No warning"
-        "UNAVAILABLE" -> "Check unavailable, you can still pay"
-        else -> level.lowercase().replaceFirstChar(Char::uppercaseChar) + " before the PIN"
+        "UNAVAILABLE" -> "Unavailable"
+        else -> level.lowercase().replaceFirstChar(Char::uppercaseChar)
     }
+    fun both(x: Double) = String.format(java.util.Locale.ENGLISH, "%.2f (%d%%)", x, Math.round(x * 100))
     Surface(
         color = Color.White,
         shape = RoundedCornerShape(12.dp),
@@ -282,15 +292,19 @@ private fun AiSeesCard(level: String, score: Double?, facts: List<String>) {
     ) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("What the AI sees", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark, modifier = Modifier.weight(1f))
-                Text(label + (score?.let { "  ·  score %.2f".format(it) } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = color)
+                Text("What the AI sees", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark,
+                    maxLines = 1, modifier = Modifier.weight(1f))
+                Text(label + (score?.let { " · " + both(it) } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                    color = color, maxLines = 1, softWrap = false)
                 Text(if (open) "  ▲" else "  ▼", fontSize = 12.sp, color = MutedText)
             }
             if (open) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(facts.joinToString("  ·  "), fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
-                Text("Demo view. The AI weighs all of these together: there is no fixed amount limit.",
-                    fontSize = 12.sp, color = MutedText, modifier = Modifier.padding(top = 4.dp))
+                Text("AI scam score: how closely this payment matches the scams the AI learned (0 = 0%, not at all; 1 = 100%, exactly). " +
+                    (cutoffs?.let { (n, p, c) -> "Nudge above ${both(n)}, Pause above ${both(p)}, Critical above ${both(c)}. " } ?: "") +
+                    "It weighs all the facts together: there is no fixed amount limit.",
+                    fontSize = 12.sp, color = MutedText, lineHeight = 16.sp, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }

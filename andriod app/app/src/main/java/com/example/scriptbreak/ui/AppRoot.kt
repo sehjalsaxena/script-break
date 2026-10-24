@@ -251,6 +251,8 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             aiLevel = ai?.level,
                             aiScore = ai?.score,
                             aiFacts = ai?.facts.orEmpty(),
+                            payeeUpiId = p.upiId,
+                            aiCutoffs = flow.currentCutoffs,
                         ),
                         onDigit = flow::amountDigit,
                         onDelete = flow::amountDelete,

@@ -559,6 +559,10 @@ class PaymentFlow(
         )
     }
 
+    /** Score cut-offs (Nudge, Pause, Critical) by model version, read from the model files at start. */
+    var scoreCutoffs: Map<String, List<Double>> = emptyMap()
+    val currentCutoffs: List<Double>? get() = scoreCutoffs[modelVersion]
+
     /** Demo view on the Amount screen: exactly what the AI was given for this payment, and what it decided. */
     val aiView: AiView?
         get() {
