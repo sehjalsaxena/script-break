@@ -43,9 +43,12 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppOrange
+import com.example.scriptbreak.ui.theme.AppOrangeLight
 import com.example.scriptbreak.ui.theme.InkDark
+import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
@@ -119,120 +122,153 @@ fun CheckBalanceScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Account 1: Demo Bank
+        // Account 1: Demo Bank (Primary)
         Surface(
             color = Color.White,
             shape = RoundedCornerShape(16.dp),
-            shadowElevation = 0.5.dp,
+            shadowElevation = 1.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(46.dp)
-                            .clip(CircleShape)
-                            .background(AppPurpleLight)
+            Column {
+                // Top accent header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .background(AppBlue)
+                )
+
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = AppIcons.AccountBalance,
-                            contentDescription = null,
-                            tint = AppPurple,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
+                        Surface(
+                            color = AppBlueLight,
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "PRIMARY UPI ACCOUNT",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AppBlue,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
                         Text(
-                            text = "Demo Bank",
-                            fontSize = 16.sp,
+                            text = "RuPay UPI",
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = InkDark
-                        )
-                        Text(
-                            text = "Savings A/c •••• 4821 (Primary)",
-                            fontSize = 13.sp,
                             color = MutedText
                         )
                     }
 
-                    if (sbiBalance == null) {
-                        if (sbiLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = AppPurple,
-                                strokeWidth = 2.5.dp
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clip(CircleShape)
+                                .background(AppBlueLight)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.AccountBalance,
+                                contentDescription = null,
+                                tint = AppBlue,
+                                modifier = Modifier.size(24.dp)
                             )
-                        } else {
-                            Surface(
-                                color = AppPurpleLight,
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.clickable {
-                                    sbiLoading = true
-                                    scope.launch {
-                                        delay(800)
-                                        sbiBalance = "₹ 48,250.00"
-                                        sbiLoading = false
-                                    }
-                                }
-                            ) {
-                                Text(
-                                    text = "Check",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AppPurple,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Demo Bank",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = "Savings A/c •••• 4821",
+                                fontSize = 13.sp,
+                                color = MutedText
+                            )
+                        }
+
+                        if (sbiBalance == null) {
+                            if (sbiLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = AppOrange,
+                                    strokeWidth = 2.5.dp
                                 )
+                            } else {
+                                Surface(
+                                    color = AppOrangeLight,
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.clickable {
+                                        sbiLoading = true
+                                        scope.launch {
+                                            delay(800)
+                                            sbiBalance = "₹ 48,250.00"
+                                            sbiLoading = false
+                                        }
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Check",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppOrange,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                AnimatedVisibility(
-                    visible = sbiBalance != null,
-                    enter = fadeIn() + slideInVertically()
-                ) {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(Color(0xFFF0F0F0))
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                    AnimatedVisibility(
+                        visible = sbiBalance != null,
+                        enter = fadeIn() + slideInVertically()
+                    ) {
+                        Column(modifier = Modifier.padding(top = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(LineBorder)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Available Balance",
+                                        fontSize = 13.sp,
+                                        color = MutedText
+                                    )
+                                    Text(
+                                        text = sbiBalance.orEmpty(),
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = InkDark
+                                    )
+                                }
                                 Text(
-                                    text = "Available Balance",
+                                    text = "Hide",
                                     fontSize = 13.sp,
-                                    color = MutedText
-                                )
-                                Text(
-                                    text = sbiBalance.orEmpty(),
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = InkDark
-                                )
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = AppIcons.Check,
-                                    contentDescription = null,
-                                    tint = SafeGreen,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Updated just now",
-                                    fontSize = 12.sp,
-                                    color = SafeGreen,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AppOrange,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .clickable { sbiBalance = null }
+                                        .padding(4.dp)
                                 )
                             }
                         }
@@ -243,120 +279,152 @@ fun CheckBalanceScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Account 2: Sample Bank
+        // Account 2: Sample Bank (Secondary)
         Surface(
             color = Color.White,
             shape = RoundedCornerShape(16.dp),
-            shadowElevation = 0.5.dp,
+            shadowElevation = 1.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(46.dp)
-                            .clip(CircleShape)
-                            .background(AppPurpleLight)
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .background(Color(0xFF004C8F)) // HDFC Navy
+                )
+
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = AppIcons.AccountBalance,
-                            contentDescription = null,
-                            tint = AppPurple,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
+                        Surface(
+                            color = AppBlueLight,
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "SECONDARY ACCOUNT",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AppBlue,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
                         Text(
-                            text = "Sample Bank",
-                            fontSize = 16.sp,
+                            text = "Visa Debit",
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = InkDark
-                        )
-                        Text(
-                            text = "Savings A/c •••• 7319 (Secondary)",
-                            fontSize = 13.sp,
                             color = MutedText
                         )
                     }
 
-                    if (hdfcBalance == null) {
-                        if (hdfcLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = AppPurple,
-                                strokeWidth = 2.5.dp
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clip(CircleShape)
+                                .background(AppBlueLight)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.AccountBalance,
+                                contentDescription = null,
+                                tint = AppBlue,
+                                modifier = Modifier.size(24.dp)
                             )
-                        } else {
-                            Surface(
-                                color = AppPurpleLight,
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.clickable {
-                                    hdfcLoading = true
-                                    scope.launch {
-                                        delay(800)
-                                        hdfcBalance = "₹ 12,400.00"
-                                        hdfcLoading = false
-                                    }
-                                }
-                            ) {
-                                Text(
-                                    text = "Check",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AppPurple,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Sample Bank",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = "Savings A/c •••• 7319",
+                                fontSize = 13.sp,
+                                color = MutedText
+                            )
+                        }
+
+                        if (hdfcBalance == null) {
+                            if (hdfcLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = AppOrange,
+                                    strokeWidth = 2.5.dp
                                 )
+                            } else {
+                                Surface(
+                                    color = AppOrangeLight,
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.clickable {
+                                        hdfcLoading = true
+                                        scope.launch {
+                                            delay(800)
+                                            hdfcBalance = "₹ 12,400.00"
+                                            hdfcLoading = false
+                                        }
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Check",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppOrange,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                AnimatedVisibility(
-                    visible = hdfcBalance != null,
-                    enter = fadeIn() + slideInVertically()
-                ) {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(Color(0xFFF0F0F0))
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                    AnimatedVisibility(
+                        visible = hdfcBalance != null,
+                        enter = fadeIn() + slideInVertically()
+                    ) {
+                        Column(modifier = Modifier.padding(top = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(LineBorder)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Available Balance",
+                                        fontSize = 13.sp,
+                                        color = MutedText
+                                    )
+                                    Text(
+                                        text = hdfcBalance.orEmpty(),
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = InkDark
+                                    )
+                                }
                                 Text(
-                                    text = "Available Balance",
+                                    text = "Hide",
                                     fontSize = 13.sp,
-                                    color = MutedText
-                                )
-                                Text(
-                                    text = hdfcBalance.orEmpty(),
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = InkDark
-                                )
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = AppIcons.Check,
-                                    contentDescription = null,
-                                    tint = SafeGreen,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Updated just now",
-                                    fontSize = 12.sp,
-                                    color = SafeGreen,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AppOrange,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .clickable { hdfcBalance = null }
+                                        .padding(4.dp)
                                 )
                             }
                         }

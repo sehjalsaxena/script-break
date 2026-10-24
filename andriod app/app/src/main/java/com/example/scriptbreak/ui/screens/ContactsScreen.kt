@@ -45,8 +45,8 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -120,8 +120,8 @@ fun ContactsScreen(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = InkDark,
                 unfocusedTextColor = InkDark,
-                cursorColor = AppPurple,
-                focusedBorderColor = AppPurple,
+                cursorColor = AppBlue,
+                focusedBorderColor = AppBlue,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White
@@ -196,14 +196,14 @@ fun ContactsScreen(
                             }
 
                             Surface(
-                                color = AppPurpleLight,
+                                color = AppBlueLight,
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
                                     text = contact.upiId,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = AppPurple,
+                                    color = AppBlue,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
                             }

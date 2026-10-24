@@ -32,7 +32,7 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.NumericKeypad
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
+import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
@@ -96,10 +96,10 @@ fun PinScreen(
                         modifier = Modifier
                             .size(20.dp)
                             .clip(CircleShape)
-                            .background(if (isFilled) AppPurple else Color.Transparent)
+                            .background(if (isFilled) AppBlue else Color.Transparent)
                             .border(
                                 width = 2.dp,
-                                color = if (isFilled) AppPurple else LineBorder,
+                                color = if (isFilled) AppBlue else LineBorder,
                                 shape = CircleShape
                             )
                     )

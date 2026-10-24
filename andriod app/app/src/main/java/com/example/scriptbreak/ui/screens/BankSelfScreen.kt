@@ -50,8 +50,8 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -91,11 +91,11 @@ fun BankSelfScreen(
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = Color.White,
-            contentColor = AppPurple,
+            contentColor = AppBlue,
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = AppPurple
+                    color = AppBlue
                 )
             },
             modifier = Modifier
@@ -150,8 +150,8 @@ fun BankSelfScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = InkDark,
                                 unfocusedTextColor = InkDark,
-                                cursorColor = AppPurple,
-                                focusedBorderColor = AppPurple,
+                                cursorColor = AppBlue,
+                                focusedBorderColor = AppBlue,
                                 unfocusedBorderColor = Color(0xFFDDE2EA),
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
@@ -169,8 +169,8 @@ fun BankSelfScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = InkDark,
                                 unfocusedTextColor = InkDark,
-                                cursorColor = AppPurple,
-                                focusedBorderColor = AppPurple,
+                                cursorColor = AppBlue,
+                                focusedBorderColor = AppBlue,
                                 unfocusedBorderColor = Color(0xFFDDE2EA),
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
@@ -188,8 +188,8 @@ fun BankSelfScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = InkDark,
                                 unfocusedTextColor = InkDark,
-                                cursorColor = AppPurple,
-                                focusedBorderColor = AppPurple,
+                                cursorColor = AppBlue,
+                                focusedBorderColor = AppBlue,
                                 unfocusedBorderColor = Color(0xFFDDE2EA),
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
@@ -207,8 +207,8 @@ fun BankSelfScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = InkDark,
                                 unfocusedTextColor = InkDark,
-                                cursorColor = AppPurple,
-                                focusedBorderColor = AppPurple,
+                                cursorColor = AppBlue,
+                                focusedBorderColor = AppBlue,
                                 unfocusedBorderColor = Color(0xFFDDE2EA),
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
@@ -252,12 +252,12 @@ fun BankSelfScreen(
                                     modifier = Modifier
                                         .size(40.dp)
                                         .clip(CircleShape)
-                                        .background(AppPurpleLight)
+                                        .background(AppBlueLight)
                                 ) {
                                     Icon(
                                         imageVector = AppIcons.AccountBalance,
                                         contentDescription = null,
-                                        tint = AppPurple,
+                                        tint = AppBlue,
                                         modifier = Modifier.size(22.dp)
                                     )
                                 }
@@ -284,12 +284,12 @@ fun BankSelfScreen(
                                     modifier = Modifier
                                         .size(40.dp)
                                         .clip(CircleShape)
-                                        .background(AppPurpleLight)
+                                        .background(AppBlueLight)
                                 ) {
                                     Icon(
                                         imageVector = AppIcons.AccountBalance,
                                         contentDescription = null,
-                                        tint = AppPurple,
+                                        tint = AppBlue,
                                         modifier = Modifier.size(22.dp)
                                     )
                                 }

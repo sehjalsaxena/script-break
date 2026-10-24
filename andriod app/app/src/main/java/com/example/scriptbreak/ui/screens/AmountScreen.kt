@@ -55,7 +55,8 @@ import com.example.scriptbreak.ui.components.NumericKeypad
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.model.AmountUi
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
@@ -175,7 +176,7 @@ fun AmountScreen(
                     .height(38.dp)
                     .clip(RoundedCornerShape(1.5.dp))
                     .graphicsLayer { alpha = cursorAlpha }
-                    .background(AppPurple)
+                    .background(AppOrange)
             )
         }
 
@@ -237,9 +238,9 @@ fun AmountScreen(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = InkDark,
                 unfocusedTextColor = InkDark,
-                focusedBorderColor = AppPurple,
+                focusedBorderColor = AppBlue,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
-                cursorColor = AppPurple,
+                cursorColor = AppBlue,
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White
             ),
