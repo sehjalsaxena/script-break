@@ -442,7 +442,7 @@ fun HomeScreen(
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "${txn.time} · Paid via UPI",
+                                        text = "${txn.time} · ${if (txn.isCredit) "Received via UPI" else "Paid via UPI"}",
                                         fontSize = 13.sp,
                                         color = MutedText
                                     )
@@ -453,7 +453,7 @@ fun HomeScreen(
                                         text = txn.amount,
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = InkDark
+                                        color = if (txn.isCredit) SafeGreen else InkDark
                                     )
                                     Text(
                                         text = "Completed",

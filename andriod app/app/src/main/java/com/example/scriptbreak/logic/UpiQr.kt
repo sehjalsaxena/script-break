@@ -6,7 +6,9 @@ import android.net.Uri
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
+import com.google.zxing.LuminanceSource
 import com.google.zxing.MultiFormatReader
+import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
@@ -45,10 +47,15 @@ object QrDecoder {
         DecodeHintType.TRY_HARDER to true,
     )
 
-    /** The text of the QR code in these ARGB pixels, or null if there is none. */
-    fun decode(pixels: IntArray, width: Int, height: Int): String? {
-        val source = RGBLuminanceSource(width, height, pixels)
-        // two ways of turning the photo into black and white, then once more for light-on-dark codes
+    /** The text of the QR code in these ARGB pixels (a picked image), or null if there is none. */
+    fun decode(pixels: IntArray, width: Int, height: Int): String? = decode(RGBLuminanceSource(width, height, pixels))
+
+    /** The same for one camera frame: its brightness (Y) plane, one byte per pixel. */
+    fun decodeLuminance(data: ByteArray, width: Int, height: Int): String? =
+        decode(PlanarYUVLuminanceSource(data, width, height, 0, 0, width, height, false))
+
+    private fun decode(source: LuminanceSource): String? {
+        // two ways of turning the picture into black and white, then once more for light-on-dark codes
         val attempts = listOf(
             BinaryBitmap(HybridBinarizer(source)),
             BinaryBitmap(GlobalHistogramBinarizer(source)),

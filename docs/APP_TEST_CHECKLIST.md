@@ -195,13 +195,28 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 
 ## 7f. Pay from a QR image
 
-Put the three images from `docs/demo_qr/` on the phone first (see `docs/demo_qr/README.md`).
+Put the three images from `docs/demo_qr/` on the phone (for "Pick a QR image") or show them on another screen (for the camera).
 
-- [ ] Home → QR icon in the search bar → the photo picker opens (no permission asked).
+- [ ] Home → QR icon in the search bar → the camera scanner opens and asks for camera permission once. Allow it.
+- [ ] Show `1_scam_refund_qr.png` on a laptop or another phone and point the camera at it → the payee page opens by itself.
+- [ ] A non-UPI QR (e.g. a website QR) → "This QR code is not a UPI payment code", and the scanner keeps scanning.
+- [ ] Deny the camera → "Camera permission is needed…" with **Allow camera**; **Pick a QR image instead** still works.
+- [ ] Judge mode → Sandbox → **Fill from a QR code** → scan or pick a QR → back in Judge mode with the amount and payee filled in, a note saying the QR's name is not verified, and the verdict updated.
 - [ ] Pick **3_rent_suresh_qr** → payee Suresh Verma, "Paid 14 times before", amber "From a QR code. Check the name and the amount…" → Pay → amount ₹18,000 and note "Rent" filled in → Continue → straight to the PIN.
 - [ ] Pick **2_tv_gupta_electronics_qr**, no call → ₹90,000 filled in, amber line only → Continue → straight to the PIN.
 - [ ] On a call, pick **1_scam_refund_qr** → payee **Ramesh K.**, banking name RAMESH KUMAR, amber "The QR says "Bank Refund Desk", but the banking name below is different…" → Pay → ₹20,000 → Continue → **Pause** ("This sends ₹20,000 out of your account…").
 - [ ] Pick a photo with no QR → "No QR code found in that image". A real shop QR (not @demoupi) → "This QR is for a real UPI ID… DemoPay only pays @demoupi IDs".
+
+## 7g. Money between Sambhav and Deepak (two phones, internet on both)
+
+- [ ] Phone A `sambhav`, Phone C `deepak`. Each sees the other in the people row and Contacts, never themselves.
+- [ ] Phone A: Check Balance → ₹2,48,250. Phone C: ₹1,86,400.
+- [ ] Phone A pays **Deepak Rawat** ₹500 (UPI PIN 4821) → Phone C shows **"Received ₹500 from Sambhav Jain"**; Home and History show +₹500 in green; Phone C's balance is ₹1,86,900.
+- [ ] Phone C pays **Sambhav Jain** ₹200 (UPI PIN 7316) → Phone A shows "Received ₹200 from Deepak Rawat".
+- [ ] Phone C logged out while Phone A pays → log in as deepak → the money is there.
+- [ ] Pay your own UPI ID (type `sambhav.jain@demoupi` as Sambhav) → "That's your own UPI ID".
+- [ ] Pay more than the balance → after the PIN: "Payment failed: not enough balance… Nothing left your account".
+- [ ] Settings → Reset demo → this person's balance is back to the start.
 
 ## 8. Not built yet (don't report as bugs)
 

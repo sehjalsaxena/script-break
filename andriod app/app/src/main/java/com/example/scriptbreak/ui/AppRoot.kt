@@ -80,6 +80,7 @@ import com.example.scriptbreak.ui.screens.SettingsScreen
 import com.example.scriptbreak.ui.screens.TrustedContactScreen
 import com.example.scriptbreak.ui.screens.PauseScreen
 import com.example.scriptbreak.ui.screens.PayToUpiScreen
+import com.example.scriptbreak.ui.screens.QrScannerScreen
 import com.example.scriptbreak.ui.screens.PayeeScreen
 import com.example.scriptbreak.ui.screens.PinScreen
 import com.example.scriptbreak.ui.screens.SuccessScreen
@@ -143,10 +144,17 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
         if (flow.familyMode && Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
     // "Pay from a QR image": the Android photo picker shares only the one image chosen (no storage permission)
+    // A QR from the camera or an image goes to the payment (Home) or to Judge mode's inputs. True = used.
+    fun useQr(text: String?): Boolean =
+        if (flow.qrForJudge) {
+            val problem = judge.fillFromQr(text)
+            if (problem == null) flow.closeQrScanner() else flow.showMessage(problem)
+            problem == null
+        } else flow.openFromQr(text)
     val pickQr = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) scope.launch {
             val text = withContext(Dispatchers.Default) { QrDecoder.decode(context, uri) }
-            flow.openFromQr(text)
+            useQr(text)
         }
     }
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -211,10 +219,8 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         userName = flow.profile.displayName,
                         onCall = flow.callNow,
                         screenShared = flow.screenShareNow,
-                        people = DemoWorld.homePeople.map { PersonUi(it.id, it.name, it.initials, it.upiId, it.colorHex) },
-                        recent = flow.ledger.mapIndexed { i, it ->
-                            TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount))
-                        }.reversed() + DemoWorld.seededRecent(flow.profile.id),
+                        people = DemoWorld.peopleFor(flow.profile.id).map { PersonUi(it.id, it.name, it.initials, it.upiId, it.colorHex) },
+                        recent = sessionTransactions(flow) + DemoWorld.seededRecent(flow.profile.id),
                     ),
                     onSendContact = flow::startContacts,
                     onPayUpiId = flow::startPayToUpi,
@@ -226,25 +232,23 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onNotifications = flow::startNotifications,
                     onAccount = flow::startAccount,
                     onSettings = flow::startSettings,
-                    onScanQr = { pickQr.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                    onScanQr = { flow.startQrScanner() },
                 )
 
                 Screen.Contacts -> ContactsScreen(
-                    contacts = DemoWorld.contacts,
+                    contacts = DemoWorld.contactsFor(flow.profile.id),
                     onSelectContact = flow::openContact,
                     onBack = { flow.back() }
                 )
 
                 Screen.AllPeople -> AllPeopleScreen(
-                    people = DemoWorld.homePeople + DemoWorld.payees.filter { it.status != "known" },
+                    people = DemoWorld.allPeopleFor(flow.profile.id),
                     onPerson = flow::openPerson,
                     onBack = { flow.back() }
                 )
 
                 Screen.History -> HistoryScreen(
-                    transactions = flow.ledger.mapIndexed { i, it ->
-                        TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount))
-                    }.reversed() + DemoWorld.seededRecent(flow.profile.id),
+                    transactions = sessionTransactions(flow) + DemoWorld.seededRecent(flow.profile.id),
                     onBack = { flow.back() }
                 )
 
@@ -256,6 +260,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
                 Screen.CheckBalance -> CheckBalanceScreen(
                     userProfileName = flow.profile.displayName,
+                    primaryBalance = "₹ ${grouped(flow.balance)}.00",
                     onBack = { flow.back() }
                 )
 
@@ -264,7 +269,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         val fromLedger = flow.ledger.reversed().mapNotNull { txn ->
                             DemoWorld.payees.firstOrNull { it.name == txn.payeeName }?.let { it.upiId to it.name }
                         }
-                        val knownPeople = DemoWorld.homePeople.map { it.upiId to it.name }
+                        val knownPeople = DemoWorld.peopleFor(flow.profile.id).map { it.upiId to it.name }
                         (fromLedger + knownPeople).distinctBy { it.first }.take(3)
                     }
                     PayToUpiScreen(
@@ -400,7 +405,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
                 Screen.Account -> AccountScreen(
                     userName = flow.profile.displayName,
-                    upiId = "${flow.account?.username ?: flow.profile.id}@demoupi",
+                    upiId = DemoWorld.ownUpi(flow.profile.id) ?: "${flow.account?.username ?: flow.profile.id}@demoupi",
                     phoneNumber = "+91 98765 43210",
                     trustedContactName = flow.contact.name,
                     onCheckBalance = flow::startCheckBalance,
@@ -425,8 +430,16 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() }
                 )
 
+                Screen.QrScanner -> QrScannerScreen(
+                    title = if (flow.qrForJudge) "QR into Judge inputs" else "Scan a QR code",
+                    onScanned = ::useQr,
+                    onPickImage = { pickQr.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                    onBack = { flow.back() },
+                )
+
                 Screen.Judge -> JudgeScreen(
                     judge = judge,
+                    onScanQr = { flow.startQrScanner(forJudge = true) },
                     simulateCall = flow.simulateCall,
                     onSimulateCall = { flow.simulateCall = it },
                     simulateScreenShare = flow.simulateScreenShare,
@@ -463,6 +476,13 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             }
         }
     }
+}
+
+/** This session's payments, paid and received, newest first (for Home and History). */
+private fun sessionTransactions(flow: PaymentFlow): List<TxnUi> {
+    val paid = flow.ledger.mapIndexed { i, it -> Triple(it.atMs, TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount)), 0) }
+    val got = flow.received.map { Triple(it.atMs, TxnUi("r-${it.id}", it.fromName, "Today", "+" + rupees(it.amount), isCredit = true), 1) }
+    return (paid + got).sortedByDescending { it.first }.map { it.second }
 }
 
 private fun displayName(context: Context, uri: Uri): String =

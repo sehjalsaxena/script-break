@@ -206,6 +206,7 @@ fun JudgeScreen(
     onLoadSample: () -> Unit,
     onBack: () -> Unit,
     resultsContent: @Composable () -> Unit = {},
+    onScanQr: (() -> Unit)? = null,
 ) {
     Column(
         modifier = Modifier
@@ -282,7 +283,8 @@ fun JudgeScreen(
                 onSimulateCall = onSimulateCall,
                 onRunInApp = onRunInApp,
                 simulateScreenShare = simulateScreenShare,
-                onSimulateScreenShare = onSimulateScreenShare
+                onSimulateScreenShare = onSimulateScreenShare,
+                onScanQr = onScanQr
             )
             1 -> StoriesTab(judge = judge)
             2 -> FileTab(
@@ -303,7 +305,8 @@ private fun InputsTab(
     onSimulateCall: (Boolean) -> Unit,
     onRunInApp: () -> Unit,
     simulateScreenShare: Boolean,
-    onSimulateScreenShare: (Boolean) -> Unit
+    onSimulateScreenShare: (Boolean) -> Unit,
+    onScanQr: (() -> Unit)? = null
 ) {
     val p = judge.inputs
 
@@ -324,6 +327,14 @@ private fun InputsTab(
                     judge.setAnswers(q1, q2)
                 }
             )
+        }
+
+        // A QR code fills the payee and amount (camera or image), then the verdict below updates live
+        if (onScanQr != null) {
+            item {
+                DemoSecondaryButton("Fill from a QR code (camera or image)", onScanQr)
+                judge.qrNote?.let { Text(it, fontSize = 13.sp, color = MutedText, modifier = Modifier.padding(top = 6.dp)) }
+            }
         }
 
         // Live AI Decision Verdict Banner

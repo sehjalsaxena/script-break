@@ -51,6 +51,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     // "Pay from a QR image": reads the UPI QR code in a picked image (classic decoder, no AI model)
     implementation("com.google.zxing:core:3.5.3")
+    // Live QR scanner: camera preview + frames (CameraX); frames are read in memory, never saved
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
     testImplementation(libs.junit)
     testImplementation("org.json:json:20240303")
     androidTestImplementation(platform(libs.androidx.compose.bom))

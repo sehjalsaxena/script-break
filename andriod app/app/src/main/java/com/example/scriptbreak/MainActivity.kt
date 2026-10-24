@@ -77,6 +77,10 @@ class MainActivity : ComponentActivity() {
             onCleared = { flow.onAlertCleared() },
         )
         flow.onFamilyLogin = { family.fetchLatest() }
+        // money between the demo people (e.g. Sambhav pays Deepak) arrives on the receiver's phone
+        flow.onSendMoney = { family.sendPayment(it) }
+        flow.onResetMoney = { family.clearPaymentsTo(it) }
+        family.listenPayments { flow.onMoneyReceived(it) }
         // remember who uses this phone, so only Sehjal's phone buzzes while it is on the login screen
         val prefs = getSharedPreferences("scriptbreak", MODE_PRIVATE)
         flow.phoneOwner = prefs.getString("last_user", null)

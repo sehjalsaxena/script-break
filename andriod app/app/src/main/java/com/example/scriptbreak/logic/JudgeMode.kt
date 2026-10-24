@@ -91,6 +91,26 @@ class JudgeMode(private val model: ScamModel?, val stories: List<Story>) {
     fun setAnswers(q1: Boolean?, q2: Boolean?) { this.q1 = q1; this.q2 = q2 }
     fun reset() { inputs = DEFAULT; q1 = null; q2 = null; storyId = null }
 
+    /** What the last QR filled in (shown under the QR button). */
+    var qrNote by mutableStateOf<String?>(null)
+
+    /**
+     * Judge mode: a QR code fills the payee and amount inputs (as Sambhav's phone sees that payee).
+     * Returns null when used, or the reason it could not be used.
+     */
+    fun fillFromQr(text: String?): String? {
+        val qr = UpiQr.parse(text) ?: return if (text == null) "No QR code found in that image" else "This QR code is not a UPI payment code"
+        if (!qr.upiId.endsWith("@demoupi")) return "This QR is for a real UPI ID (${qr.upiId}). DemoPay only uses @demoupi IDs."
+        val known = DemoWorld.payees.firstOrNull { it.upiId == qr.upiId }
+        val status = if (known?.status == "known") "known" else "new"
+        edit { it.copy(amount = qr.amount ?: it.amount, payeeStatus = status, payeeKind = known?.kind ?: "person", payeePasted = false) }
+        tab = 0
+        qrNote = "From the QR: ${qr.upiId} (${if (status == "known") "paid before" else "new payee"})" +
+            (qr.amount?.let { ", amount filled in" } ?: ", no amount in the QR") +
+            (qr.name?.let { ". The name in the QR, \"$it\", is not verified." } ?: ".")
+        return null
+    }
+
     fun loadStory(s: Story) {
         inputs = s.payment; q1 = s.q1; q2 = s.q2; storyId = s.id; tab = 0
     }

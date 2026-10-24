@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 fun CheckBalanceScreen(
     userProfileName: String,
     onBack: () -> Unit,
+    primaryBalance: String? = null,   // the live demo balance (opening + received - paid)
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -215,7 +216,7 @@ fun CheckBalanceScreen(
                                         sbiLoading = true
                                         scope.launch {
                                             delay(800)
-                                            sbiBalance = "₹ 48,250.00"
+                                            sbiBalance = primaryBalance ?: "₹ 48,250.00"
                                             sbiLoading = false
                                         }
                                     }

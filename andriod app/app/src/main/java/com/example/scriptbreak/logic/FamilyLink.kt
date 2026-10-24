@@ -5,6 +5,7 @@ import java.util.UUID
 import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.model.FamilyAlertUi
 import com.google.firebase.FirebaseApp
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -38,6 +39,9 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     private val deviceId: String = context.getSharedPreferences("scriptbreak", Context.MODE_PRIVATE).let { prefs ->
         prefs.getString("device_id", null) ?: UUID.randomUUID().toString().also { prefs.edit().putString("device_id", it).apply() }
     }
+
+    /** Demo payments between the team's phones (e.g. Sambhav pays Deepak). */
+    private val payments: DatabaseReference? = node?.parent?.child("payments")
 
     /** True when alerts can reach another phone (Firebase configured). */
     val online: Boolean get() = node != null
@@ -137,6 +141,54 @@ class FamilyLink(context: Context) : FamilyAlertSender {
             ))
             mine && status != "sent" && !onLogin -> onStatus(id, status)       // Sehjal answered OUR alert
             !mine && status == "called" -> onCleared()                        // handled on Sehjal's phone
+        }
+    }
+
+    /** Sends a demo payment to the receiver's phone: who, how much, the UPI reference and note. */
+    fun sendPayment(t: DemoTransfer) {
+        val ref = payments ?: return
+        signedIn {
+            ref.child(t.id).setValue(mapOf(
+                "to" to t.toProfile, "fromName" to t.fromName, "fromUpi" to t.fromUpi, "amount" to t.amount,
+                "atMs" to t.atMs, "upiRef" to t.upiRef, "note" to t.note,
+            ))
+        }
+    }
+
+    /** Every demo payment, including ones sent while this app was closed. Older than 24 hours: deleted. */
+    fun listenPayments(onReceived: (DemoTransfer) -> Unit) {
+        val ref = payments ?: return
+        signedIn {
+            ref.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(s: DataSnapshot, previous: String?) {
+                    val atMs = (s.child("atMs").value as? Number)?.toLong() ?: return
+                    if (System.currentTimeMillis() - atMs >= KEEP_FOR) { s.ref.removeValue(); return }
+                    onReceived(DemoTransfer(
+                        id = s.key ?: return,
+                        toProfile = s.child("to").value as? String ?: return,
+                        fromName = s.child("fromName").value as? String ?: "",
+                        fromUpi = s.child("fromUpi").value as? String ?: "",
+                        amount = (s.child("amount").value as? Number)?.toLong() ?: return,
+                        atMs = atMs,
+                        upiRef = s.child("upiRef").value as? String ?: "",
+                        note = s.child("note").value as? String ?: "",
+                    ))
+                }
+                override fun onChildChanged(s: DataSnapshot, previous: String?) {}
+                override fun onChildRemoved(s: DataSnapshot) {}
+                override fun onChildMoved(s: DataSnapshot, previous: String?) {}
+                override fun onCancelled(e: DatabaseError) {}
+            })
+        }
+    }
+
+    /** Reset demo: delete the money this person received. */
+    fun clearPaymentsTo(profileId: String) {
+        val ref = payments ?: return
+        signedIn {
+            ref.get().addOnSuccessListener { snap ->
+                snap.children.filter { it.child("to").value == profileId }.forEach { it.ref.removeValue() }
+            }
         }
     }
 

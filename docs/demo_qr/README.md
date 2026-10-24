@@ -9,7 +9,8 @@ Made with ZXing (`docs/demo_qr`). They use demo UPI IDs only (`@demoupi`), so no
 | `2_tv_gupta_electronics_qr.png` | `upi://pay?pa=guptaelectronics@demoupi&pn=Gupta%20Electronics&am=90000&cu=INR&tn=TV` | Genuine shop. No call: amber line only, then the PIN |
 | `3_rent_suresh_qr.png` | `upi://pay?pa=suresh.verma@demoupi&pn=Suresh%20Verma&am=18000&cu=INR&tn=Rent` | Usual landlord: nothing extra, straight to the PIN |
 
-**Getting them onto the phone:** send them to yourself (WhatsApp, Telegram or email) and save them to the gallery, or
-copy them over USB into `Pictures`. Then in DemoPay: Home → QR icon → pick the image.
+**Camera:** show the image on a laptop or another phone, then in DemoPay: Home → QR icon → point the camera at it.
+Judge mode: Sandbox → **Fill from a QR code**.
 
-A judge can also show any of them on a laptop screen: take a photo with the phone's camera, then pick that photo.
+**From the gallery:** send the images to yourself (WhatsApp, Telegram or email) and save them, or copy them over USB into
+`Pictures`. Then on the scanner screen tap **Pick a QR image instead**.

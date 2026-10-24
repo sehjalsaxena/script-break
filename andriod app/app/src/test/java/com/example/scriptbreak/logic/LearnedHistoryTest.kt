@@ -44,6 +44,9 @@ class LearnedHistoryTest {
     fun theUsualPaymentMovesAsThePersonPays() {
         val f = sharma()
         assertEquals(650.0, f.usualPayment, 0.0)
+        // enough money for 30 big payments (the demo balance would otherwise decline them); received money is not a payment
+        f.onMoneyReceived(DemoTransfer("salary", "sharma", "Employer", "employer@demoupi", 1_000_000, now, "4000"))
+        assertEquals(42, f.paymentsLast90d().size)
         repeat(30) { now += 60_000; f.payKnown("suresh", 20_000) }
         assertEquals(72, f.paymentsLast90d().size)
         assertTrue("usual payment learned from the 30 big payments: ${f.usualPayment}", f.usualPayment > 2000)

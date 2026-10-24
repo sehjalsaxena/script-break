@@ -70,6 +70,8 @@ class QrPaymentTest {
         f.toAmount()
         assertEquals("the QR's amount is filled in", 20_000L, f.amount)
         assertEquals("Refund verification", f.note)
+        assertTrue("the Safety check repeats the QR name warning: ${f.aiView!!.facts}",
+            f.aiView!!.facts.contains("⚠ The QR says \"Bank Refund Desk\", not the banking name"))
         f.pay()
         assertEquals(Screen.Pause, f.screen)
         assertTrue(f.pauseResult!!.reasons.contains(PaymentFlow.CALL_NOW))
@@ -81,7 +83,10 @@ class QrPaymentTest {
         rent.openFromQr(rentQr)
         assertEquals("known", rent.statusOf(rent.payee!!))
         assertEquals("From a QR code. Check the name and the amount before you pay.", rent.qrNotice)
-        rent.toAmount(); rent.pay()
+        rent.toAmount()
+        assertFalse("a matching QR name is not a warning", rent.qrNameMismatch)
+        assertTrue(rent.aiView!!.facts.none { it.contains("QR") })
+        rent.pay()
         assertEquals("rent to the usual landlord: straight to the PIN", Screen.Pin, rent.screen)
 
         val tv = sambhav()
@@ -108,6 +113,55 @@ class QrPaymentTest {
         assertEquals(PaymentFlow.LIMIT_MESSAGE, f.message)
         f.toAmount()
         assertEquals("over the limit: not filled in", 0L, f.amount)
+    }
+
+    @Test
+    fun decodesACameraFrame() {
+        val size = 480
+        val m = QRCodeWriter().encode(scamQr, BarcodeFormat.QR_CODE, size, size)
+        val y = ByteArray(size * size) { i -> if (m.get(i % size, i / size)) 0 else 255.toByte() }   // brightness plane
+        assertEquals(scamQr, QrDecoder.decodeLuminance(y, size, size))
+    }
+
+    @Test
+    fun cameraScannerOpensFromHomeAndBackGoesHome() {
+        val f = sambhav(call = true)
+        f.startQrScanner()
+        assertEquals(Screen.QrScanner, f.screen)
+        assertFalse("a non-UPI code keeps the scanner open", f.openFromQr("https://example.com"))
+        assertEquals(Screen.QrScanner, f.screen)
+        f.back()
+        assertEquals(Screen.Home, f.screen)
+        f.startQrScanner()
+        assertTrue(f.openFromQr(scamQr))
+        assertEquals(Screen.Payee, f.screen)
+    }
+
+    @Test
+    fun judgeModeFillsItsInputsFromAQr() {
+        val f = PaymentFlow(model, Signals(), { }).apply { assertTrue(login("judge", "0000")) }
+        val judge = JudgeMode(model, emptyList())
+        f.startQrScanner(forJudge = true)
+        assertEquals(Screen.QrScanner, f.screen)
+        assertNull(judge.fillFromQr(scamQr))
+        f.closeQrScanner()
+        assertEquals("back to Judge mode", Screen.Judge, f.screen)
+        assertEquals(20000.0, judge.inputs.amount, 0.0)
+        assertEquals("new", judge.inputs.payeeStatus)
+        assertEquals("person", judge.inputs.payeeKind)
+        assertTrue(judge.qrNote!!, judge.qrNote!!.contains("Bank Refund Desk") && judge.qrNote!!.contains("not verified"))
+
+        assertNull(judge.fillFromQr(tvQr))
+        assertEquals("merchant", judge.inputs.payeeKind)
+        assertNull(judge.fillFromQr(rentQr))
+        assertEquals("known", judge.inputs.payeeStatus)
+        assertEquals(18000.0, judge.inputs.amount, 0.0)
+
+        assertEquals("This QR code is not a UPI payment code", judge.fillFromQr("hello"))
+        assertTrue(judge.fillFromQr("upi://pay?pa=shop@okaxis")!!.contains("real UPI ID"))
+        assertEquals("unchanged after a bad QR", 18000.0, judge.inputs.amount, 0.0)
+        f.startQrScanner(forJudge = true); f.back()
+        assertEquals(Screen.Judge, f.screen)
     }
 
     @Test

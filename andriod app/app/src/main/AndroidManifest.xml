@@ -11,6 +11,9 @@
     <!-- On the trusted contact's phone: buzz and show the alert as a notification -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- QR scanner only: the camera runs only while the scanner screen is open; nothing is saved -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Read-aloud on the Critical screen uses the phone's text-to-speech engine -->
     <queries>

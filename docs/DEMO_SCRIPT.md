@@ -27,7 +27,7 @@ For the technical team, have ready:
 - the repo link and the check-in commit `f14de57`
 - [README.md](../README.md), which maps every form promise to the file that implements it
 - [DISCLOSURE.md](../DISCLOSURE.md)
-- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (72 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (81 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
 - the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
 
 ## Who holds what
@@ -61,11 +61,15 @@ The amber line appears ("…138× your usual payment"), tap **What the AI sees**
 *Say:* "The model alone would pause this. Our coaching check says a full-screen stop needs a sign that someone is steering
 the payment: a call, screen sharing, a pasted ID, switching apps. In a shop there is none, so there's just one line."
 
-**1c. Optional, if a judge asks about QR codes (40 s).** On a call, Home → QR icon → pick `1_scam_refund_qr`.
+**1c. Optional, if a judge asks about QR codes (40 s).** On a call, Home → QR icon → the camera opens → point it at
+`1_scam_refund_qr.png` shown on Phone C or a laptop (or tap "Pick a QR image instead").
 The payee page shows the real banking name (RAMESH KUMAR) and warns that the QR says "Bank Refund Desk". Pay → ₹20,000 is
 already filled in → Pause: "This sends ₹20,000 **out of** your account".
 *Say:* "The classic trick is 'scan this to receive your refund'. A QR is just another way to enter a payee, so the same AI
 checks it, and we never trust the name written inside the QR."
+
+**1d. Optional: real money flow between two phones (20 s).** Phone A pays **Deepak Rawat** ₹500. Phone C (logged in as
+`deepak`) shows "Received ₹500 from Sambhav Jain", and the balance goes up. Known person, normal amount: no warning at all.
 
 **2. The scam call (1 min).** Deepak calls Phone A from Phone C as a "CBI officer" (digital-arrest script). Phone A's Home shows **"Active phone call detected"**.
 Pay to UPI ID → type `ramesh.k@demoupi` → amount **₹20,000**.

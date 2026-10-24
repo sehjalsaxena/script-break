@@ -27,8 +27,9 @@ Libraries that prototype used: react, react-dom, vite, @vitejs/plugin-react, typ
 | Kotlin, Android Gradle Plugin | 2.2.10, 9.4.1 | Build |
 | JUnit | 4.13.2 | Unit tests |
 | org.json:json | 20240303 | Unit tests only: lets the model parity test read JSON on the computer (not in the app) |
-| Firebase Realtime Database + Firebase Authentication (anonymous) | firebase-bom 33.7.0 | "Ask family" alert between phones (free Spark plan). Sends only what the person chooses: who, amount, payee name, up to 3 reasons, the time, and a random install id. Deleted once Rohit answers, or after 24 hours. Not used for scoring. |
+| Firebase Realtime Database + Firebase Authentication (anonymous) | firebase-bom 33.7.0 | "Ask family" alert between phones (free Spark plan). Sends only what the person chooses: who, amount, payee name, up to 3 reasons, the time, and a random install id. Deleted once Sehjal answers, or after 24 hours. Also carries demo payments between the team's phones (e.g. Sambhav pays Deepak): receiver, sender's name and demo UPI ID, amount, UPI ref, note; deleted after 24 hours or on Reset demo. Not used for scoring. |
 | ZXing core (Apache 2.0) | 3.5.3 | "Pay from a QR image": reads the UPI QR code in an image the person picks, on the phone. A classic decoding algorithm, not an AI model. Also used once on a laptop to make the demo QR images in `docs/demo_qr/` |
+| CameraX (camera-camera2, camera-lifecycle, camera-view; Apache 2.0) | 1.3.4 | Live QR scanner: camera preview and frames, only while the scanner screen is open. Frames are read in memory by ZXing and never saved or sent |
 | Python | 3.13.14 (3.10+ works) | AI kit in `ml/` |
 | NumPy, SciPy, scikit-learn, joblib | 2.5.4, 1.18.1, 1.9.1, 1.6.0 (pinned in `ml/requirements.txt`) | Training the model (logistic regression, random forest, gradient boosting), evaluation, analyst clustering. Training only: the app scores with our own Kotlin code, no ML library |
 | Android text-to-speech, Android notifications/vibration | built into Android | Read-aloud on the Critical screen; buzzing the family phone |

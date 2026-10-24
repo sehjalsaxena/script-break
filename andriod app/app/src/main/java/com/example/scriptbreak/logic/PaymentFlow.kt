@@ -20,10 +20,22 @@ import kotlin.math.roundToLong
 enum class Screen {
     Login, UserPicker, Home, PayToUpi, Contacts, AllPeople, History, BankSelf, CheckBalance,
     Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst,
-    Report, TrustedContact, Notifications, Account, Settings
+    Report, TrustedContact, Notifications, Account, Settings, QrScanner
 }
 
 /** A payment made during this demo session (the app's own payment record). */
+/** Money between the demo people (e.g. Sambhav pays Deepak): it arrives on the receiver's phone through Firebase. */
+data class DemoTransfer(
+    val id: String,
+    val toProfile: String,     // the receiver's profile id (sharma | priya | rohit)
+    val fromName: String,
+    val fromUpi: String,
+    val amount: Long,
+    val atMs: Long,
+    val upiRef: String,
+    val note: String = "",
+)
+
 /** What the AI noticed for the payment being typed, in plain words (the "Safety check" card). */
 data class AiView(val level: String, val score: Double?, val facts: List<String>, val reminderOnly: Boolean = false)
 
@@ -124,6 +136,27 @@ class PaymentFlow(
     private val ledgers = mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>>()
     val ledger: androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>
         get() = ledgers.getOrPut(profile.id) { mutableStateListOf() }
+    /** Money received from the other demo people (all profiles; each person sees their own). */
+    private val incoming = mutableStateListOf<DemoTransfer>()
+    /** Called when a payment goes to another demo person: MainActivity sends it to their phone (Firebase). */
+    var onSendMoney: (DemoTransfer) -> Unit = {}
+    /** Called by Reset demo: MainActivity removes this person's received money from Firebase too. */
+    var onResetMoney: (String) -> Unit = {}
+
+    /** Money this person received in the demo, newest first. */
+    val received: List<DemoTransfer> get() = incoming.filter { it.toProfile == profile.id }.sortedByDescending { it.atMs }
+
+    /** Demo balance: opening balance + money received - money paid in this session. */
+    val balance: Long get() = profile.openingBalance + received.sumOf { it.amount } - ledger.sumOf { it.amount }
+
+    /** Money arrived (from Firebase, or from this same phone). Each transfer is counted once. */
+    fun onMoneyReceived(t: DemoTransfer) {
+        if (incoming.any { it.id == t.id }) return
+        incoming.add(t)
+        if (account?.mode == t.toProfile && clock() - t.atMs < 2 * 60 * 1000L)
+            message = "Received ${rupees(t.amount)} from ${t.fromName}"
+    }
+
     /** Rules approved in the analyst console (guardrail G3). */
     var approvedRules: List<ApprovedRule> = emptyList()
 
@@ -259,6 +292,7 @@ class PaymentFlow(
             Screen.Success -> done()
             Screen.Report -> screen = Screen.Success
             Screen.TrustedContact -> screen = Screen.Settings
+            Screen.QrScanner -> if (qrForJudge) closeQrScanner() else finish()
         }
         return true
     }
@@ -368,20 +402,27 @@ class PaymentFlow(
 
     fun toAmount() { amountDigits = prefillAmount; note = prefillNote; screen = Screen.Amount }
 
+    /** The live QR scanner, for paying (Home) or for filling Judge mode's inputs. */
+    var qrForJudge by mutableStateOf(false); private set
+    fun startQrScanner(forJudge: Boolean = false) { qrForJudge = forJudge; screen = Screen.QrScanner }
+    fun closeQrScanner() { if (qrForJudge) { qrForJudge = false; screen = Screen.Judge } else finish() }
+    fun showMessage(text: String) { message = text }
+
     /**
      * "Pay from a QR image". The QR is only another way to enter the payee: the same payee page,
      * the same AI check and the same UPI PIN follow. Only @demoupi IDs are paid (demo, no real money).
      */
-    fun openFromQr(text: String?) {
-        if (text == null) { message = "No QR code found in that image. Try a clearer picture."; return }
-        val qr = UpiQr.parse(text) ?: run { message = "This QR code is not a UPI payment code"; return }
+    /** Returns true when the QR was used and the payee page opened; false (with a message) otherwise. */
+    fun openFromQr(text: String?): Boolean {
+        if (text == null) { message = "No QR code found in that image. Try a clearer picture."; return false }
+        val qr = UpiQr.parse(text) ?: run { message = "This QR code is not a UPI payment code"; return false }
         if (!qr.upiId.endsWith("@demoupi")) {
             message = "This QR is for a real UPI ID (${qr.upiId}). DemoPay is a demo: it only pays @demoupi IDs, no real money."
-            return
+            return false
         }
         // the payee comes from the app's own records / the UPI ID, never from the name written in the QR
         val p = DemoWorld.payees.firstOrNull { it.upiId == qr.upiId } ?: DemoWorld.lookup(qr.upiId)
-            ?: run { message = "This QR has an invalid UPI ID"; return }
+            ?: run { message = "This QR has an invalid UPI ID"; return false }
         resetPayment()
         payee = p
         fromQr = true
@@ -394,19 +435,27 @@ class PaymentFlow(
         }
         prefillNote = qr.note.orEmpty()
         screen = Screen.Payee
+        return true
     }
 
     /** Shown on the payee page for a QR payment. The name inside a QR can say anything, so it is checked here. */
     val qrNotice: String?
         get() {
-            val p = payee ?: return null
-            if (!fromQr) return null
-            val n = qrName
+            if (payee == null || !fromQr) return null
+            return if (!qrNameMismatch) "From a QR code. Check the name and the amount before you pay."
+            else "From a QR code. The QR says \"$qrName\", but the banking name below is different. Check who you are paying."
+        }
+
+    /** The name written in the scanned QR is not the payee's name or banking name (a common trick). */
+    val qrNameMismatch: Boolean
+        get() {
+            val p = payee ?: return false
+            val n = qrName ?: return false
+            if (!fromQr) return false
             fun norm(s: String) = s.lowercase().filter(Char::isLetterOrDigit)
-            val matches = n == null || norm(n).let { q -> q.isNotEmpty() && (norm(p.name).contains(q) || q.contains(norm(p.name)) ||
-                norm(p.bankingName).contains(q) || q.contains(norm(p.bankingName))) }
-            return if (matches) "From a QR code. Check the name and the amount before you pay."
-            else "From a QR code. The QR says \"$n\", but the banking name below is different. Check who you are paying."
+            val q = norm(n)
+            if (q.isEmpty()) return false
+            return listOf(norm(p.name), norm(p.bankingName)).none { it.isNotEmpty() && (it.contains(q) || q.contains(it)) }
         }
 
     // ---- amount ------------------------------------------------------------------------------
@@ -430,6 +479,9 @@ class PaymentFlow(
     fun pay() {
         if (amount <= 0) return
         if (amount > DemoWorld.UPI_LIMIT) { message = LIMIT_MESSAGE; return }
+        if (returnTo == null && payee?.upiId != null && payee?.upiId == DemoWorld.ownUpi(profile.id)) {
+            message = "That's your own UPI ID. Pick someone else to pay."; return
+        }
         val r = assessSafely(null, null)
         if (r == null) {                     // fail-open: never block a payment because of our own error
             message = "Safety check unavailable. You can still pay."
@@ -549,12 +601,25 @@ class PaymentFlow(
             }
             return
         }
+        // like a real bank: a payment larger than the (demo) balance is declined, and nothing leaves the account
+        if (returnTo == null && amount > balance) {
+            message = "Payment failed: not enough balance (${rupees(balance)} available). Nothing left your account."
+            finish(); return
+        }
         val now = clock()
         val status = statusOf(p)
         // Judge/Analyst test payments are not real: they must not change anyone's history or the model's inputs
         if (returnTo == null) ledger.add(SessionPayment(p.id, p.name, amount, now, status == "new" || status == "recent", warnedThisPayment))
         val shown = criticalResult ?: pauseResult
         val upiRef = "4" + (now % 100_000_000_000L).toString().padStart(11, '0')
+        // paying another demo person (e.g. Deepak): the money arrives in their account, on this phone and on theirs
+        val receiver = DemoWorld.accountByUpi(p.upiId)
+        if (returnTo == null && receiver != null && receiver.mode != profile.id) {
+            val t = DemoTransfer("$now-${profile.id}", receiver.mode, profile.displayName, DemoWorld.ownUpi(profile.id).orEmpty(),
+                amount, now, upiRef, note)
+            onMoneyReceived(t)
+            onSendMoney(t)
+        }
         reportPacket = ReportPacket(
             amountText = rupees(amount), payeeName = p.name, payeeUpiId = p.upiId, upiRef = upiRef,
             whenText = SimpleDateFormat("d MMM yyyy, h:mm a", Locale.ENGLISH).format(Date(now)),
@@ -668,6 +733,7 @@ class PaymentFlow(
                 "flagged" -> warn += "⚠ Reported for fraud"
                 else -> ok += "✓ You've paid them before"
             }
+            if (judgeInputs == null && qrNameMismatch) warn += "⚠ The QR says \"$qrName\", not the banking name"
             val hasHistory = p.payments90d >= 10 && p.median90d > 0
             val ratio = if (hasHistory) p.amount / p.median90d else 0.0
             val usual = rupees(p.median90d.roundToLong())
@@ -689,6 +755,7 @@ class PaymentFlow(
     fun resetDemo() {
         ledgers.clear(); contacts.clear(); contacts.putAll(DEFAULT_CONTACTS); pendingContacts.clear()
         otpFor = null; demoOtp = null; lastAlert = null; simulateCall = false; simulateScreenShare = false
+        incoming.removeAll { it.toProfile == profile.id }; onResetMoney(profile.id)
         resetPayment()
         message = "Demo reset: payment history is back to the start"
     }

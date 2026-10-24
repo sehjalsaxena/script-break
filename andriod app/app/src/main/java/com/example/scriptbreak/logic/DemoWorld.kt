@@ -13,7 +13,8 @@ data class Profile(
     val median90d: Double,      // usual (median) payment in the synthetic 90-day history the demo starts with
     val payments90d: Int,       // number of payments in that history
     val contactName: String,    // trusted contact for "Ask family"
-    val shownToFamilyAs: String // how the trusted contact's phone names this person
+    val shownToFamilyAs: String,// how the trusted contact's phone names this person
+    val openingBalance: Long = 0, // demo balance before this session's payments (synthetic)
 )
 
 data class PayeeRecord(
@@ -41,6 +42,7 @@ data class Account(
     val upiPinHash: String?,       // only people who pay have a UPI PIN
     val demoLoginPin: String,      // shown on the login screen (demo only)
     val demoUpiPin: String?,
+    val upiId: String? = null,     // this person's own demo UPI ID (others can pay it)
 ) {
     fun checkLogin(pin: String) = DemoWorld.hash("$username:$pin") == loginPinHash
     fun checkUpiPin(pin: String) = upiPinHash != null && DemoWorld.hash("$username-upi:$pin") == upiPinHash
@@ -61,9 +63,9 @@ object DemoWorld {
     const val UPI_LIMIT = 100_000L
 
     val accounts: List<Account> = listOf(
-        Account("sambhav", "Sambhav Jain", mode = "sharma", loginPinHash = "ba9daeba79544e90605d91663f69a50ee8655080c1505c869f2bebcb7a2de7eb", upiPinHash = "3833b52b6eea3d8af29f5963cfba0d4d13c01165ce25fae17e75f968c491e9d8", demoLoginPin = "1111", demoUpiPin = "4821"),
-        Account("deepak", "Deepak Rawat", mode = "priya", loginPinHash = "2fda858c3af4887cfb817e4937a32673b0746e4a9bd22dc123dc5c51efd00fc9", upiPinHash = "486eb1896cba6cdd1dd5beae845bca5a27fc1c810bafe162bc40b11beffa42d3", demoLoginPin = "2222", demoUpiPin = "7316"),
-        Account("sehjal", "Sehjal Saxena", mode = "rohit", loginPinHash = "241d05bd50b7bbb45b47bc989f746535fb7caa56109678ca7a82fe9167321cfa", upiPinHash = null, demoLoginPin = "3333", demoUpiPin = null),
+        Account("sambhav", "Sambhav Jain", mode = "sharma", loginPinHash = "ba9daeba79544e90605d91663f69a50ee8655080c1505c869f2bebcb7a2de7eb", upiPinHash = "3833b52b6eea3d8af29f5963cfba0d4d13c01165ce25fae17e75f968c491e9d8", demoLoginPin = "1111", demoUpiPin = "4821", upiId = "sambhav.jain@demoupi"),
+        Account("deepak", "Deepak Rawat", mode = "priya", loginPinHash = "2fda858c3af4887cfb817e4937a32673b0746e4a9bd22dc123dc5c51efd00fc9", upiPinHash = "486eb1896cba6cdd1dd5beae845bca5a27fc1c810bafe162bc40b11beffa42d3", demoLoginPin = "2222", demoUpiPin = "7316", upiId = "deepak.rawat@demoupi"),
+        Account("sehjal", "Sehjal Saxena", mode = "rohit", loginPinHash = "241d05bd50b7bbb45b47bc989f746535fb7caa56109678ca7a82fe9167321cfa", upiPinHash = null, demoLoginPin = "3333", demoUpiPin = null, upiId = "sehjal.saxena@demoupi"),
         Account("judge", "Judge", mode = "judge", loginPinHash = "72cdfeadb538864524a9e9a8641acf4a305c9b21d757a2c144de8c6744bb08c6", upiPinHash = null, demoLoginPin = "0000", demoUpiPin = null),
         Account("analyst", "Analyst", mode = "analyst", loginPinHash = "f1806240e1e119d841fdb68070019777d55c9e57d56d02f1bc2dbe28da141c9e", upiPinHash = null, demoLoginPin = "9999", demoUpiPin = null),
     )
@@ -74,8 +76,8 @@ object DemoWorld {
         MessageDigest.getInstance("SHA-256").digest("scriptbreak:$s".toByteArray()).joinToString("") { "%02x".format(it) }
 
     val profiles: Map<String, Profile> = listOf(
-        Profile("sharma", "Sambhav Jain", median90d = 650.0, payments90d = 42, contactName = "Sehjal", shownToFamilyAs = "Sambhav"),
-        Profile("priya", "Deepak Rawat", median90d = 1200.0, payments90d = 60, contactName = "Sehjal", shownToFamilyAs = "Deepak"),
+        Profile("sharma", "Sambhav Jain", median90d = 650.0, payments90d = 42, contactName = "Sehjal", shownToFamilyAs = "Sambhav", openingBalance = 248_250),
+        Profile("priya", "Deepak Rawat", median90d = 1200.0, payments90d = 60, contactName = "Sehjal", shownToFamilyAs = "Deepak", openingBalance = 186_400),
     ).associateBy { it.id }
 
     val payees: List<PayeeRecord> = listOf(
@@ -84,6 +86,9 @@ object DemoWorld {
         PayeeRecord("suresh", "Suresh Verma", "suresh.verma@demoupi", "SURESH KUMAR VERMA", status = "known", paidTimes = 14, initials = "SV", colorHex = "#4F7FB0"),
         PayeeRecord("sunita", "Sunita Iyer", "sunita.iyer@demoupi", "SUNITA IYER", status = "known", paidTimes = 9, initials = "SI", colorHex = "#D0679A"),
         PayeeRecord("kirana", "Sharma Kirana Store", "sharmakirana@demoupi", "SHARMA GENERAL STORE", kind = "merchant", status = "known", paidTimes = 23, initials = "SK", colorHex = "#4F9B7A"),
+        // the two payers in the demo: each can pay the other (money arrives on the other's phone)
+        PayeeRecord("sambhav", "Sambhav Jain", "sambhav.jain@demoupi", "SAMBHAV JAIN", status = "known", paidTimes = 5, initials = "SJ", colorHex = "#C2185B"),
+        PayeeRecord("deepak", "Deepak Rawat", "deepak.rawat@demoupi", "DEEPAK RAWAT", status = "known", paidTimes = 5, initials = "DR", colorHex = "#00897B"),
         // never paid: reached by typing or pasting their UPI ID
         PayeeRecord("ramesh", "Ramesh K.", "ramesh.k@demoupi", "RAMESH KUMAR", initials = "RK", colorHex = "#6B74D6"),
         PayeeRecord("anil", "Anil Mehta", "anil.mehta@demoupi", "ANIL MEHTA", initials = "AM", colorHex = "#B07A3A"),
@@ -92,6 +97,18 @@ object DemoWorld {
     )
 
     val homePeople: List<PayeeRecord> get() = payees.filter { it.status == "known" }
+
+    /** This person's own demo UPI ID (null for Judge / Analyst). */
+    fun ownUpi(profileId: String): String? = accounts.firstOrNull { it.mode == profileId }?.upiId
+
+    /** The demo person who owns this UPI ID, if any (their phone receives the money). */
+    fun accountByUpi(upiId: String): Account? = accounts.firstOrNull { it.upiId != null && it.upiId == upiId.trim().lowercase() }
+
+    /** People and contacts as one person sees them: never themselves. */
+    fun peopleFor(profileId: String): List<PayeeRecord> = homePeople.filter { it.upiId != ownUpi(profileId) }
+    fun contactsFor(profileId: String): List<ContactItem> = contacts.filter { it.upiId != ownUpi(profileId) }
+    fun allPeopleFor(profileId: String): List<PayeeRecord> =
+        peopleFor(profileId) + payees.filter { it.status != "known" && it.upiId != ownUpi(profileId) }
 
     val contacts: List<ContactItem> = listOf(
         ContactItem("c1", "Sehjal Saxena", "+91 98765 43210", "sehjal.saxena@demoupi", "SS", "#3D8FD1", "rohit"),
@@ -102,6 +119,8 @@ object DemoWorld {
         // Ramesh K. (the scammer's account in the demo) is deliberately NOT a saved contact: the caller dictates his UPI ID
         ContactItem("c7", "Manoj Electricals", "+91 98666 11223", "manoj.elec@demoupi", "ME", "#7A8A3A", "manoj"),
         ContactItem("c8", "Gupta Electronics", "+91 98777 22334", "guptaelectronics@demoupi", "GE", "#8A5BB0", "gupta"),
+        ContactItem("c9", "Deepak Rawat", "+91 98888 33445", "deepak.rawat@demoupi", "DR", "#00897B", "deepak"),
+        ContactItem("c10", "Sambhav Jain", "+91 98999 44556", "sambhav.jain@demoupi", "SJ", "#C2185B", "sambhav"),
     )
 
     fun byId(id: String): PayeeRecord? = payees.firstOrNull { it.id == id }

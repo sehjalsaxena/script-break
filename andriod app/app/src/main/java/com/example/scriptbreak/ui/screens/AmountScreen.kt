@@ -60,6 +60,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
+import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
 import com.example.scriptbreak.ui.theme.NudgeAmberBar
@@ -241,7 +242,7 @@ fun AmountScreen(
                 focusedTextColor = InkDark,
                 unfocusedTextColor = InkDark,
                 focusedBorderColor = AppBlue,
-                unfocusedBorderColor = Color(0xFFDDE2EA),
+                unfocusedBorderColor = LineBorder,
                 cursorColor = AppBlue,
                 focusedContainerColor = AppSurface,
                 unfocusedContainerColor = AppSurface
@@ -282,17 +283,18 @@ private fun SafetyCheckCard(level: String, score: Double?, facts: List<String>, 
         else -> MutedText to "Check not available"
     }
     Surface(
-        color = Color.White,
+        color = AppSurface,   // follows light / dark mode
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDDE2EA)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),
         modifier = Modifier.fillMaxWidth().clickable { open = !open }
     ) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Safety check", fontSize = 15.sp, color = MutedText, maxLines = 1)
-                Text("  $label", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = color,
-                    maxLines = 1, modifier = Modifier.weight(1f))
-                Text(if (open) "Hide ▲" else "Why? ▼", fontSize = 13.sp, color = AppPurple)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Safety check", fontSize = 13.sp, color = MutedText)
+                    Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = color)
+                }
+                Text(if (open) "Hide ▲" else "Why? ▼", fontSize = 14.sp, color = AppPurple)
             }
             if (open) {
                 Spacer(modifier = Modifier.height(6.dp))

@@ -213,7 +213,7 @@ fun HistoryScreen(
                                 text = txn.amount,
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = InkDark
+                                color = if (txn.isCredit) SafeGreen else InkDark
                             )
                         }
                     }

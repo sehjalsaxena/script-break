@@ -43,6 +43,7 @@ import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import com.example.scriptbreak.ui.theme.FaintText
 import com.example.scriptbreak.ui.theme.InkDark
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
@@ -104,7 +105,7 @@ fun AnalystScreen(analyst: AnalystMode, onRunInApp: () -> Unit, onBack: () -> Un
 
 @Composable
 private fun Card(content: @Composable () -> Unit) {
-    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
     }
 }
