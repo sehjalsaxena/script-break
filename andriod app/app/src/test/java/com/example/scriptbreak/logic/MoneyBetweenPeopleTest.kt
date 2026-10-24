@@ -105,6 +105,26 @@ class MoneyBetweenPeopleTest {
     }
 
     @Test
+    fun sambhavPaysSehjalWithHerQr() {
+        val text = "upi://pay?pa=sehjal.saxena@demoupi&pn=Sehjal%20Saxena&cu=INR"   // docs/demo_qr/6_pay_sehjal_qr.png
+        val sent = mutableListOf<DemoTransfer>()
+        val sambhav = phone("sambhav", "1111", sent)
+        assertTrue(sambhav.openFromQr(text))
+        assertEquals("Sehjal Saxena", sambhav.payee!!.name)
+        assertEquals("known", sambhav.statusOf(sambhav.payee!!))
+        assertFalse(sambhav.qrNameMismatch)
+        sambhav.toAmount(); "300".forEach { sambhav.amountDigit(it.digitToInt()) }; sambhav.pay()
+        assertEquals("paid before, normal amount: straight to the PIN", Screen.Pin, sambhav.screen)
+        "4821".forEach { sambhav.pinDigit(it.digitToInt()) }; sambhav.pinSubmit()
+        assertEquals(Screen.Success, sambhav.screen)
+        assertEquals("rohit", sent.single().toProfile)
+
+        val sehjal = phone("sehjal", "3333", mutableListOf())
+        sehjal.onMoneyReceived(sent.single())
+        assertEquals("Received ₹300 from Sambhav Jain", sehjal.message)
+    }
+
+    @Test
     fun youCannotPayYourselfOrMoreThanYouHave() {
         val sent = mutableListOf<DemoTransfer>()
         val f = phone("sambhav", "1111", sent)

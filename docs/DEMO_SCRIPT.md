@@ -27,7 +27,7 @@ For the technical team, have ready:
 - the repo link and the check-in commit `f14de57`
 - [README.md](../README.md), which maps every form promise to the file that implements it
 - [DISCLOSURE.md](../DISCLOSURE.md)
-- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (86 tests) and `python run_all_tests.py` (21 passed) were already run, with the output on screen
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (87 tests) and `python run_all_tests.py` (21 passed) were already run, with the output on screen
 - the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
 
 ## Who holds what
