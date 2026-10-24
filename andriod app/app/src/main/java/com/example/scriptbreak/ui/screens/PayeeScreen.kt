@@ -34,6 +34,7 @@ import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.model.PayeeUi
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
@@ -126,7 +127,7 @@ fun PayeeScreen(
 
             // Verified banking name card
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(16.dp),
                 shadowElevation = 1.dp,
                 modifier = Modifier.fillMaxWidth()

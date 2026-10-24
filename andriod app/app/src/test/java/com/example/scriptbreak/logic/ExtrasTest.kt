@@ -92,4 +92,28 @@ class ExtrasTest {
         assertTrue(d.byType.all { it.neverSeen != null })
         assertTrue("fairness table present", d.fairness.keys.any { it.startsWith("First-time users") })
     }
+
+    @Test
+    fun darkModeTogglesAndPersists() {
+        val f = sharma()
+        assertEquals(false, f.isDarkMode)
+        f.toggleDarkMode()
+        assertEquals(true, f.isDarkMode)
+        f.isDarkMode = false
+        assertEquals(false, f.isDarkMode)
+        f.isDarkMode = true
+        assertEquals(true, f.isDarkMode)
+    }
+
+    @Test
+    fun languageTogglesAndSyncsAcrossApp() {
+        val f = sharma()
+        assertEquals(false, f.hindi)
+        f.toggleHindi()
+        assertEquals(true, f.hindi)
+        f.hindi = false
+        assertEquals(false, f.hindi)
+        f.hindi = true
+        assertEquals(true, f.hindi)
+    }
 }

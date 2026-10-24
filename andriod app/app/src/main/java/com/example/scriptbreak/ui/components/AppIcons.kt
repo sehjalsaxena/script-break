@@ -805,4 +805,60 @@ object AppIcons {
         horizontalLineTo(19f)
         close()
     }.build()
+
+    val DarkMode: ImageVector = ImageVector.Builder(
+        name = "DarkMode",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(12.3f, 2f)
+        curveTo(6.78f, 2.05f, 2.3f, 6.57f, 2.3f, 12.1f)
+        curveTo(2.3f, 17.62f, 6.78f, 22.1f, 12.3f, 22.1f)
+        curveTo(16.78f, 22.1f, 20.57f, 19.14f, 21.84f, 15.03f)
+        curveTo(20.91f, 15.35f, 19.92f, 15.53f, 18.9f, 15.53f)
+        curveTo(13.65f, 15.53f, 9.4f, 11.28f, 9.4f, 6.03f)
+        curveTo(9.4f, 4.41f, 9.8f, 2.89f, 10.51f, 1.55f)
+        curveTo(9.78f, 1.84f, 9.07f, 2.22f, 8.41f, 2.68f)
+        close()
+    }.build()
+
+    val Language: ImageVector = ImageVector.Builder(
+        name = "Language",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(11.99f, 2f)
+        curveTo(6.47f, 2f, 2f, 6.48f, 2f, 12f)
+        curveTo(2f, 17.52f, 6.47f, 22f, 11.99f, 22f)
+        curveTo(17.52f, 22f, 22f, 17.52f, 22f, 12f)
+        curveTo(22f, 6.48f, 17.52f, 2f, 11.99f, 2f)
+        close()
+        moveTo(17.92f, 7f)
+        horizontalLineTo(14.89f)
+        curveTo(14.56f, 5.4f, 14.02f, 3.91f, 13.31f, 2.58f)
+        curveTo(15.28f, 3.39f, 16.91f, 4.96f, 17.92f, 7f)
+        close()
+        moveTo(12f, 4.04f)
+        curveTo(12.67f, 5.25f, 13.16f, 6.58f, 13.43f, 8f)
+        horizontalLineTo(10.57f)
+        curveTo(10.84f, 6.58f, 11.33f, 5.25f, 12f, 4.04f)
+        close()
+        moveTo(4.26f, 14f)
+        curveTo(4.1f, 13.36f, 4f, 12.69f, 4f, 12f)
+        curveTo(4f, 11.31f, 4.1f, 10.64f, 4.26f, 10f)
+        horizontalLineTo(7.64f)
+        curveTo(7.56f, 10.65f, 7.5f, 11.32f, 7.5f, 12f)
+        curveTo(7.5f, 12.68f, 7.56f, 13.35f, 7.64f, 14f)
+        horizontalLineTo(4.26f)
+        close()
+        moveTo(12f, 19.96f)
+        curveTo(11.33f, 18.75f, 10.84f, 17.42f, 10.57f, 16f)
+        horizontalLineTo(13.43f)
+        curveTo(13.16f, 17.42f, 12.67f, 18.75f, 12f, 19.96f)
+        close()
+    }.build()
 }

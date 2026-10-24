@@ -41,6 +41,7 @@ import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -76,7 +77,7 @@ fun PayToUpiScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Surface(
-            color = Color.White,
+            color = AppSurface,
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 1.dp,
             modifier = Modifier.fillMaxWidth()
@@ -122,8 +123,8 @@ fun PayToUpiScreen(
                         focusedBorderColor = AppBlue,
                         unfocusedBorderColor = Color(0xFFDDE2EA),
                         cursorColor = AppBlue,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        focusedContainerColor = AppSurface,
+                        unfocusedContainerColor = AppSurface
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -148,7 +149,7 @@ fun PayToUpiScreen(
         ) {
             recentPayees.forEach { (id, name) ->
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(14.dp),
                     shadowElevation = 0.5.dp,
                     modifier = Modifier

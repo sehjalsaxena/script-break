@@ -95,4 +95,32 @@
     <string name="family_alert_disclaimer">Rohit can\'t see the account or stop the payment.</string>
     <string name="family_alert_call_now">Call %1$s now</string>
     <string name="family_alert_called">I\'ve called</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_display_group">Display &amp; Appearance</string>
+    <string name="settings_dark_mode">Dark Mode</string>
+    <string name="settings_dark_mode_sub">Sleek midnight dark theme</string>
+    <string name="settings_language">App Language / भाषा</string>
+    <string name="settings_language_en">English (US)</string>
+    <string name="settings_language_hi">हिन्दी (Hindi)</string>
+    <string name="settings_security_group">ScriptBreak Scam Safeguards</string>
+    <string name="settings_trusted_contact">Trusted Family Contact</string>
+    <string name="settings_trusted_contact_sub">%1$s • 24h delay protected</string>
+    <string name="settings_call_monitoring">Live Call Scam Interception</string>
+    <string name="settings_call_monitoring_sub">Alerts on active calls during transfer</string>
+    <string name="settings_screen_shield">Screen-Share Protection</string>
+    <string name="settings_screen_shield_sub">Blocks payments during remote access</string>
+    <string name="settings_adaptive_baseline">Learned Payment Baseline</string>
+    <string name="settings_adaptive_baseline_sub">Nudges when amount is unusual for payee</string>
+    <string name="settings_payments_group">Payments &amp; Bank Preferences</string>
+    <string name="settings_profile_accounts">Profile &amp; Accounts</string>
+    <string name="settings_profile_accounts_sub">Manage linked bank accounts and QR code</string>
+    <string name="settings_check_balance">Check Bank Balance</string>
+    <string name="settings_check_balance_sub">Primary: Demo Bank •••• 4821</string>
+    <string name="settings_system_group">System &amp; Diagnostics</string>
+    <string name="settings_engine">ScriptBreak Engine</string>
+    <string name="settings_engine_sub">Model: %1$s</string>
+    <string name="settings_reset_demo">Reset Demo (Clear Session Data)</string>
+    <string name="settings_sign_out">Sign Out</string>
 </resources>

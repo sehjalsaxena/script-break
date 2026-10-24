@@ -44,6 +44,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
@@ -69,7 +70,10 @@ fun NotificationsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val notifications = remember {
+    val blueLight = AppBlueLight
+    val orangeLight = AppOrangeLight
+
+    val notifications = remember(blueLight, orangeLight) {
         mutableStateListOf(
             NotificationItem(
                 id = "1",
@@ -101,7 +105,7 @@ fun NotificationsScreen(
                 category = "Security",
                 icon = AppIcons.Person,
                 iconTint = AppBlue,
-                iconBg = AppBlueLight,
+                iconBg = blueLight,
                 unread = false
             ),
             NotificationItem(
@@ -112,7 +116,7 @@ fun NotificationsScreen(
                 category = "Security",
                 icon = AppIcons.Lock,
                 iconTint = AppOrange,
-                iconBg = AppOrangeLight,
+                iconBg = orangeLight,
                 unread = false
             ),
             NotificationItem(
@@ -123,7 +127,7 @@ fun NotificationsScreen(
                 category = "Transactions",
                 icon = AppIcons.AccountBalance,
                 iconTint = AppBlue,
-                iconBg = AppBlueLight,
+                iconBg = blueLight,
                 unread = false
             )
         )
@@ -184,7 +188,7 @@ fun NotificationsScreen(
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = AppBlue,
                         selectedLabelColor = Color.White,
-                        containerColor = Color.White,
+                        containerColor = AppSurface,
                         labelColor = InkDark
                     ),
                     shape = RoundedCornerShape(20.dp),
@@ -244,7 +248,7 @@ fun NotificationsScreen(
             ) {
                 items(filteredList, key = { it.id }) { item ->
                     Surface(
-                        color = Color.White,
+                        color = AppSurface,
                         shape = RoundedCornerShape(14.dp),
                         shadowElevation = 0.5.dp,
                         modifier = Modifier

@@ -52,6 +52,7 @@ import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -125,7 +126,7 @@ fun BankSelfScreen(
             if (selectedTab == 0) {
                 // Bank Account Form
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(16.dp),
                     shadowElevation = 0.5.dp,
                     modifier = Modifier.fillMaxWidth()
@@ -221,7 +222,7 @@ fun BankSelfScreen(
             } else {
                 // To Self Form
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(16.dp),
                     shadowElevation = 0.5.dp,
                     modifier = Modifier.fillMaxWidth()

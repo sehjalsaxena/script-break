@@ -44,6 +44,7 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
@@ -124,8 +125,8 @@ fun AllPeopleScreen(
                 cursorColor = AppPurple,
                 focusedBorderColor = AppPurple,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                focusedContainerColor = AppSurface,
+                unfocusedContainerColor = AppSurface
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -161,7 +162,7 @@ fun AllPeopleScreen(
             ) {
                 items(filteredPeople, key = { it.id }) { person ->
                     Surface(
-                        color = Color.White,
+                        color = AppSurface,
                         shape = RoundedCornerShape(14.dp),
                         shadowElevation = 0.5.dp,
                         modifier = Modifier

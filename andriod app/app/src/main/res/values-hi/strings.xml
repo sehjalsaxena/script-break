@@ -95,4 +95,32 @@
     <string name="family_alert_disclaimer">रोहित खाता नहीं देख सकते और न ही भुगतान रोक सकते हैं।</string>
     <string name="family_alert_call_now">%1$s को अभी कॉल करें</string>
     <string name="family_alert_called">मैंने कॉल कर लिया है</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="settings_display_group">डिस्प्ले और उपस्थिति</string>
+    <string name="settings_dark_mode">डार्क मोड</string>
+    <string name="settings_dark_mode_sub">कम रोशनी के लिए आरामदायक डार्क थीम</string>
+    <string name="settings_language">ऐप की भाषा / Language</string>
+    <string name="settings_language_en">English (US)</string>
+    <string name="settings_language_hi">हिन्दी (Hindi)</string>
+    <string name="settings_security_group">ScriptBreak धोखाधड़ी सुरक्षा</string>
+    <string name="settings_trusted_contact">विश्वसनीय पारिवारिक संपर्क</string>
+    <string name="settings_trusted_contact_sub">%1$s • 24 घंटे की सुरक्षा सक्रिय</string>
+    <string name="settings_call_monitoring">लाइव कॉल धोखाधड़ी सुरक्षा</string>
+    <string name="settings_call_monitoring_sub">कॉल के दौरान भुगतान करने पर चेतावनी</string>
+    <string name="settings_screen_shield">स्क्रीन-शेयर सुरक्षा</string>
+    <string name="settings_screen_shield_sub">रिमोट एक्सेस या रिकॉर्डिंग के दौरान भुगतान रोकें</string>
+    <string name="settings_adaptive_baseline">भुगतान विसंगति पहचान</string>
+    <string name="settings_adaptive_baseline_sub">असामान्य राशि होने पर सचेत करें</string>
+    <string name="settings_payments_group">भुगतान और बैंक प्राथमिकताएं</string>
+    <string name="settings_profile_accounts">प्रोफ़ाइल और खाते</string>
+    <string name="settings_profile_accounts_sub">जुड़े बैंक खाते और QR कोड प्रबंधित करें</string>
+    <string name="settings_check_balance">बैंक बैलेंस देखें</string>
+    <string name="settings_check_balance_sub">प्राथमिक: Demo Bank •••• 4821</string>
+    <string name="settings_system_group">सिस्टम और विवरण</string>
+    <string name="settings_engine">ScriptBreak इंजन</string>
+    <string name="settings_engine_sub">मॉडल: %1$s</string>
+    <string name="settings_reset_demo">डेमो रीसेट करें (सत्र डेटा साफ़ करें)</string>
+    <string name="settings_sign_out">साइन आउट</string>
 </resources>

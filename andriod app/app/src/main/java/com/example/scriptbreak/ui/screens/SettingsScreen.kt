@@ -35,21 +35,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueElectric
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
-import com.example.scriptbreak.ui.theme.CritRed
-import com.example.scriptbreak.ui.theme.CritRedTint
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
+import com.example.scriptbreak.ui.theme.LocalDarkTheme
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
@@ -58,6 +61,10 @@ import com.example.scriptbreak.ui.theme.SafeGreenTint
 fun SettingsScreen(
     trustedContactName: String,
     modelVersion: String,
+    isDarkMode: Boolean = false,
+    onToggleDarkMode: (Boolean) -> Unit = {},
+    isHindi: Boolean = false,
+    onToggleLanguage: (Boolean) -> Unit = {},
     onTrustedContact: () -> Unit,
     onCheckBalance: () -> Unit,
     onAccount: () -> Unit,
@@ -71,7 +78,6 @@ fun SettingsScreen(
     var callMonitoring by remember { mutableStateOf(true) }
     var screenRecordingShield by remember { mutableStateOf(true) }
     var adaptiveLearning by remember { mutableStateOf(true) }
-    var hindiLanguage by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -81,7 +87,7 @@ fun SettingsScreen(
             .navigationBarsPadding()
     ) {
         AppTopBar(
-            title = "Settings",
+            title = stringResource(R.string.settings_title),
             onBack = onBack,
             showScriptBreakBadge = true
         )
@@ -94,16 +100,176 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Group 1: Security & Scam Safeguards
+            // Group 1: Display & Appearance (Dark Mode & Language)
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "ScriptBreak Scam Safeguards",
+                        text = stringResource(R.string.settings_display_group),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = InkDark
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Dark Mode Setting Row
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(if (isDarkMode) Color(0xFF312E81) else AppBlueLight)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.DarkMode,
+                                contentDescription = null,
+                                tint = if (isDarkMode) Color(0xFFFDE047) else AppBlue,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_dark_mode),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_dark_mode_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
+                        }
+                        Switch(
+                            checked = isDarkMode,
+                            onCheckedChange = {
+                                onToggleDarkMode(it)
+                                Toast.makeText(
+                                    context,
+                                    if (it) "डार्क मोड सक्रिय / Dark mode enabled" else "लाइट मोड सक्रिय / Light mode enabled",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = AppOrange,
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = LineBorder
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = LineBorder, thickness = 0.5.dp)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Language Setting Row (Segmented EN / हिन्दी selector)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(AppOrangeLight)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.Language,
+                                contentDescription = null,
+                                tint = AppOrange,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_language),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = if (isHindi) stringResource(R.string.settings_language_hi) else stringResource(R.string.settings_language_en),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
+                        }
+
+                        // Segmented Interactive Pill
+                        Surface(
+                            color = if (isDarkMode) Color(0xFF1E2E46) else Color(0xFFE2E8F0),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.padding(2.dp)
+                        ) {
+                            Row(modifier = Modifier.padding(3.dp)) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(if (!isHindi) (if (isDarkMode) AppBlueElectric else AppBlue) else Color.Transparent)
+                                        .clickable {
+                                            if (isHindi) {
+                                                onToggleLanguage(false)
+                                                Toast.makeText(context, "Language switched to English", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Text(
+                                        text = "EN",
+                                        fontSize = 12.sp,
+                                        fontWeight = if (!isHindi) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (!isHindi) Color.White else MutedText
+                                    )
+                                }
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(if (isHindi) AppOrange else Color.Transparent)
+                                        .clickable {
+                                            if (!isHindi) {
+                                                onToggleLanguage(true)
+                                                Toast.makeText(context, "भाषा हिन्दी में बदली गई", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Text(
+                                        text = "हिन्दी",
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isHindi) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isHindi) Color.White else MutedText
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Group 2: Security & Scam Safeguards
+            Surface(
+                color = AppSurface,
+                shape = RoundedCornerShape(18.dp),
+                shadowElevation = 0.5.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.settings_security_group),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkDark
@@ -136,8 +302,17 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Trusted Family Contact", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("$trustedContactName • 24h delay protected", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_trusted_contact),
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_trusted_contact_sub, trustedContactName),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Icon(
                             imageVector = AppIcons.ChevronRight,
@@ -166,21 +341,30 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = AppIcons.Phone,
                                 contentDescription = null,
-                                tint = AppBlue,
+                                tint = if (isDarkMode) AppBlueElectric else AppBlue,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Live Call Scam Interception", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Alerts on active calls during transfer", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_call_monitoring),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_call_monitoring_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Switch(
                             checked = callMonitoring,
                             onCheckedChange = { callMonitoring = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = AppBlue
+                                checkedTrackColor = if (isDarkMode) AppBlueElectric else AppBlue
                             )
                         )
                     }
@@ -210,15 +394,24 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Screen-Share Protection", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Blocks payments during remote access", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_screen_shield),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_screen_shield_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Switch(
                             checked = screenRecordingShield,
                             onCheckedChange = { screenRecordingShield = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = AppBlue
+                                checkedTrackColor = if (isDarkMode) AppBlueElectric else AppBlue
                             )
                         )
                     }
@@ -248,31 +441,40 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Learned Payment Baseline", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Nudges when amount is unusual for payee", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_adaptive_baseline),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_adaptive_baseline_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Switch(
                             checked = adaptiveLearning,
                             onCheckedChange = { adaptiveLearning = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = AppBlue
+                                checkedTrackColor = if (isDarkMode) AppBlueElectric else AppBlue
                             )
                         )
                     }
                 }
             }
 
-            // Group 2: Payment & Account Preferences
+            // Group 3: Payment & Account Preferences
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Payments & Bank Preferences",
+                        text = stringResource(R.string.settings_payments_group),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkDark
@@ -298,14 +500,23 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = AppIcons.Person,
                                 contentDescription = null,
-                                tint = AppBlue,
+                                tint = if (isDarkMode) AppBlueElectric else AppBlue,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Profile & Accounts", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Manage linked bank accounts and QR code", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_profile_accounts),
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_profile_accounts_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Icon(
                             imageVector = AppIcons.ChevronRight,
@@ -337,14 +548,23 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = AppIcons.AccountBalance,
                                 contentDescription = null,
-                                tint = AppBlue,
+                                tint = if (isDarkMode) AppBlueElectric else AppBlue,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Check Bank Balance", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Primary: Demo Bank •••• 4821", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_check_balance),
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_check_balance_sub),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Icon(
                             imageVector = AppIcons.ChevronRight,
@@ -356,16 +576,16 @@ fun SettingsScreen(
                 }
             }
 
-            // Group 3: System & Demo Options
+            // Group 4: System & Diagnostics
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "System & Diagnostics",
+                        text = stringResource(R.string.settings_system_group),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkDark
@@ -378,33 +598,17 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Language / भाषा", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text(if (hindiLanguage) "हिन्दी (Hindi)" else "English (US)", fontSize = 12.sp, color = MutedText)
-                        }
-                        Switch(
-                            checked = hindiLanguage,
-                            onCheckedChange = {
-                                hindiLanguage = it
-                                Toast.makeText(context, if (it) "भाषा हिन्दी चुनी गई" else "Language set to English", Toast.LENGTH_SHORT).show()
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = AppOrange
+                            Text(
+                                text = stringResource(R.string.settings_engine),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkDark
                             )
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    HorizontalDivider(color = LineBorder, thickness = 0.5.dp)
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("ScriptBreak Engine", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("Model: $modelVersion", fontSize = 12.sp, color = MutedText)
+                            Text(
+                                text = stringResource(R.string.settings_engine_sub, modelVersion),
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
                         }
                         Surface(
                             color = SafeGreenTint,
@@ -420,10 +624,10 @@ fun SettingsScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     DemoSecondaryButton(
-                        text = "Reset Demo (Clear Session Data)",
+                        text = stringResource(R.string.settings_reset_demo),
                         onClick = {
                             onResetDemo()
                             Toast.makeText(context, "Demo payments reset to defaults", Toast.LENGTH_SHORT).show()
@@ -434,7 +638,7 @@ fun SettingsScreen(
 
             // Log Out Button
             DemoSecondaryButton(
-                text = "Sign Out",
+                text = stringResource(R.string.settings_sign_out),
                 onClick = onLogout
             )
 

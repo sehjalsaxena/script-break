@@ -99,7 +99,8 @@ class PaymentFlow(
     var q1 by mutableStateOf<Boolean?>(null); private set
     var q2 by mutableStateOf<Boolean?>(null); private set
     var askedFamily by mutableStateOf(false); private set
-    var hindi by mutableStateOf(false); private set
+    var hindi by mutableStateOf(false)
+    var isDarkMode by mutableStateOf(false)
     var secondsLeft by mutableIntStateOf(0); private set
     /** Digits typed on the UPI PIN pad (kept only until the PIN is checked, never stored or sent). */
     private var pinEntry by mutableStateOf("")
@@ -418,6 +419,7 @@ class PaymentFlow(
 
     fun continueAnyway() { if (secondsLeft <= 0) goPin() }
     fun toggleHindi() { hindi = !hindi }
+    fun toggleDarkMode() { isDarkMode = !isDarkMode }
 
     /** "Wait 30 minutes": the payment is cancelled, nothing leaves the account. */
     fun wait30() { val r = returnTo; resetPayment(); returnTo = r; screen = Screen.Waiting }

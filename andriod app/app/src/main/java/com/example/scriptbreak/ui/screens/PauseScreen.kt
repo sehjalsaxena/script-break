@@ -48,6 +48,7 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.model.PauseUi
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.FaintText
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
@@ -217,7 +218,7 @@ fun PauseScreen(
 
             // Family Emergency Contact Section with live beacon dot
             Surface(
-                color = if (state.askedFamily) SafeGreenTint else Color.White,
+                color = if (state.askedFamily) SafeGreenTint else AppSurface,
                 shape = RoundedCornerShape(14.dp),
                 shadowElevation = 0.5.dp,
                 border = androidx.compose.foundation.BorderStroke(
@@ -314,7 +315,7 @@ private fun QuestionCard(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = Color.White,
+        color = AppSurface,
         shape = RoundedCornerShape(14.dp),
         shadowElevation = 0.5.dp,
         modifier = modifier.fillMaxWidth()

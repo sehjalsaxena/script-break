@@ -53,6 +53,7 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.AppPurpleLight
 import com.example.scriptbreak.ui.theme.CritRed
@@ -166,7 +167,7 @@ private val GUARDRAIL_TEXT = mapOf(
 
 @Composable
 private fun ResultCard(r: Result?, modelVersion: String, story: String?) {
-    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (story != null) Text(story, fontSize = 14.sp, color = MutedText)
             if (r == null) {
@@ -269,7 +270,7 @@ private fun StoriesTab(judge: JudgeMode) {
         }
         items(judge.stories, key = { it.id }) { s ->
             val ai = judge.levelOf(s)
-            Surface(color = Color.White, shape = RoundedCornerShape(14.dp), shadowElevation = 0.5.dp,
+            Surface(color = AppSurface, shape = RoundedCornerShape(14.dp), shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth().clickable { judge.loadStory(s) }) {
                 Column(Modifier.padding(14.dp)) {
                     Text("${s.id} · ${s.kind}", fontSize = 13.sp, color = FaintText)
@@ -336,7 +337,7 @@ private fun per1000(x: Double) = String.format(Locale.ENGLISH, "%.1f", x * 1000)
 
 @Composable
 private fun KitSummaryCard(k: KitResult) {
-    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(k.fileName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = InkDark)
             Text("${k.rows.size} payments scored, ${k.problems.size} skipped", fontSize = 15.sp, color = MutedText)

@@ -59,6 +59,9 @@ import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
+import com.example.scriptbreak.ui.theme.AppSurface
+import com.example.scriptbreak.ui.theme.AppBlueElectric
+import com.example.scriptbreak.ui.theme.LocalDarkTheme
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
 @Composable
@@ -175,7 +178,7 @@ fun HomeScreen(
             // Search bar with QR scan icon button
             item {
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(24.dp),
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
@@ -227,7 +230,7 @@ fun HomeScreen(
             // Quick Actions 4x1 inside an elevated action dock
             item {
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(18.dp),
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
@@ -273,7 +276,7 @@ fun HomeScreen(
             // Recent people horizontal section
             item {
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(16.dp),
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
@@ -373,7 +376,7 @@ fun HomeScreen(
             // Recent Payments Section
             item {
                 Surface(
-                    color = Color.White,
+                    color = AppSurface,
                     shape = RoundedCornerShape(16.dp),
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
@@ -467,7 +470,7 @@ fun HomeScreen(
 
         // Bottom Navigation Bar
         NavigationBar(
-            containerColor = Color.White,
+            containerColor = AppSurface,
             tonalElevation = 4.dp
         ) {
             NavigationBarItem(
@@ -476,9 +479,11 @@ fun HomeScreen(
                 icon = { Icon(AppIcons.Home, contentDescription = "Home") },
                 label = { Text(stringResource(R.string.nav_home), fontSize = 14.sp, fontWeight = FontWeight.SemiBold) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = AppBlue,
-                    selectedTextColor = AppBlue,
-                    indicatorColor = AppBlueLight
+                    selectedIconColor = if (LocalDarkTheme.current) AppBlueElectric else AppBlue,
+                    selectedTextColor = if (LocalDarkTheme.current) AppBlueElectric else AppBlue,
+                    indicatorColor = if (LocalDarkTheme.current) Color(0xFF1E2E46) else AppBlueLight,
+                    unselectedIconColor = MutedText,
+                    unselectedTextColor = MutedText
                 )
             )
             NavigationBarItem(

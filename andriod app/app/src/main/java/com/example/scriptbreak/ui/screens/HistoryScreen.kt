@@ -45,6 +45,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
@@ -144,7 +145,7 @@ fun HistoryScreen(
                         .ifEmpty { "TX" }
 
                     Surface(
-                        color = Color.White,
+                        color = AppSurface,
                         shape = RoundedCornerShape(14.dp),
                         shadowElevation = 0.5.dp,
                         modifier = Modifier

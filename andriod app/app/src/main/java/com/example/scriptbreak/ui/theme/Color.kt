@@ -1,30 +1,77 @@
 package com.example.scriptbreak.ui.theme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
 // DemoPay brand palette: Blue and Orange tones from the official logo
 val AppBlue = Color(0xFF10223F)        // Rich midnight navy blue
 val AppBlueDark = Color(0xFF0A1629)
-val AppBlueLight = Color(0xFFEEF3FB)   // Clean soft ice-blue tint
+val AppBlueElectric = Color(0xFF60A5FA) // Vibrant electric blue for dark mode accents
 
 val AppOrange = Color(0xFFFD600D)      // Vibrant brand orange from the logo
 val AppOrangeDark = Color(0xFFE05004)
-val AppOrangeLight = Color(0xFFFFF2E8) // Soft warm orange tint
 
 // Brand aliases for compatibility
 val AppPurple = AppBlue                // Transitioned from old purple to Logo Navy Blue
 val AppPurpleDark = AppBlueDark
-val AppPurpleLight = AppBlueLight
-val AppBackground = Color(0xFFF8FAFC)  // Clean modern fintech surface
-val AppSurface = Color(0xFFFFFFFF)
+
+// Dynamic theme tokens adapting to dark / light mode
+val AppBackground: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF0B1322) else Color(0xFFF8FAFC)
+
+val AppSurface: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF132238) else Color(0xFFFFFFFF)
 
 // Typography & borders
-val InkDark = Color(0xFF0F172A)
-val BodyDark = Color(0xFF1E293B)
-val MutedText = Color(0xFF64748B)
-val FaintText = Color(0xFF94A3B8)
-val LineBorder = Color(0xFFE2E8F0)
-val PanelBg = Color(0xFFF1F5F9)
+val InkDark: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFFF8FAFC) else Color(0xFF0F172A)
+
+val BodyDark: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFFCBD5E1) else Color(0xFF1E293B)
+
+val MutedText: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF94A3B8) else Color(0xFF64748B)
+
+val FaintText: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF64748B) else Color(0xFF94A3B8)
+
+val LineBorder: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF1E2E46) else Color(0xFFE2E8F0)
+
+val PanelBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF132238) else Color(0xFFF1F5F9)
+
+val AppBlueLight: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF1E2E46) else Color(0xFFEEF3FB)
+
+val AppOrangeLight: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF352018) else Color(0xFFFFF2E8)
+
+val AppPurpleLight: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = AppBlueLight
 
 // Safe state (Green)
 val SafeGreen = Color(0xFF0E7F5B)

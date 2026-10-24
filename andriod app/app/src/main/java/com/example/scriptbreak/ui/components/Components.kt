@@ -41,6 +41,9 @@ import com.example.scriptbreak.ui.theme.CallGreen
 import com.example.scriptbreak.ui.theme.CallGreenTint
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
+import com.example.scriptbreak.ui.theme.AppSurface
+import com.example.scriptbreak.ui.theme.AppBlueElectric
+import com.example.scriptbreak.ui.theme.LocalDarkTheme
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
 
@@ -55,7 +58,7 @@ fun DemoPayLogoText(
             text = "Demo",
             fontSize = fontSize,
             fontWeight = fontWeight,
-            color = AppBlue
+            color = if (LocalDarkTheme.current) AppBlueElectric else AppBlue
         )
         Text(
             text = "Pay",
@@ -339,7 +342,7 @@ fun NumericKeypad(
             )
 
             Surface(
-                color = Color.White.copy(alpha = 0.7f),
+                color = AppSurface.copy(alpha = 0.7f),
                 shape = RoundedCornerShape(14.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier
@@ -373,7 +376,7 @@ private fun KeypadButton(
 ) {
     val haptic = LocalHapticFeedback.current
     Surface(
-        color = Color.White,
+        color = AppSurface,
         shape = RoundedCornerShape(14.dp),
         shadowElevation = 0.5.dp,
         modifier = modifier

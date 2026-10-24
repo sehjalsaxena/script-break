@@ -47,6 +47,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
@@ -124,7 +125,7 @@ fun CheckBalanceScreen(
 
         // Account 1: Demo Bank (Primary)
         Surface(
-            color = Color.White,
+            color = AppSurface,
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 1.dp,
             border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),
@@ -281,7 +282,7 @@ fun CheckBalanceScreen(
 
         // Account 2: Sample Bank (Secondary)
         Surface(
-            color = Color.White,
+            color = AppSurface,
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 1.dp,
             border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),

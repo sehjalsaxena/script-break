@@ -35,6 +35,7 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.model.SuccessUi
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import com.example.scriptbreak.ui.theme.InkDark
@@ -98,7 +99,7 @@ fun SuccessScreen(
 
         // Transaction Details Card
         Surface(
-            color = Color.White,
+            color = AppSurface,
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 1.dp,
             modifier = Modifier.fillMaxWidth()

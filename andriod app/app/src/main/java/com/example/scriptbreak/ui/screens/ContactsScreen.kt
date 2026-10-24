@@ -47,6 +47,7 @@ import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -123,8 +124,8 @@ fun ContactsScreen(
                 cursorColor = AppBlue,
                 focusedBorderColor = AppBlue,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                focusedContainerColor = AppSurface,
+                unfocusedContainerColor = AppSurface
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -160,7 +161,7 @@ fun ContactsScreen(
             ) {
                 items(filteredContacts, key = { it.id }) { contact ->
                     Surface(
-                        color = Color.White,
+                        color = AppSurface,
                         shape = RoundedCornerShape(14.dp),
                         shadowElevation = 0.5.dp,
                         modifier = Modifier

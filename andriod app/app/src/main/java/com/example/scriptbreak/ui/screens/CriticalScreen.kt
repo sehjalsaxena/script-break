@@ -38,9 +38,11 @@ import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.model.CriticalUi
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import com.example.scriptbreak.ui.theme.InkDark
+import com.example.scriptbreak.ui.theme.LocalDarkTheme
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -84,7 +86,7 @@ fun CriticalScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppSurface)
     ) {
         // Top Navigation Bar
         Row(
@@ -268,7 +270,7 @@ fun CriticalScreen(
 
             // LAST LINE of the message (anti-coaching callout)
             Surface(
-                color = InkDark,
+                color = if (LocalDarkTheme.current) Color(0xFF1E2E46) else InkDark,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -21,6 +21,12 @@ import com.example.scriptbreak.logic.ResultsData
 import com.example.scriptbreak.ml.ScamModel
 import com.example.scriptbreak.ui.AppRoot
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
+import android.content.res.Configuration
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import java.util.Locale
 import java.util.function.Consumer
 
 class MainActivity : ComponentActivity() {
@@ -83,12 +89,35 @@ class MainActivity : ComponentActivity() {
             )
         } catch (e: Exception) { null }
         setContent {
-            ScriptBreakTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = com.example.scriptbreak.ui.theme.AppBackground
-                ) {
-                    AppRoot(flow, signals, judge, analyst, family, results)
+            val isDark = flow.isDarkMode
+            val isHindi = flow.hindi
+
+            val currentLocale = remember(isHindi) {
+                if (isHindi) Locale.forLanguageTag("hi-IN") else Locale.forLanguageTag("en-IN")
+            }
+            val currentConfig = LocalConfiguration.current
+            val localizedConfig = remember(currentConfig, currentLocale) {
+                Configuration(currentConfig).apply {
+                    setLocale(currentLocale)
+                    setLayoutDirection(currentLocale)
+                }
+            }
+            val baseContext = LocalContext.current
+            val localizedContext = remember(baseContext, currentLocale) {
+                baseContext.createConfigurationContext(localizedConfig)
+            }
+
+            CompositionLocalProvider(
+                LocalConfiguration provides localizedConfig,
+                LocalContext provides localizedContext
+            ) {
+                ScriptBreakTheme(darkTheme = isDark) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = com.example.scriptbreak.ui.theme.AppBackground
+                    ) {
+                        AppRoot(flow, signals, judge, analyst, family, results)
+                    }
                 }
             }
         }

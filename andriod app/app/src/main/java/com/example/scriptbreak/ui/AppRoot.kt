@@ -403,6 +403,10 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 Screen.Settings -> SettingsScreen(
                     trustedContactName = flow.contact.name,
                     modelVersion = flow.modelVersion,
+                    isDarkMode = flow.isDarkMode,
+                    onToggleDarkMode = { flow.isDarkMode = it },
+                    isHindi = flow.hindi,
+                    onToggleLanguage = { flow.hindi = it },
                     onTrustedContact = flow::openTrustedContact,
                     onCheckBalance = flow::startCheckBalance,
                     onAccount = flow::startAccount,

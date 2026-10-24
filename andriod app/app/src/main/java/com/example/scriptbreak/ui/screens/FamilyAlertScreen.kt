@@ -50,6 +50,7 @@ import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.model.FamilyAlertUi
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import com.example.scriptbreak.ui.theme.InkDark
@@ -203,7 +204,7 @@ fun FamilyAlertScreen(
 
             // Signals Card
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(14.dp),
                 border = BorderStroke(1.dp, Color(0xFFE8ECF2)),
                 modifier = Modifier.fillMaxWidth()

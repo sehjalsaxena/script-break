@@ -65,6 +65,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.FaintText
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
@@ -141,7 +142,7 @@ fun LoginScreen(accounts: List<Account>, onLogin: (username: String, pin: String
         if (!showProfiles) {
             Surface(
                 shape = CircleShape,
-                color = Color.White,
+                color = AppSurface,
                 shadowElevation = 4.dp,
                 border = BorderStroke(1.dp, LineBorder),
                 modifier = Modifier
@@ -189,7 +190,7 @@ fun LoginScreen(accounts: List<Account>, onLogin: (username: String, pin: String
                 .padding(top = 16.dp, end = 16.dp)
         ) {
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(16.dp),
                 shadowElevation = 8.dp,
                 border = BorderStroke(1.dp, LineBorder),

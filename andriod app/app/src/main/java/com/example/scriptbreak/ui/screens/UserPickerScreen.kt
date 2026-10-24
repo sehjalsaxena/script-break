@@ -36,6 +36,7 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.DemoPayLogoText
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.BodyDark
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
@@ -163,7 +164,7 @@ private fun ProfileCard(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = Color.White,
+        color = AppSurface,
         shape = RoundedCornerShape(16.dp),
         shadowElevation = 1.dp,
         modifier = modifier

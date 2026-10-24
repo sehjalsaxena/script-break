@@ -31,6 +31,7 @@ import com.example.scriptbreak.logic.Rate
 import com.example.scriptbreak.logic.ResultsData
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
 import com.example.scriptbreak.ui.theme.AppPurple
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.FaintText
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
@@ -134,7 +135,7 @@ fun ResultsTab(
 
 @Composable
 private fun Card(content: @Composable () -> Unit) {
-    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { content() }
     }
 }

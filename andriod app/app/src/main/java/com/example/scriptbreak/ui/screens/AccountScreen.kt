@@ -44,6 +44,7 @@ import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppOrangeLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.LineBorder
@@ -94,7 +95,7 @@ fun AccountScreen(
         ) {
             // Profile Card
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()
@@ -232,7 +233,7 @@ fun AccountScreen(
 
             // Linked Bank Accounts Card
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()
@@ -314,7 +315,7 @@ fun AccountScreen(
 
             // Security & Protection
             Surface(
-                color = Color.White,
+                color = AppSurface,
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
                 modifier = Modifier.fillMaxWidth()

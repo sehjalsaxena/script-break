@@ -57,6 +57,7 @@ import com.example.scriptbreak.ui.model.AmountUi
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppOrange
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
@@ -241,8 +242,8 @@ fun AmountScreen(
                 focusedBorderColor = AppBlue,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
                 cursorColor = AppBlue,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                focusedContainerColor = AppSurface,
+                unfocusedContainerColor = AppSurface
             ),
             modifier = Modifier.fillMaxWidth()
         )

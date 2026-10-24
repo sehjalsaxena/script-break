@@ -36,6 +36,7 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.FaintText
 import com.example.scriptbreak.ui.theme.InkDark
@@ -51,7 +52,7 @@ import java.util.Locale
 
 @Composable
 private fun WhiteCard(content: @Composable () -> Unit) {
-    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
     }
 }
