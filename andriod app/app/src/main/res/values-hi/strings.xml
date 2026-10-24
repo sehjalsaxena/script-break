@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">DemoPay</string>
+    <string name="app_subtitle">ScriptBreak द्वारा सुरक्षित</string>
+    <string name="demo_banner">डेमो ऐप – कोई वास्तविक पैसे या बैंक खाते का उपयोग नहीं</string>
+
+    <!-- User Picker -->
+    <string name="user_picker_title">यह फ़ोन कौन इस्तेमाल कर रहा है?</string>
+    <string name="user_picker_subtitle">डेमो प्रोफ़ाइल चुनें</string>
+    <string name="profile_sharma_title">श्री शर्मा</string>
+    <string name="profile_sharma_sub">मुख्य डेमो उपयोगकर्ता\nसामान्य परिदृश्य</string>
+    <string name="profile_priya_title">प्रिया</string>
+    <string name="profile_priya_sub">नियमित उपयोगकर्ता\nसामान्य भुगतान</string>
+    <string name="profile_rohit_title">रोहित (बेटा)</string>
+    <string name="profile_rohit_sub">पारिवारिक संपर्क\nअलर्ट प्राप्त करता है</string>
+    <string name="profile_judge_title">जज मोड</string>
+    <string name="profile_judge_sub">परीक्षण परिदृश्य\nमॉडल निर्णय देखें</string>
+    <string name="profile_analyst_title">एनालिस्ट मोड</string>
+    <string name="profile_analyst_sub">पैटर्न और परिणाम\nकी समीक्षा करें</string>
+
+    <!-- Home -->
+    <string name="search_hint">नाम, UPI ID या नंबर से किसी को भी भुगतान करें</string>
+    <string name="on_call_banner">फ़ोन कॉल जारी है · लाइव सुरक्षा सक्रिय</string>
+    <string name="action_send">संपर्क को भेजें</string>
+    <string name="action_upi_id">UPI ID पर भेजें</string>
+    <string name="action_bank">बैंक / स्वयं</string>
+    <string name="action_balance">बैलेंस देखें</string>
+    <string name="recent_people">हाल के लोग</string>
+    <string name="view_all">सभी देखें</string>
+    <string name="recent_payments">हाल के भुगतान</string>
+    <string name="nav_home">होम</string>
+    <string name="nav_history">इतिहास</string>
+    <string name="nav_settings">सेटिंग्स</string>
+
+    <!-- Payee & Amount -->
+    <string name="verified_banking_name">सत्यापित बैंकिंग नाम</string>
+    <string name="pay">भुगतान करें</string>
+    <string name="continue_btn">जारी रखें</string>
+    <string name="add_note_optional">नोट जोड़ें (वैकल्पिक)</string>
+    <string name="new_payee_never_paid">नया प्राप्तकर्ता – पहले कभी नहीं भेजा</string>
+
+    <!-- Pay to UPI ID -->
+    <string name="pay_upi_title">UPI ID पर भेजें</string>
+    <string name="pay_upi_hint">कोई भी UPI ID दर्ज करें (उदा. name@demoupi)</string>
+    <string name="paste">पेस्ट करें</string>
+    <string name="recent_upi_ids">हाल की UPI IDs</string>
+
+    <!-- Pause Screen (SPEC.md Section 12) -->
+    <string name="pause_title">भुगतान करने से पहले</string>
+    <string name="pause_sends">यह आपके खाते से %1$s %2$s को भेजता है।</string>
+    <string name="pause_q1">क्या आपसे कहा गया है कि आपके पैसे की जाँच, सुरक्षा या उसे छुड़ाने के लिए यह भुगतान ज़रूरी है?</string>
+    <string name="pause_q2">क्या किसी ने आपसे यह भुगतान अपने परिवार या बैंक से छिपाकर रखने को कहा है?</string>
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
+    <string name="not_sure">पक्का नहीं?</string>
+    <string name="ask_family">%1$s से कहें कि मुझे कॉल करें</string>
+    <string name="asked_family">%1$s से कॉल करने को कहा गया है</string>
+    <string name="next">आगे</string>
+    <string name="checked_on_phone">इस फ़ोन पर जाँचा गया · नियम पैक v0.3</string>
+
+    <!-- Critical Screen (SPEC.md Section 12) -->
+    <string name="critical_title">रुकिए। यह एक आम धोखाधड़ी जैसा है।</string>
+    <string name="critical_calm">आप किसी मुसीबत में नहीं हैं। इस भुगतान का फ़ैसला आपके हाथ में है।</string>
+    <string name="critical_never">पुलिस, CBI, RBI और बैंक कभी भी पैसे की जाँच, सुरक्षा या उसे छुड़ाने के लिए पैसे भेजने को नहीं कहते।</string>
+    <string name="critical_to_payee_new">%1$s, %2$s को (नया प्राप्तकर्ता)</string>
+    <string name="critical_to_payee">%1$s, %2$s को</string>
+    <string name="critical_last">अगर कोई आपसे इस स्क्रीन को अनदेखा करने को कह रहा है, तो वही धोखाधड़ी है।</string>
+    <string name="critical_wait">30 मिनट रुकें</string>
+    <string name="critical_continue_countdown">फिर भी जारी रखें (%1$d सेकंड)</string>
+    <string name="critical_continue_now">फिर भी जारी रखें</string>
+    <string name="critical_report">भुगतान कर चुके हैं? अभी रिपोर्ट करें: 1930 पर कॉल करें</string>
+
+    <!-- PIN Screen -->
+    <string name="enter_upi_pin">4-अंकों का UPI PIN दर्ज करें</string>
+    <string name="sending_amount_to">%2$s को %1$s भेज रहे हैं</string>
+    <string name="pin_security_note">UPI PIN कभी किसी के साथ साझा न करें।</string>
+
+    <!-- Success Screen -->
+    <string name="payment_successful">भुगतान सफल रहा</string>
+    <string name="paid_successfully_to">%1$s को सफलतापूर्वक भुगतान किया गया</string>
+    <string name="upi_ref_label">UPI संदर्भ ID: %1$s</string>
+    <string name="done">हो गया</string>
+    <string name="report_fraud_title">धोखाधड़ी का संदेह है?</string>
+    <string name="report_fraud_desc">साइबर अपराध पर अभी रिपोर्ट करें: 1930 पर कॉल करें</string>
+    <string name="report_payment_btn">भुगतान रिपोर्ट करें</string>
+
+    <!-- Waiting Screen -->
+    <string name="waiting_title">भुगतान रद्द कर दिया गया</string>
+    <string name="waiting_body">भुगतान रद्द कर दिया गया। आपके खाते से कुछ भी नहीं कटा है।</string>
+    <string name="waiting_sub">यदि आप अभी भी भुगतान करना चाहते हैं तो 30 मिनट बाद आएँ।</string>
+    <string name="back_to_home">होम पर वापस जाएँ</string>
+
+    <!-- Family Alert Screen -->
+    <string name="family_alert_title">%1$s शायद किसी फ़्रॉड कॉल पर हैं</string>
+    <string name="family_alert_sub">%1$s, %3$s को %2$s भेजने की कोशिश कर रहे हैं।</string>
+    <string name="family_alert_disclaimer">रोहित खाता नहीं देख सकते और न ही भुगतान रोक सकते हैं।</string>
+    <string name="family_alert_call_now">%1$s को अभी कॉल करें</string>
+    <string name="family_alert_called">मैंने कॉल कर लिया है</string>
+</resources>

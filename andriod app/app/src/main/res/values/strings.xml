@@ -1,3 +1,98 @@
 <resources>
-    <string name="app_name">ScriptBreak</string>
+    <string name="app_name">DemoPay</string>
+    <string name="app_subtitle">protected by ScriptBreak</string>
+    <string name="demo_banner">Demo app – no real money or bank accounts are used</string>
+
+    <!-- User Picker -->
+    <string name="user_picker_title">Who\'s using this phone?</string>
+    <string name="user_picker_subtitle">Choose a demo profile</string>
+    <string name="profile_sharma_title">Mr. Sharma</string>
+    <string name="profile_sharma_sub">Main demo user\nNormal scenario</string>
+    <string name="profile_priya_title">Priya</string>
+    <string name="profile_priya_sub">Regular user\nNormal payments</string>
+    <string name="profile_rohit_title">Rohit (Son)</string>
+    <string name="profile_rohit_sub">Family contact\nReceives alerts</string>
+    <string name="profile_judge_title">Judge Mode</string>
+    <string name="profile_judge_sub">Test scenarios\nView model decisions</string>
+    <string name="profile_analyst_title">Analyst</string>
+    <string name="profile_analyst_sub">Review patterns\nand results</string>
+
+    <!-- Home -->
+    <string name="search_hint">Pay anyone on UPI by name, UPI ID or number</string>
+    <string name="on_call_banner">On call · Live guidance active</string>
+    <string name="action_send">Send to contact</string>
+    <string name="action_upi_id">Pay UPI ID</string>
+    <string name="action_bank">Bank / Self</string>
+    <string name="action_balance">Check balance</string>
+    <string name="recent_people">Recent people</string>
+    <string name="view_all">View all</string>
+    <string name="recent_payments">Recent payments</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Payee & Amount -->
+    <string name="verified_banking_name">Verified banking name</string>
+    <string name="pay">Pay</string>
+    <string name="continue_btn">Continue</string>
+    <string name="add_note_optional">Add a note (optional)</string>
+    <string name="new_payee_never_paid">New payee – never paid</string>
+
+    <!-- Pay to UPI ID -->
+    <string name="pay_upi_title">Pay to UPI ID</string>
+    <string name="pay_upi_hint">Enter any UPI ID (e.g. name@demoupi)</string>
+    <string name="paste">Paste</string>
+    <string name="recent_upi_ids">Recent UPI IDs</string>
+
+    <!-- Pause Screen (SPEC.md Section 12) -->
+    <string name="pause_title">Before you pay</string>
+    <string name="pause_sends">This sends %1$s out of your account to %2$s.</string>
+    <string name="pause_q1">Were you told this payment is needed to verify, protect or release your money?</string>
+    <string name="pause_q2">Has anyone asked you to keep this payment secret from your family or bank?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="not_sure">Not sure?</string>
+    <string name="ask_family">Ask %1$s to call me</string>
+    <string name="asked_family">%1$s has been asked to call you</string>
+    <string name="next">Next</string>
+    <string name="checked_on_phone">Checked on this phone · rule pack v0.3</string>
+
+    <!-- Critical Screen (SPEC.md Section 12) -->
+    <string name="critical_title">Stop. This matches a common scam.</string>
+    <string name="critical_calm">You are not in trouble. You are in control of this payment.</string>
+    <string name="critical_never">Police, CBI, RBI and banks never ask you to move money to verify, protect or release it.</string>
+    <string name="critical_to_payee_new">%1$s to %2$s, a new payee</string>
+    <string name="critical_to_payee">%1$s to %2$s</string>
+    <string name="critical_last">If someone is telling you to ignore this screen, that is the scam.</string>
+    <string name="critical_wait">Wait 30 minutes</string>
+    <string name="critical_continue_countdown">Continue anyway (%1$d s)</string>
+    <string name="critical_continue_now">Continue anyway</string>
+    <string name="critical_report">Already paid? Report now: call 1930</string>
+
+    <!-- PIN Screen -->
+    <string name="enter_upi_pin">ENTER 4-DIGIT UPI PIN</string>
+    <string name="sending_amount_to">Sending %1$s to %2$s</string>
+    <string name="pin_security_note">UPI PIN is never shared with anyone, including DemoPay or ScriptBreak.</string>
+
+    <!-- Success Screen -->
+    <string name="payment_successful">Payment Successful</string>
+    <string name="paid_successfully_to">Paid successfully to %1$s</string>
+    <string name="upi_ref_label">UPI Ref ID: %1$s</string>
+    <string name="done">Done</string>
+    <string name="report_fraud_title">Suspect scam?</string>
+    <string name="report_fraud_desc">Report now to cyber crime: call 1930 or visit cybercrime.gov.in</string>
+    <string name="report_payment_btn">Report payment</string>
+
+    <!-- Waiting Screen -->
+    <string name="waiting_title">Payment cancelled</string>
+    <string name="waiting_body">Payment cancelled. Nothing has left your account.</string>
+    <string name="waiting_sub">Come back in 30 minutes if you still want to pay.</string>
+    <string name="back_to_home">Back to home</string>
+
+    <!-- Family Alert Screen -->
+    <string name="family_alert_title">%1$s may be on a scam call</string>
+    <string name="family_alert_sub">%1$s is trying to pay %2$s to %3$s.</string>
+    <string name="family_alert_disclaimer">Rohit can\'t see the account or stop the payment.</string>
+    <string name="family_alert_call_now">Call %1$s now</string>
+    <string name="family_alert_called">I\'ve called</string>
 </resources>
