@@ -46,6 +46,16 @@ data class Account(
     fun checkUpiPin(pin: String) = upiPinHash != null && DemoWorld.hash("$username-upi:$pin") == upiPinHash
 }
 
+data class ContactItem(
+    val id: String,
+    val name: String,
+    val phone: String,
+    val upiId: String,
+    val initials: String,
+    val colorHex: String,
+    val payeeId: String? = null
+)
+
 object DemoWorld {
     /** Maximum for one UPI payment (the NPCI limit for most person-to-person payments). */
     const val UPI_LIMIT = 100_000L
@@ -83,11 +93,23 @@ object DemoWorld {
 
     val homePeople: List<PayeeRecord> get() = payees.filter { it.status == "known" }
 
+    val contacts: List<ContactItem> = listOf(
+        ContactItem("c1", "Rohit (son)", "+91 98765 43210", "rohit.sharma@demoupi", "RS", "#3D8FD1", "rohit"),
+        ContactItem("c2", "Suresh Verma", "+91 98111 22334", "suresh.verma@demoupi", "SV", "#4F7FB0", "suresh"),
+        ContactItem("c3", "Sunita Iyer", "+91 98222 33445", "sunita.iyer@demoupi", "SI", "#D0679A", "sunita"),
+        ContactItem("c4", "Sharma Kirana Store", "+91 98333 44556", "sharmakirana@demoupi", "SK", "#4F9B7A", "kirana"),
+        ContactItem("c5", "Anil Mehta", "+91 98444 55667", "anil.mehta@demoupi", "AM", "#B07A3A", "anil"),
+        ContactItem("c6", "Ramesh K.", "+91 98555 66778", "ramesh.k@demoupi", "RK", "#6B74D6", "ramesh"),
+        ContactItem("c7", "Manoj Electricals", "+91 98666 11223", "manoj.elec@demoupi", "ME", "#7A8A3A", "manoj"),
+        ContactItem("c8", "Gupta Electronics", "+91 98777 22334", "guptaelectronics@demoupi", "GE", "#8A5BB0", "gupta"),
+    )
+
     fun byId(id: String): PayeeRecord? = payees.firstOrNull { it.id == id }
 
-    private val upiPattern = Regex("^[a-z0-9._-]{2,}@[a-z]{2,}$")
+    // Enforce that UPI ID is strictly @demoupi
+    private val upiPattern = Regex("^[a-z0-9._-]{2,}@demoupi$")
 
-    /** Find a payee by UPI ID. Unknown but valid IDs become a new person named from the ID. */
+    /** Find a payee by UPI ID. Only @demoupi IDs are supported. Unknown but valid IDs become a new person named from the ID. */
     fun lookup(upiId: String): PayeeRecord? {
         val id = upiId.trim().lowercase()
         if (!upiPattern.matches(id)) return null

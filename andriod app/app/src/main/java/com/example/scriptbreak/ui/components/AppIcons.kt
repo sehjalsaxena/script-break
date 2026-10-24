@@ -31,6 +31,28 @@ object AppIcons {
         close()
     }.build()
 
+    val Close: ImageVector = ImageVector.Builder(
+        name = "Close",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(19f, 6.41f)
+        lineTo(17.59f, 5f)
+        lineTo(12f, 10.59f)
+        lineTo(6.41f, 5f)
+        lineTo(5f, 6.41f)
+        lineTo(10.59f, 12f)
+        lineTo(5f, 17.59f)
+        lineTo(6.41f, 19f)
+        lineTo(12f, 13.41f)
+        lineTo(17.59f, 19f)
+        lineTo(19f, 17.59f)
+        lineTo(13.41f, 12f)
+        close()
+    }.build()
+
     val Check: ImageVector = ImageVector.Builder(
         name = "Check",
         defaultWidth = 24.dp,
