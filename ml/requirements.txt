@@ -1,4 +1,5 @@
-numpy
-scipy
-scikit-learn
-joblib
+# Versions we ran and verified the full rebuild with (python run_all_tests.py: 20 passed).
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0

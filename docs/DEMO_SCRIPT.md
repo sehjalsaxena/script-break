@@ -2,6 +2,34 @@
 
 All data is synthetic and all names are fictional. "Demo app, no real money."
 
+## Preliminary round (30 → 10): 12 minutes, demo + conversation, no slides
+
+Judges use the product and ask questions; a technical team checks the code (plagiarism, completeness) at the same time.
+Stage 1 marks: works end to end on judge-picked inputs (25), **spot-check results with error rates on unseen data and
+named failures (30)**, own engineering that any member can explain (15), alert and response flow with safeguards (15),
+delivery against the Round 1 plan (15).
+
+| Time | Who | What |
+|---|---|---|
+| 0:00–0:45 | Sambhav | The one-liner (README, first line). "A scammer on a call talks the victim through the payment. Banks check amounts; we check the pattern, on the phone, before the PIN." |
+| 0:45–4:00 | All three | Live story below: scenes 1, 1b, 2, 3, 4, 5 (rent, no popup → TV, amber line only → scam call → Pause → "No, No" stays → Yes → Critical → Rohit's phone buzzes → Rohit calls → "I've called") |
+| 4:00–6:30 | Judge + Deepak | Hand Phone C (judge mode) to a judge: "Change anything." Inputs tab, then **Run in app**. Then Test file → load the sample, or their own file: error rates with 95% ranges |
+| 6:30–8:30 | Deepak | Results tab: 80% vs 60% (our rules) vs 24% (bank rule) at 7.3 per 1,000 false alarms, with 95% ranges. Scam types never seen (sent by mistake only 11%). **Named failures:** S06 (small splits to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 new-landlord deposit, wrongly Paused), most false alarms = genuine first payment to a new person during a call, first-time users get 1.8× more false alarms (12.5 vs 6.9 per 1,000). "We report these instead of tuning on test data." Reproduce: `python run_all_tests.py`, 20 checks |
+| 8:30–9:30 | Sambhav | Analyst: log in as analyst on Phone C → the AI found 89 "sent by mistake" reports → Approve → Run in app → Pause. "The AI proposes, a human approves." |
+| 9:30–12:00 | All | Questions. Changes from Round 1: web app → native Android (a website can't see calls); rules decide → trained AI decides, rules stay as guardrails. Deliberate cuts: no push to a fully closed app (needs a server); screen-share detection is Android 15+ |
+
+Who answers what (but everyone must manage the 30-second version of everything):
+- **Sambhav:** payment flow, signals, safety layer (C1, G1–G4), Firebase alert, Judge and Analyst modes.
+- **Sehjal:** screens, wording (SPEC.md), Hindi, read-aloud, big text and buttons.
+- **Deepak:** data generator, model choice, thresholds, results, failures ([ml/JUDGE_QA.md](../ml/JUDGE_QA.md)).
+
+For the technical team, have ready:
+- the repo link and the check-in commit `f14de57`
+- [README.md](../README.md), which maps every form promise to the file that implements it
+- [DISCLOSURE.md](../DISCLOSURE.md)
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (63 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
+- the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
+
 ## Who holds what
 
 | Phone | Person | Logged in as | Role in the story |

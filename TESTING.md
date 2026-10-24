@@ -15,7 +15,7 @@ pip install -r requirements.txt
 python run_all_tests.py           # add --android to also run the Kotlin parity test (needs Android Studio's JDK)
 ```
 
-Expected last line: **`19 passed, 0 failed`** (`20 passed, 0 failed` with `--android`).
+Expected last line: **`20 passed, 0 failed`** (`21 passed, 0 failed` with `--android`).
 Results: `ml/results/TEST_SUMMARY.md` (all checks, error bars, edge cases) and `ml/results/REPORT.md` (full model report).
 
 What the command does:
