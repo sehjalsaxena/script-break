@@ -1,5 +1,6 @@
 package com.example.scriptbreak.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -98,22 +100,32 @@ fun UserPickerScreen(
             .background(AppBackground)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = stringResource(R.string.user_picker_title),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = InkDark
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = stringResource(R.string.user_picker_subtitle),
-            fontSize = 16.sp,
-            color = MutedText
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(R.drawable.app_logo),
+                contentDescription = "DemoPay Logo",
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            )
+            Spacer(modifier = Modifier.width(14.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.user_picker_title),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = InkDark
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.user_picker_subtitle),
+                    fontSize = 15.sp,
+                    color = MutedText
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
