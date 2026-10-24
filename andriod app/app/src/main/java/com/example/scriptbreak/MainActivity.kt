@@ -1,15 +1,27 @@
 package com.example.scriptbreak
 
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.AndroidSignals
 import com.example.scriptbreak.logic.Discovery
@@ -21,13 +33,17 @@ import com.example.scriptbreak.logic.ResultsData
 import com.example.scriptbreak.ml.ScamModel
 import com.example.scriptbreak.ui.AppRoot
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
-import android.content.res.Configuration
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
 import java.util.function.Consumer
+
+class LocalizedActivityContext(
+    val activity: MainActivity,
+    private val localizedContext: Context
+) : ContextWrapper(activity), ActivityResultRegistryOwner {
+    override fun getResources(): Resources = localizedContext.resources
+    override val activityResultRegistry: ActivityResultRegistry
+        get() = activity.activityResultRegistry
+}
 
 class MainActivity : ComponentActivity() {
     private lateinit var signals: AndroidSignals
@@ -102,14 +118,18 @@ class MainActivity : ComponentActivity() {
                     setLayoutDirection(currentLocale)
                 }
             }
-            val baseContext = LocalContext.current
-            val localizedContext = remember(baseContext, currentLocale) {
-                baseContext.createConfigurationContext(localizedConfig)
+            val localizedContext = remember(currentLocale) {
+                createConfigurationContext(localizedConfig)
+            }
+            val localizedWrapper = remember(localizedContext) {
+                LocalizedActivityContext(this@MainActivity, localizedContext)
             }
 
             CompositionLocalProvider(
                 LocalConfiguration provides localizedConfig,
-                LocalContext provides localizedContext
+                LocalContext provides localizedWrapper,
+                LocalActivityResultRegistryOwner provides this@MainActivity,
+                LocalOnBackPressedDispatcherOwner provides this@MainActivity
             ) {
                 ScriptBreakTheme(darkTheme = isDark) {
                     Surface(
