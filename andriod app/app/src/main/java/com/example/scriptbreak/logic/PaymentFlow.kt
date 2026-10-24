@@ -23,8 +23,7 @@ enum class Screen {
     Report, TrustedContact, Notifications, Account, Settings, QrScanner
 }
 
-/** A payment made during this demo session (the app's own payment record). */
-/** One alert in the trusted contact's alerts list (Sehjal's phone), newest first. */
+/** One "Ask family" alert this phone received (shown in the recipient's Notifications), newest first. */
 data class FamilyInboxItem(val alert: FamilyAlertUi, val key: Long, val read: Boolean = false, val done: Boolean = false)
 
 /** Money between the demo people (e.g. Sambhav pays Deepak): it arrives on the receiver's phone through Firebase. */
@@ -42,6 +41,7 @@ data class DemoTransfer(
 /** What the AI noticed for the payment being typed, in plain words (the "Safety check" card). */
 data class AiView(val level: String, val score: Double?, val facts: List<String>, val reminderOnly: Boolean = false)
 
+/** A payment made during this demo session (the app's own payment record). */
 data class SessionPayment(
     val payeeId: String,
     val payeeName: String,
@@ -125,17 +125,17 @@ class PaymentFlow(
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
     private var lastAlertAt = 0L   // when it was sent (or got here, if unknown), so a very old alert is not shown
-    private val handledAlerts = mutableSetOf<Long>()   // alerts Sehjal already answered on this phone
-    /** Sehjal's alerts list: every alert this phone got, newest first. Tapping one opens "Call now / I've called". */
+    private val handledAlerts = mutableSetOf<Long>()   // alerts already answered ("I've called") on this phone
+    /** Every alert this phone got, newest first. Each person sees theirs in Notifications; tapping opens "Call now / I've called". */
     val familyInbox = mutableStateListOf<FamilyInboxItem>()
     private var openAlertAfterLogin = false            // the phone notification was tapped before its person logged in
     private var alertSentBy: String? = null            // who sent the last "Ask family" from this phone (gets the answers)
     /** In-app notifications (bell on Home) that this person cleared or read, kept as "profileId:noticeId". */
     private val clearedNotices = mutableStateListOf<String>()
     private val readNotices = mutableStateListOf<String>()
-    /** Called when Sehjal logs in: MainActivity reads the latest alert from Firebase right away. */
+    /** Called when someone logs in: MainActivity reads the latest alert from Firebase right away. */
     var onFamilyLogin: () -> Unit = {}
-    /** Who last logged in on THIS phone (saved by MainActivity), so only Sehjal's phone buzzes on the login screen. */
+    /** Who last logged in on THIS phone (saved by MainActivity), so only the alert's recipient's phone buzzes on the login screen. */
     var phoneOwner: String? = null
     var onLoggedIn: (String) -> Unit = {}
     var success by mutableStateOf<SuccessUi?>(null); private set
@@ -155,6 +155,9 @@ class PaymentFlow(
 
     /** Money this person received in the demo, newest first. */
     val received: List<DemoTransfer> get() = incoming.filter { it.toProfile == profile.id }.sortedByDescending { it.atMs }
+
+    /** Every payment made on this phone in this session, by anyone (Judge mode's scoreboard). */
+    val allPayments: List<SessionPayment> get() = ledgers.values.flatten()
 
     /** Demo balance: opening balance + money received - money paid in this session. */
     val balance: Long get() = profile.openingBalance + received.sumOf { it.amount } - ledger.sumOf { it.amount }
@@ -188,8 +191,6 @@ class PaymentFlow(
     /** Demo OTP: no SMS is sent, the code is shown on screen. Never a real OTP. */
     var otpFor by mutableStateOf<TrustedContact?>(null); private set
     var demoOtp by mutableStateOf<String?>(null); private set
-
-    /** This phone is being used as the trusted contact's (Sehjal's) phone. */
 
     private var pasted = false            // payee UPI ID pasted, not typed or picked
     private var prefillAmount = ""        // amount written in a scanned QR code (the person can change it)
@@ -538,20 +539,20 @@ class PaymentFlow(
         val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock(),
             toProfile = DemoWorld.alertRecipient(profile.id))
         alertSentBy = profile.id
-        lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Sehjal)
+        lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as the recipient)
         addToInbox(alert)
         askedFamily = true
         family.send(alert)
         message = "${contact.name} has been alerted"
     }
 
-    // ---- the trusted contact's side (Sehjal's phone) -----------------------------------------
+    // ---- the trusted contact's side (the recipient's phone) ----------------------------------
     /**
-     * An alert arrived from another phone. It is ALWAYS kept, even if nobody is logged in, and opens as
-     * soon as Sehjal logs in. Returns true if this phone should buzz.
+     * An alert arrived from another phone. It is ALWAYS kept, even if nobody is logged in, and is in the
+     * recipient's Notifications when they log in. Returns true if this phone should buzz.
      */
     fun onIncomingAlert(alert: FamilyAlertUi): Boolean {
-        if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // Sehjal already answered it
+        if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // already answered on this phone
         val same = lastAlert != null && lastAlert?.sentAtMs == alert.sentAtMs && alert.sentAtMs != null
         lastAlert = alert; lastAlertAt = alert.sentAtMs ?: clock()
         addToInbox(alert)
@@ -574,7 +575,7 @@ class PaymentFlow(
         if (familyInbox.none { it.key == key }) familyInbox.add(0, FamilyInboxItem(alert, key))
     }
 
-    /** Sehjal taps an alert in the list: the "Call now / I've called" screen opens. */
+    /** The recipient taps an alert in Notifications: the "Call now / I've called" screen opens. */
     fun openAlert(key: Long) {
         val i = familyInbox.indexOfFirst { it.key == key }
         if (i < 0) return
@@ -583,10 +584,10 @@ class PaymentFlow(
         screen = Screen.FamilyAlert
     }
 
-    /** Sehjal tapped the phone notification: open the newest open alert (right after login, if needed). */
+    /** The phone notification was tapped: open the newest open alert for this person (right after login, if needed). */
     fun openAlertFromNotification() {
-        val latest = familyInbox.firstOrNull { !it.done }
         val me = account?.mode
+        val latest = familyInbox.firstOrNull { !it.done && it.alert.toProfile == me } ?: familyInbox.firstOrNull { !it.done }
         when {
             me == null -> openAlertAfterLogin = true
             latest == null -> if (me in DemoWorld.profiles) openAlertAfterLogin = true   // still arriving from Firebase
@@ -605,7 +606,7 @@ class PaymentFlow(
         familyInbox.indices.forEach { i -> if (!familyInbox[i].done) familyInbox[i] = familyInbox[i].copy(done = true) }
     }
 
-    /** Sehjal's answer reached the sender's phone. */
+    /** The trusted contact's answer reached the sender's phone. */
     fun onFamilyStatus(status: String) {
         if (account?.mode != alertSentBy) return   // only the person who asked sees the answer
         when (status) {
@@ -614,7 +615,7 @@ class PaymentFlow(
         }
     }
 
-    /** Sehjal handled the alert: back to waiting for the next one. */
+    /** "I've called": the alert is answered; back to Notifications. */
     fun familyDone() {
         lastAlert?.sentAtMs?.let { k ->
             handledAlerts += k
@@ -884,7 +885,7 @@ class PaymentFlow(
         private val DEFAULT_CONTACTS = mapOf(
             "sharma" to TrustedContact("Sehjal", "friend", "9876543210"),
             "priya" to TrustedContact("Sehjal", "friend", "9876543210"),
-            "rohit" to TrustedContact("Sambhav", "friend", "9812345678"),
+            "rohit" to TrustedContact("Sambhav", "friend", "9899944556"),
         )
 
         /** Median, the same way Python's statistics.median does it (mean of the middle two for an even count). */

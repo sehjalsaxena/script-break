@@ -122,7 +122,7 @@ private val PRESET_SCENARIOS = listOf(
         id = "screen_share",
         icon = AppIcons.ScreenShare,
         title = "Remote Takeover",
-        subtitle = "AnyDesk screen sharing to payee (₹28k)",
+        subtitle = "Remote-access app sharing the screen (₹28k)",
         expectedBadge = "CRITICAL",
         badgeColorType = "CRITICAL",
         payment = Payment(
@@ -139,15 +139,15 @@ private val PRESET_SCENARIOS = listOf(
         id = "reverse_refund",
         icon = AppIcons.History,
         title = "Wrong Credit",
-        subtitle = "Refund trap for stranger deposit (₹10k)",
-        expectedBadge = "PAUSE",
-        badgeColorType = "PAUSE",
+        subtitle = "Stranger's 'mistaken' ₹10k, to be sent on to another account",
+        expectedBadge = "CRITICAL",
+        badgeColorType = "CRITICAL",
         payment = Payment(
             amount = 10000.0,
             median90d = 1200.0,
             payments90d = 40,
             creditUnknown48h = 10000.0,
-            payeeIsSender = true,
+            payeeIsSender = false,   // returning it to the real sender is genuine (no warning); another account is the scam
             payeeStatus = "new"
         ),
     ),
@@ -184,7 +184,7 @@ private val PRESET_SCENARIOS = listOf(
     QuickScenario(
         id = "sharma_demo",
         icon = AppIcons.Refresh,
-        title = "Mr. Sharma Demo",
+        title = "Sambhav Demo",
         subtitle = "Benchmark ₹20k on phone call to new payee",
         expectedBadge = "BENCHMARK",
         badgeColorType = "PAUSE",

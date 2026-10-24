@@ -147,7 +147,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             judge.kitLoading = false
         }
     }
-    // Sehjal's phone needs permission to show the alert as a notification (Android 13+)
+    // the trusted contact's phone needs permission to show the alert as a notification (Android 13+)
     val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(flow.account) {
         // anyone can receive an "Ask family" alert (Sehjal from Sambhav and Deepak, Sambhav from Sehjal)
@@ -440,7 +440,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 Screen.Account -> AccountScreen(
                     userName = flow.profile.displayName,
                     upiId = DemoWorld.ownUpi(flow.profile.id) ?: "${flow.account?.username ?: flow.profile.id}@demoupi",
-                    phoneNumber = "+91 98765 43210",
+                    phoneNumber = DemoWorld.ownPhone(flow.profile.id) ?: "+91 98765 43210",
                     trustedContactName = flow.contact.name,
                     onCheckBalance = flow::startCheckBalance,
                     onTrustedContact = flow::openTrustedContact,
@@ -484,7 +484,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() },
                     resultsContent = {
                         LaunchedEffect(Unit) { if (live == null) runLive() }
-                        ResultsTab(results, live, liveRunning, flow.ledger.size, flow.ledger.count { it.afterWarning }, ::runLive)
+                        ResultsTab(results, live, liveRunning, flow.allPayments.size, flow.allPayments.count { it.afterWarning }, ::runLive)
                     },
                 )
 

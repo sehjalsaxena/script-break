@@ -14,13 +14,14 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 /**
- * "Ask family" between two phones, through Firebase Realtime Database (free plan).
- * Sambhav's phone writes one short alert; Sehjal's phone (Sehjal profile) listens and shows it.
- * Sehjal's answer ("calling", "called") goes back the same way.
+ * "Ask family" between phones, through Firebase Realtime Database (free plan).
+ * The payer's phone writes one short alert for their trusted contact (Sambhav and Deepak -> Sehjal,
+ * Sehjal -> Sambhav); the trusted contact's phone shows it. The answer ("calling", "called") comes back.
+ * Demo payments between the team's phones travel the same way (see [sendPayment]).
  *
  * Only what the person chose to send leaves the phone: who, amount, payee name and up to 3 reasons.
  * No account number, no UPI PIN, nothing about the call. If Firebase is not set up or there is no
- * internet, the alert still shows on this phone (Sehjal profile) and Firebase sends it once online.
+ * internet, the alert is still kept on this phone and Firebase sends it once online.
  */
 class FamilyLink(context: Context) : FamilyAlertSender {
     private val node: DatabaseReference? = try {
@@ -74,7 +75,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
         }
     }
 
-    /** Sehjal's answer: "calling" or "called". */
+    /** The trusted contact's answer: "calling" or "called". */
     fun setStatus(status: String) {
         val n = node ?: return
         signedIn { n.child("status").setValue(status) }
@@ -93,8 +94,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
 
     /**
      * Listen for alerts and status changes, from app start, whoever is logged in.
-     * [onAlert]: an alert from ANOTHER phone that Sehjal has not handled yet (kept up to 24 hours).
-     * [onStatus]: Sehjal's answer to an alert THIS phone sent.
+     * [onAlert]: an alert from ANOTHER phone that has not been answered yet (kept up to 24 hours).
+     * [onStatus]: the trusted contact's answer to an alert THIS phone sent.
      * [onCleared]: the alert is gone (handled, deleted or too old). Call [stop] to remove the listener.
      */
     fun listen(onAlert: (Long, FamilyAlertUi) -> Unit, onStatus: (Long, String) -> Unit, onCleared: () -> Unit = {}) {
@@ -112,8 +113,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     }
 
     /**
-     * Sehjal just logged in: read the alert from Firebase NOW, so one sent while he was logged out, or
-     * while this app was closed, is shown straight away (with the time it was sent).
+     * Someone just logged in: read the alert from Firebase NOW, so one sent while they were logged out,
+     * or while this app was closed, is in their Notifications straight away (with the time it was sent).
      */
     fun fetchLatest() {
         val n = node ?: return
@@ -129,7 +130,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
             s.ref.removeValue(); onCleared(); return
         }
         val mine = s.child("fromDevice").value == deviceId
-        // still open until Sehjal taps "I've called"; a live change to "calling" is Sehjal's own tap, not a new alert
+        // still open until "I've called"; a live change to "calling" is the recipient's own tap, not a new alert
         val open = if (onLogin) status != "called" else status == "sent"
         when {
             open && !mine -> onAlert(id, FamilyAlertUi(
@@ -140,8 +141,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                 sentAtMs = sentAt,
                 toProfile = s.child("to").value as? String ?: "rohit",
             ))
-            mine && status != "sent" && !onLogin -> onStatus(id, status)       // Sehjal answered OUR alert
-            !mine && status == "called" -> onCleared()                        // handled on Sehjal's phone
+            mine && status != "sent" && !onLogin -> onStatus(id, status)       // the contact answered OUR alert
+            !mine && status == "called" -> onCleared()                        // answered on the recipient's phone
         }
     }
 
@@ -157,10 +158,13 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     }
 
     /** Every demo payment, including ones sent while this app was closed. Older than 24 hours: deleted. */
+    private var paymentsListener: ChildEventListener? = null
+
     fun listenPayments(onReceived: (DemoTransfer) -> Unit) {
         val ref = payments ?: return
         signedIn {
-            ref.addChildEventListener(object : ChildEventListener {
+            paymentsListener?.let { ref.removeEventListener(it) }
+            paymentsListener = ref.addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(s: DataSnapshot, previous: String?) {
                     val atMs = (s.child("atMs").value as? Number)?.toLong() ?: return
                     if (System.currentTimeMillis() - atMs >= KEEP_FOR) { s.ref.removeValue(); return }
@@ -196,12 +200,14 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     fun stop() {
         listener?.let { node?.removeEventListener(it) }
         listener = null
+        paymentsListener?.let { payments?.removeEventListener(it) }
+        paymentsListener = null
     }
 
     companion object {
         /** Demo pairing: Sambhav's family. A real app pairs phones with the trusted-contact OTP. */
         const val FAMILY_ID = "sharma-family"
-        /** An alert Sehjal has not handled is kept this long, then deleted. */
+        /** An alert nobody has answered is kept this long, then deleted. */
         private const val KEEP_FOR = 24 * 60 * 60 * 1000L
     }
 }

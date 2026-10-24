@@ -101,7 +101,7 @@ data class Result(
     val level: String,           // NONE | NUDGE | PAUSE | CRITICAL
     val score: Double,           // 0..1, the model's scam probability
     val reasons: List<String>,   // up to 3 plain-language reasons
-    val guardrails: List<String>,// safety rules that changed the level (G1, G2, G4, approved rule ids)
+    val guardrails: List<String>,// safety-layer steps that fired (C1, G1, G2, G4, G5, approved rule ids)
     val modelVersion: String,
 )
 

@@ -9,7 +9,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/** Three-phone demo: the family alert reaches Sehjal whenever he logs in; call and screen share are both shown. */
+/** Three-phone demo: the family alert reaches Sehjal whenever Sehjal logs in; call and screen share are both shown. */
 class FamilyAndScreenShareTest {
     private val model = ScamModel.fromJson(File("src/main/assets/scam_model.json").readText())
     private var now = 1_800_000_000_000L

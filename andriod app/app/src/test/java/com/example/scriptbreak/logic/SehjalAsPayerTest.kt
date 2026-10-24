@@ -59,7 +59,7 @@ class SehjalAsPayerTest {
         assertEquals(Screen.Notifications, sehjal.screen)
         assertTrue(sehjal.myAlerts.single().done)
 
-        val deepak = phone().apply { login("deepak", "2222") }           // not for Deepak: not in his list, no buzz
+        val deepak = phone().apply { login("deepak", "2222") }           // not for Deepak: not in Deepak's list, no buzz
         assertFalse(deepak.onIncomingAlert(sent.single()))
         assertTrue(deepak.myAlerts.isEmpty())
         deepak.openAlertFromNotification()

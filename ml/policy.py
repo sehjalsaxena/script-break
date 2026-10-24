@@ -2,7 +2,8 @@
 
 The MODEL decides how risky a payment looks. This small, explicit POLICY decides what the
 app does about it. These guardrails are what the disclosure form calls "rules stay as
-safety guardrails"; they protect the user if the model is wrong, and never lower a level.
+safety guardrails"; they protect the user if the model is wrong. G1-G5 never lower a level;
+only the C1 coaching check can (a popup with no sign of coaching becomes the amber line).
 
   Score -> level      score > critical -> CRITICAL; > pause -> PAUSE;
                       > nudge and amount >= Rs 1,000 -> NUDGE; else NONE
@@ -23,7 +24,7 @@ safety guardrails"; they protect the user if the model is wrong, and never lower
                       so a TV bought in a shop still gets only the amber line. Measured on the test set:
                       +4 scams caught, genuine interrupted 7.27 -> 7.40 per 1,000 (budget 8).
   G4 answers          at PAUSE or above, "Yes" to Q1 or Q2 -> CRITICAL. "No" changes nothing,
-                      so answers can only RAISE the level. G1-G4 run after C1, so they still raise
+                      so answers can only RAISE the level. G1-G5 run after C1, so they still raise
   (in the app)        "Continue anyway" always available; if scoring fails, the payment goes through
 """
 from __future__ import annotations

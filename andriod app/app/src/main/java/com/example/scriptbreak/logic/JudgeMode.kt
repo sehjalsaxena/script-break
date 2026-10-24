@@ -119,7 +119,9 @@ class JudgeMode(private val model: ScamModel?, val stories: List<Story>) {
 
     /** Read and score a test file. Pure function of the text: safe to run off the main thread. */
     fun scoreKit(text: String, fileName: String): KitResult {
-        val (records, problems) = KitParser.parse(text)
+        val (records, parsedProblems) = KitParser.parse(text)
+        val problems = if (model == null && records.isNotEmpty()) parsedProblems + "The AI model could not be loaded, so nothing was scored"
+                       else parsedProblems
         val rows = records.mapIndexedNotNull { i, r ->
             val res = assess(r.payment, r.q1, r.q2) ?: return@mapIndexedNotNull null
             KitRow(i + 1, r.label, r.workflow, res.level, res.score, r.payment.amount, res.reasons)
@@ -175,7 +177,8 @@ object KitParser {
             val f = normalise(rec.optJSONObject("features") ?: rec)
             val status = f.optString("payee_status", "known"); val kind = f.optString("payee_kind", "person")
             when {
-                !f.has("amount") || f.optDouble("amount", 0.0) <= 0 -> problems += "Row ${i + 1}: amount missing or not above 0"
+                !f.has("amount") || !f.optDouble("amount", 0.0).let { it.isFinite() && it > 0 } ->
+                    problems += "Row ${i + 1}: amount missing or not above 0"
                 status !in STATUSES -> problems += "Row ${i + 1}: unknown payee_status \"$status\""
                 kind !in KINDS -> problems += "Row ${i + 1}: unknown payee_kind \"$kind\""
                 else -> out += Parsed(Payment.fromJson(f), triState(rec, f, "q1"), triState(rec, f, "q2"), label(rec), rec.optString("workflow").ifBlank { null })

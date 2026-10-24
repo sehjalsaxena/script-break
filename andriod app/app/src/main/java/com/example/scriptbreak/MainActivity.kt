@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
             onAlert = { _, alert -> if (flow.onIncomingAlert(alert)) FamilyBuzz.buzz(applicationContext, alert) },
             onStatus = { _, status ->
                 flow.onFamilyStatus(status)
-                // Sehjal has called: the alert has done its job, so the sender's phone deletes it from Firebase
+                // the trusted contact has called: the alert has done its job, so the sender's phone deletes it
                 if (status == "called") family.clear()
             },
             onCleared = { flow.onAlertCleared() },
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
         flow.onSendMoney = { family.sendPayment(it) }
         flow.onResetMoney = { family.clearPaymentsTo(it) }
         family.listenPayments { flow.onMoneyReceived(it) }
-        // remember who uses this phone, so only Sehjal's phone buzzes while it is on the login screen
+        // remember who uses this phone, so only the alert's recipient's phone buzzes on the login screen
         val prefs = getSharedPreferences("scriptbreak", MODE_PRIVATE)
         flow.phoneOwner = prefs.getString("last_user", null)
         flow.onLoggedIn = { user -> prefs.edit().putString("last_user", user).apply() }
@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                     setLayoutDirection(currentLocale)
                 }
             }
-            val localizedContext = remember(currentLocale) {
+            val localizedContext = remember(localizedConfig) {
                 createConfigurationContext(localizedConfig)
             }
             val localizedWrapper = remember(localizedContext) {
@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Sehjal tapped the phone notification while the app was already open in the background. */
+    /** The alert notification was tapped while the app was already open in the background. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)

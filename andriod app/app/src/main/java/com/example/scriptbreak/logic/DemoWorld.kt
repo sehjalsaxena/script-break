@@ -108,6 +108,9 @@ object DemoWorld {
     /** The demo person who owns this UPI ID, if any (their phone receives the money). */
     fun accountByUpi(upiId: String): Account? = accounts.firstOrNull { it.upiId != null && it.upiId == upiId.trim().lowercase() }
 
+    /** This person's own phone number in the demo (from the contacts list; fictional). */
+    fun ownPhone(profileId: String): String? = contacts.firstOrNull { it.upiId == ownUpi(profileId) }?.phone
+
     /** People and contacts as one person sees them: never themselves. */
     fun peopleFor(profileId: String): List<PayeeRecord> = homePeople.filter { it.upiId != ownUpi(profileId) }
     fun contactsFor(profileId: String): List<ContactItem> = contacts.filter { it.upiId != ownUpi(profileId) }
@@ -120,7 +123,7 @@ object DemoWorld {
         ContactItem("c3", "Sunita Iyer", "+91 98222 33445", "sunita.iyer@demoupi", "SI", "#D0679A", "sunita"),
         ContactItem("c4", "Sharma Kirana Store", "+91 98333 44556", "sharmakirana@demoupi", "SK", "#4F9B7A", "kirana"),
         ContactItem("c5", "Anil Mehta", "+91 98444 55667", "anil.mehta@demoupi", "AM", "#B07A3A", "anil"),
-        // Ramesh K. (the scammer's account in the demo) is deliberately NOT a saved contact: the caller dictates his UPI ID
+        // Ramesh K. (the scammer's account in the demo) is deliberately NOT a saved contact: the caller dictates the UPI ID
         ContactItem("c7", "Manoj Electricals", "+91 98666 11223", "manoj.elec@demoupi", "ME", "#7A8A3A", "manoj"),
         ContactItem("c8", "Gupta Electronics", "+91 98777 22334", "guptaelectronics@demoupi", "GE", "#8A5BB0", "gupta"),
         ContactItem("c9", "Deepak Rawat", "+91 98888 33445", "deepak.rawat@demoupi", "DR", "#00897B", "deepak"),
