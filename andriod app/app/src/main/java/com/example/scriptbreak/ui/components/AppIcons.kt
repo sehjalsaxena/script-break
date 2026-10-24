@@ -1102,5 +1102,103 @@ object AppIcons {
         curveTo(19.84f, 21.41f, 20.73f, 19.64f, 19.8f, 18.4f)
         close()
     }.build()
+
+    val Backspace: ImageVector = ImageVector.Builder(
+        name = "Backspace",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(22f, 3f)
+        horizontalLineTo(7f)
+        curveTo(6.31f, 3f, 5.77f, 3.35f, 5.41f, 3.88f)
+        lineTo(0f, 12f)
+        lineTo(5.41f, 20.11f)
+        curveTo(5.77f, 20.64f, 6.31f, 21f, 7f, 21f)
+        horizontalLineTo(22f)
+        curveTo(23.1f, 21f, 24f, 20.1f, 24f, 19f)
+        verticalLineTo(5f)
+        curveTo(24f, 3.9f, 23.1f, 3f, 22f, 3f)
+        close()
+        moveTo(19f, 15.59f)
+        lineTo(17.59f, 17f)
+        lineTo(14f, 13.41f)
+        lineTo(10.41f, 17f)
+        lineTo(9f, 15.59f)
+        lineTo(12.59f, 12f)
+        lineTo(9f, 8.41f)
+        lineTo(10.41f, 7f)
+        lineTo(14f, 10.59f)
+        lineTo(17.59f, 7f)
+        lineTo(19f, 8.41f)
+        lineTo(15.41f, 12f)
+        lineTo(19f, 15.59f)
+        close()
+    }.build()
+
+    val ArrowUpward: ImageVector = ImageVector.Builder(
+        name = "ArrowUpward",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(4f, 12f)
+        lineTo(5.41f, 13.41f)
+        lineTo(11f, 7.83f)
+        verticalLineTo(20f)
+        horizontalLineTo(13f)
+        verticalLineTo(7.83f)
+        lineTo(18.59f, 13.41f)
+        lineTo(20f, 12f)
+        lineTo(12f, 4f)
+        close()
+    }.build()
+
+    val ArrowDropDown: ImageVector = ImageVector.Builder(
+        name = "ArrowDropDown",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(7f, 10f)
+        lineTo(12f, 15f)
+        lineTo(17f, 10f)
+        close()
+    }.build()
+
+    val ArrowDropUp: ImageVector = ImageVector.Builder(
+        name = "ArrowDropUp",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(7f, 14f)
+        lineTo(12f, 9f)
+        lineTo(17f, 14f)
+        close()
+    }.build()
+
+    val CallMade: ImageVector = ImageVector.Builder(
+        name = "CallMade",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(9f, 5f)
+        verticalLineTo(7f)
+        horizontalLineTo(15.59f)
+        lineTo(4.99f, 17.6f)
+        lineTo(6.4f, 19.01f)
+        lineTo(17f, 8.41f)
+        verticalLineTo(15f)
+        horizontalLineTo(19f)
+        verticalLineTo(5f)
+        close()
+    }.build()
 }
 

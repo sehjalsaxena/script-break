@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.logic.JudgeMode
@@ -119,7 +122,7 @@ private val PRESET_SCENARIOS = listOf(
         id = "screen_share",
         icon = AppIcons.ScreenShare,
         title = "Remote Takeover",
-        subtitle = "AnyDesk screen sharing to new payee (₹28k)",
+        subtitle = "AnyDesk screen sharing to payee (₹28k)",
         expectedBadge = "CRITICAL",
         badgeColorType = "CRITICAL",
         payment = Payment(
@@ -191,8 +194,7 @@ private val PRESET_SCENARIOS = listOf(
 
 /**
  * Judge Mode: Interactive AI Defense Sandbox & Showcase for Hackathon Judges.
- * Test scenarios live, inspect neural model scores and safety guardrails,
- * evaluate curated fraud stories, and run batch offline datasets.
+ * Fully responsive across all Android device screen sizes with generous breathing room.
  */
 @Composable
 fun JudgeScreen(
@@ -212,6 +214,7 @@ fun JudgeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(AppBackground)
+            .navigationBarsPadding()
     ) {
         AppTopBar(
             title = "Judge Mode",
@@ -220,57 +223,50 @@ fun JudgeScreen(
             modifier = Modifier.padding(horizontal = 8.dp)
         )
 
-        // Segmented Navigation Pill Control with Vector Icons
-        Surface(
-            color = PanelBg,
-            shape = RoundedCornerShape(14.dp),
-            border = BorderStroke(1.dp, LineBorder),
+        Spacer(Modifier.height(4.dp))
+
+        // Horizontally Scrollable Segmented Pill Tabs with Generous Touch Targets
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 6.dp)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                val tabs = listOf(
-                    Triple("Sandbox", AppIcons.Tune, 0),
-                    Triple("Stories", AppIcons.MenuBook, 1),
-                    Triple("Batch", AppIcons.Folder, 2),
-                    Triple("Score", AppIcons.Assessment, 3)
-                )
-                tabs.forEach { (title, icon, index) ->
-                    val isSelected = judge.tab == index
-                    Surface(
-                        color = if (isSelected) AppSurface else Color.Transparent,
-                        shape = RoundedCornerShape(10.dp),
-                        border = if (isSelected) BorderStroke(1.dp, LineBorder) else null,
-                        shadowElevation = if (isSelected) 1.dp else 0.dp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable { judge.tab = index }
+            val tabs = listOf(
+                Triple("Live Sandbox", AppIcons.Tune, 0),
+                Triple("Scam Stories", AppIcons.MenuBook, 1),
+                Triple("Batch Test", AppIcons.Folder, 2),
+                Triple("Scoreboard", AppIcons.Assessment, 3)
+            )
+            tabs.forEach { (title, icon, index) ->
+                val isSelected = judge.tab == index
+                Surface(
+                    color = if (isSelected) AppPurple else PanelBg,
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(1.dp, if (isSelected) AppPurple else LineBorder),
+                    shadowElevation = if (isSelected) 1.5.dp else 0.dp,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable { judge.tab = index }
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        ) {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                tint = if (isSelected) AppPurple else MutedText,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Spacer(Modifier.width(5.dp))
-                            Text(
-                                text = title,
-                                fontSize = 12.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) AppPurple else MutedText,
-                                maxLines = 1
-                            )
-                        }
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (isSelected) Color.White else MutedText,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = title,
+                            fontSize = 13.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) Color.White else InkDark
+                        )
                     }
                 }
             }
@@ -314,9 +310,9 @@ private fun InputsTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item { Spacer(Modifier.height(2.dp)) }
+        item { Spacer(Modifier.height(4.dp)) }
 
         // 1-Tap Quick Presets for Hackathon Judges
         item {
@@ -343,7 +339,7 @@ private fun InputsTab(
                 r = judge.result,
                 modelVersion = judge.modelVersion,
                 story = judge.stories.firstOrNull { it.id == judge.storyId }?.let {
-                    "${it.id}: ${it.title} (Design Target: ${it.round1Level})"
+                    "${it.id}: ${it.title} (Target: ${it.round1Level})"
                 },
                 onRunInApp = onRunInApp,
                 onReset = { judge.reset() },
@@ -488,7 +484,7 @@ private fun InputsTab(
                     value = judge.q1
                 ) { judge.setAnswers(it, judge.q2) }
 
-                HorizontalDivider(color = LineBorder.copy(alpha = 0.5f))
+                HorizontalDivider(color = LineBorder.copy(alpha = 0.5f), modifier = Modifier.padding(vertical = 4.dp))
 
                 JudgeAnswerRow(
                     label = "Q2: Were you instructed to keep this transaction secret from family or bank?",
@@ -520,7 +516,7 @@ private fun InputsTab(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(48.dp)) }
     }
 }
 
@@ -532,7 +528,7 @@ private fun QuickPresetsRow(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -542,11 +538,20 @@ private fun QuickPresetsRow(
                 fontWeight = FontWeight.Bold,
                 color = InkDark
             )
-            Text(
-                text = "Scroll for more",
-                fontSize = 12.sp,
-                color = FaintText
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Swipe for more",
+                    fontSize = 12.sp,
+                    color = FaintText
+                )
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    imageVector = AppIcons.ChevronRight,
+                    contentDescription = null,
+                    tint = FaintText,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
         }
 
         LazyRow(
@@ -571,15 +576,15 @@ private fun QuickPresetsRow(
                     ),
                     shadowElevation = if (isSelected) 2.dp else 0.5.dp,
                     modifier = Modifier
-                        .width(220.dp)
-                        .height(130.dp)
+                        .width(228.dp)
+                        .height(144.dp)
                         .clickable { onSelect(preset.payment, preset.q1, preset.q2) }
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
+                            .padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -601,34 +606,43 @@ private fun QuickPresetsRow(
                                     color = badgeFg,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                                 )
                             }
                         }
 
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(
-                                text = preset.title,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = InkDark,
-                                maxLines = 1
+                        Text(
+                            text = preset.title,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = InkDark,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = preset.subtitle,
+                            fontSize = 12.sp,
+                            color = MutedText,
+                            maxLines = 2,
+                            lineHeight = 16.sp
+                        )
+
+                        Spacer(Modifier.weight(1f))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isSelected) AppPurple else AppBlue.copy(alpha = 0.4f))
                             )
+                            Spacer(Modifier.width(6.dp))
                             Text(
-                                text = preset.subtitle,
-                                fontSize = 12.sp,
-                                color = MutedText,
-                                maxLines = 2,
-                                lineHeight = 16.sp
+                                text = if (isSelected) "Active Preset" else "Tap to Select",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isSelected) AppPurple else AppBlue
                             )
                         }
-
-                        Text(
-                            text = if (isSelected) "Active Preset" else "Tap to Select",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (isSelected) AppPurple else AppBlue
-                        )
                     }
                 }
             }
@@ -697,7 +711,7 @@ private fun ResultCard(
         shadowElevation = 2.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             // Story subtitle if loaded from stories
             if (story != null) {
                 Surface(
@@ -734,43 +748,55 @@ private fun ResultCard(
                 Surface(
                     color = bg,
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, fg.copy(alpha = 0.4f))
+                    border = BorderStroke(1.dp, fg.copy(alpha = 0.4f)),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = levelIcon,
                             contentDescription = null,
                             tint = fg,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = levelTitle,
                             color = fg,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
+                Spacer(Modifier.width(8.dp))
+
                 Surface(
                     color = PanelBg,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(0.5.dp, LineBorder)
                 ) {
                     Text(
-                        text = "v$modelVersion (Offline ML)",
+                        text = "On-Device AI",
                         fontSize = 11.sp,
-                        color = FaintText,
+                        color = MutedText,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
                     )
                 }
             }
 
-            Text(levelDesc, fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
+            Text(
+                text = levelDesc,
+                fontSize = 13.sp,
+                color = MutedText,
+                lineHeight = 18.sp,
+                modifier = Modifier.padding(vertical = 2.dp)
+            )
 
             // Risk Gauge Meter
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -787,11 +813,13 @@ private fun ResultCard(
                     )
                     Text(
                         text = String.format(Locale.ENGLISH, "%.1f%%", r.score * 100),
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = fg
                     )
                 }
+
+                Spacer(Modifier.height(2.dp))
 
                 LinearProgressIndicator(
                     progress = { r.score.toFloat() },
@@ -802,6 +830,8 @@ private fun ResultCard(
                         .height(10.dp)
                         .clip(RoundedCornerShape(5.dp))
                 )
+
+                Spacer(Modifier.height(4.dp))
 
                 // Threshold Markers
                 Row(
@@ -816,21 +846,23 @@ private fun ResultCard(
             }
 
             // Reasons Section
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "AI Detection Insights",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = InkDark
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = InkDark,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
                 )
                 if (r.reasons.isEmpty()) {
                     Surface(
                         color = PanelBg,
                         shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, LineBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
@@ -839,9 +871,9 @@ private fun ResultCard(
                                 tint = SafeGreen,
                                 modifier = Modifier.size(18.dp)
                             )
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(10.dp))
                             Text(
-                                text = "Zero risk signals triggered. Transaction matches normal spending behavior.",
+                                text = "Zero risk signals triggered. Normal spending behavior.",
                                 fontSize = 13.sp,
                                 color = SafeGreen,
                                 fontWeight = FontWeight.Medium
@@ -857,7 +889,7 @@ private fun ResultCard(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
@@ -866,12 +898,13 @@ private fun ResultCard(
                                     tint = AppPurple,
                                     modifier = Modifier.size(18.dp)
                                 )
-                                Spacer(Modifier.width(8.dp))
+                                Spacer(Modifier.width(12.dp))
                                 Text(
                                     text = reason,
                                     fontSize = 13.sp,
                                     color = InkDark,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
+                                    lineHeight = 18.sp
                                 )
                             }
                         }
@@ -887,7 +920,7 @@ private fun ResultCard(
                     border = BorderStroke(1.dp, CritRed.copy(alpha = 0.3f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = AppIcons.Security,
@@ -895,9 +928,9 @@ private fun ResultCard(
                                 tint = CritRed,
                                 modifier = Modifier.size(16.dp)
                             )
-                            Spacer(Modifier.width(6.dp))
+                            Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Deterministic Safety Rule Override Active",
+                                text = "Deterministic Safety Rule Override",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = CritRed
@@ -907,34 +940,41 @@ private fun ResultCard(
                             val expl = when (g) {
                                 "G1" -> "Rule G1: Payee is on Bank/RBI Fraud Watchlist (Mandatory Block)"
                                 "G2" -> "Rule G2: Payee was previously paid despite security warning"
-                                "G4" -> "Rule G4: User confirmed psychological coercion (secret demand / fake verification)"
+                                "G4" -> "Rule G4: User confirmed psychological coercion"
                                 else -> "$g: Safety rule approved by banking policy"
                             }
-                            Text("• $expl", fontSize = 12.sp, color = InkDark)
+                            Text("• $expl", fontSize = 12.sp, color = InkDark, lineHeight = 16.sp)
                         }
                     }
                 }
             }
 
-            HorizontalDivider(color = LineBorder)
+            HorizontalDivider(color = LineBorder.copy(alpha = 0.6f))
 
-            // Action Buttons
+            // Balanced Single-Line Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DemoPrimaryButton(
-                    text = "Run in Real App Checkout",
+                    text = "Run in App",
                     onClick = onRunInApp,
-                    modifier = Modifier.weight(1.3f),
+                    modifier = Modifier.weight(1.2f),
                     enabled = canRun
                 )
                 DemoSecondaryButton(
                     text = "Reset",
                     onClick = onReset,
-                    modifier = Modifier.weight(0.7f)
+                    modifier = Modifier.weight(0.8f)
                 )
             }
+
+            Text(
+                text = "Model v$modelVersion · Evaluated on this phone offline",
+                fontSize = 11.sp,
+                color = FaintText,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp)
+            )
         }
     }
 }
@@ -976,18 +1016,18 @@ private fun SectionCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = AppPurple,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(10.dp))
                     Text(
                         text = title,
                         fontSize = 16.sp,
@@ -1000,32 +1040,13 @@ private fun SectionCard(
                         text = subtitle,
                         fontSize = 12.sp,
                         color = MutedText,
-                        lineHeight = 16.sp
+                        lineHeight = 16.sp,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
             }
-            HorizontalDivider(color = LineBorder.copy(alpha = 0.6f))
+            HorizontalDivider(color = LineBorder.copy(alpha = 0.5f), modifier = Modifier.padding(vertical = 2.dp))
             content()
-        }
-    }
-}
-
-@Composable
-private fun JudgeFieldHeader(label: String, helper: String? = null) {
-    Column(modifier = Modifier.padding(bottom = 4.dp)) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = InkDark
-        )
-        if (!helper.isNullOrEmpty()) {
-            Text(
-                text = helper,
-                fontSize = 12.sp,
-                color = MutedText,
-                lineHeight = 16.sp
-            )
         }
     }
 }
@@ -1038,8 +1059,22 @@ private fun JudgeNumberField(
     onChange: (Long) -> Unit
 ) {
     var text by remember(value) { mutableStateOf(value.toString()) }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        JudgeFieldHeader(label, helper)
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = InkDark
+        )
+        if (helper.isNotEmpty()) {
+            Text(
+                text = helper,
+                fontSize = 12.sp,
+                color = MutedText,
+                lineHeight = 16.sp
+            )
+        }
+        Spacer(Modifier.height(2.dp))
         OutlinedTextField(
             value = text,
             onValueChange = { s ->
@@ -1077,9 +1112,9 @@ private fun JudgeSwitchRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .clickable { onChange(!checked) }
-            .padding(vertical = 4.dp)
+            .padding(vertical = 6.dp)
     ) {
-        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
             Text(
                 text = label,
                 fontSize = 14.sp,
@@ -1091,7 +1126,8 @@ private fun JudgeSwitchRow(
                     text = helper,
                     fontSize = 12.sp,
                     color = MutedText,
-                    lineHeight = 15.sp
+                    lineHeight = 16.sp,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
             }
         }
@@ -1115,8 +1151,22 @@ private fun JudgeChoiceRow(
     selected: String,
     onPick: (String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        JudgeFieldHeader(label, helper)
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = InkDark
+        )
+        if (helper.isNotEmpty()) {
+            Text(
+                text = helper,
+                fontSize = 12.sp,
+                color = MutedText,
+                lineHeight = 16.sp
+            )
+        }
+        Spacer(Modifier.height(4.dp))
         Row(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -1153,7 +1203,7 @@ private fun JudgeAnswerRow(
     value: Boolean?,
     onPick: (Boolean?) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = label,
             fontSize = 14.sp,
@@ -1161,8 +1211,10 @@ private fun JudgeAnswerRow(
             color = InkDark,
             lineHeight = 18.sp
         )
-        Spacer(Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             listOf(
                 Triple("Not Asked", null, MutedText),
                 Triple("Yes (Coerced)", true, CritRed),
@@ -1213,7 +1265,7 @@ private fun StoriesTab(judge: JudgeMode) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item { Spacer(Modifier.height(4.dp)) }
 
@@ -1225,7 +1277,7 @@ private fun StoriesTab(judge: JudgeMode) {
                 border = BorderStroke(1.dp, LineBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = AppIcons.MenuBook,
@@ -1254,7 +1306,9 @@ private fun StoriesTab(judge: JudgeMode) {
         // Category Filter Chips
         item {
             Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(
@@ -1300,7 +1354,7 @@ private fun StoriesTab(judge: JudgeMode) {
                     .fillMaxWidth()
                     .clickable { judge.loadStory(s) }
             ) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1313,21 +1367,57 @@ private fun StoriesTab(judge: JudgeMode) {
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = kindFg,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                                 )
                             }
                             Spacer(Modifier.width(8.dp))
                             Text(s.id, fontSize = 12.sp, color = FaintText, fontWeight = FontWeight.SemiBold)
                         }
 
-                        Surface(color = PanelBg, shape = RoundedCornerShape(6.dp)) {
-                            Text(
-                                text = "₹${s.payment.amount.toLong()}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = InkDark,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (isMatch) {
+                                Surface(color = SafeGreenTint, shape = RoundedCornerShape(6.dp)) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = AppIcons.Check,
+                                            contentDescription = null,
+                                            tint = SafeGreen,
+                                            modifier = Modifier.size(11.dp)
+                                        )
+                                        Spacer(Modifier.width(3.dp))
+                                        Text("Match", fontSize = 10.sp, color = SafeGreen, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            } else {
+                                Surface(color = NudgeAmberTint, shape = RoundedCornerShape(6.dp)) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = AppIcons.Warning,
+                                            contentDescription = null,
+                                            tint = NudgeAmber,
+                                            modifier = Modifier.size(11.dp)
+                                        )
+                                        Spacer(Modifier.width(3.dp))
+                                        Text("Adjusted", fontSize = 10.sp, color = NudgeAmber, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Surface(color = PanelBg, shape = RoundedCornerShape(6.dp)) {
+                                Text(
+                                    text = "₹${s.payment.amount.toLong()}",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = InkDark,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                )
+                            }
                         }
                     }
 
@@ -1349,57 +1439,35 @@ private fun StoriesTab(judge: JudgeMode) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("Target: ", fontSize = 12.sp, color = MutedText)
                             Text(s.round1Level, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Spacer(Modifier.width(10.dp))
+                            Spacer(Modifier.width(8.dp))
                             Text("AI: ", fontSize = 12.sp, color = MutedText)
                             Surface(color = aiBg, shape = RoundedCornerShape(4.dp)) {
                                 Text(
                                     text = aiLevel,
-                                    fontSize = 12.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = aiFg,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                 )
                             }
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (isMatch) {
-                                Icon(
-                                    imageVector = AppIcons.Check,
-                                    contentDescription = null,
-                                    tint = SafeGreen,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text("Matches Target", fontSize = 12.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
-                            } else {
-                                Icon(
-                                    imageVector = AppIcons.Warning,
-                                    contentDescription = null,
-                                    tint = NudgeAmber,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text("AI Adjusted", fontSize = 12.sp, color = NudgeAmber, fontWeight = FontWeight.SemiBold)
-                            }
-                            Spacer(Modifier.width(10.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Test", fontSize = 12.sp, color = AppPurple, fontWeight = FontWeight.Bold)
-                                Spacer(Modifier.width(2.dp))
-                                Icon(
-                                    imageVector = AppIcons.ChevronRight,
-                                    contentDescription = null,
-                                    tint = AppPurple,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
+                            Text("Test Story", fontSize = 12.sp, color = AppPurple, fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.width(3.dp))
+                            Icon(
+                                imageVector = AppIcons.ChevronRight,
+                                contentDescription = null,
+                                tint = AppPurple,
+                                modifier = Modifier.size(15.dp)
+                            )
                         }
                     }
                 }
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(48.dp)) }
     }
 }
 
@@ -1413,7 +1481,7 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item { Spacer(Modifier.height(4.dp)) }
 
@@ -1425,7 +1493,7 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
                 border = BorderStroke(1.dp, LineBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = AppIcons.Folder,
@@ -1433,7 +1501,7 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
                             tint = AppPurple,
                             modifier = Modifier.size(22.dp)
                         )
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(10.dp))
                         Text(
                             text = "Offline Batch Benchmark Evaluator",
                             fontSize = 17.sp,
@@ -1453,20 +1521,18 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
 
         // Action Buttons
         item {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 DemoPrimaryButton(
                     text = "Run 400-Payment Benchmark",
                     onClick = onLoadSample,
-                    modifier = Modifier.weight(1.2f),
                     enabled = !judge.kitLoading
                 )
                 DemoSecondaryButton(
-                    text = "Upload Custom File",
+                    text = "Upload Custom Test File",
                     onClick = onPickFile,
-                    modifier = Modifier.weight(0.8f),
                     enabled = !judge.kitLoading
                 )
             }
@@ -1481,7 +1547,7 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(18.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         CircularProgressIndicator(color = AppPurple, modifier = Modifier.size(24.dp))
@@ -1500,7 +1566,12 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
 
             // Filter Tabs for rows
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(vertical = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     listOf(
                         "All Payments (${kit.rows.size})" to 0,
                         "Missed Scams (${kit.missedScams.size})" to 1,
@@ -1561,7 +1632,7 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(48.dp)) }
     }
 }
 
@@ -1577,7 +1648,7 @@ private fun KitSummaryCard(k: KitResult) {
         shadowElevation = 1.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1640,7 +1711,7 @@ private fun KitSummaryCard(k: KitResult) {
             }
 
             // Level Distribution Breakdown
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Decision Level Distribution", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -1663,7 +1734,7 @@ private fun KitSummaryCard(k: KitResult) {
             }
 
             if (k.hasLabels && k.byWorkflow.isNotEmpty()) {
-                HorizontalDivider(color = LineBorder)
+                HorizontalDivider(color = LineBorder.copy(alpha = 0.5f))
                 Text("Detection Rate by Fraud Type", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
                 k.byWorkflow.forEach { (workflow, rate) ->
                     Row(
@@ -1697,7 +1768,7 @@ private fun StatTile(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(title, fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.Medium)
@@ -1717,7 +1788,7 @@ private fun RowLine(r: KitRow) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

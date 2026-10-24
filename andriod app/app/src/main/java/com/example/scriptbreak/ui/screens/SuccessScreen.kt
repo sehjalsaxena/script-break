@@ -43,6 +43,10 @@ import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 import com.example.scriptbreak.ui.theme.SuccessGreen
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 @Composable
 fun SuccessScreen(
     state: SuccessUi,
@@ -54,10 +58,17 @@ fun SuccessScreen(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
-            .padding(20.dp),
+            .padding(20.dp)
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(36.dp))
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(20.dp))
 
         // Success Check Icon
         Box(
@@ -170,8 +181,9 @@ fun SuccessScreen(
                 }
             }
         }
+    }
 
-        Spacer(modifier = Modifier.weight(1f))
+    Spacer(modifier = Modifier.height(16.dp))
 
         DemoPrimaryButton(
             text = stringResource(R.string.done),

@@ -83,6 +83,7 @@ fun AmountScreen(
             .fillMaxSize()
             .background(AppBackground)
             .padding(16.dp)
+            .navigationBarsPadding()
     ) {
         AppTopBar(
             onBack = onBack,
@@ -288,19 +289,52 @@ private fun SafetyCheckCard(level: String, score: Double?, facts: List<String>, 
         border = androidx.compose.foundation.BorderStroke(1.dp, LineBorder),
         modifier = Modifier.fillMaxWidth().clickable { open = !open }
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Safety check", fontSize = 13.sp, color = MutedText)
                     Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = color)
                 }
-                Text(if (open) "Hide ▲" else "Why? ▼", fontSize = 14.sp, color = AppPurple)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (open) "Hide" else "Why?", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = AppPurple)
+                    Spacer(Modifier.width(2.dp))
+                    Icon(
+                        imageVector = if (open) AppIcons.ArrowDropUp else AppIcons.ArrowDropDown,
+                        contentDescription = null,
+                        tint = AppPurple,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
             if (open) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 facts.forEach { line ->
-                    Text(line, fontSize = 15.sp, lineHeight = 21.sp,
-                        color = if (line.startsWith("✓")) SafeGreen else InkDark)
+                    val isCheck = line.startsWith("✓")
+                    val isWarn = line.startsWith("⚠")
+                    val cleanText = line.removePrefix("✓").removePrefix("⚠").trim()
+                    Row(
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 3.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isCheck) AppIcons.Check else if (isWarn) AppIcons.Warning else AppIcons.Info,
+                            contentDescription = null,
+                            tint = if (isCheck) SafeGreen else if (isWarn) NudgeAmber else MutedText,
+                            modifier = Modifier
+                                .size(15.dp)
+                                .padding(top = 2.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = cleanText,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            color = if (isCheck) SafeGreen else InkDark,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
                 score?.let {
                     Text("AI risk score: ${Math.round(it * 100)}%", fontSize = 13.sp, color = MutedText,

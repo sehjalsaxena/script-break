@@ -359,11 +359,11 @@ fun NumericKeypad(
                     }
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "⌫",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = InkDark
+                    Icon(
+                        imageVector = AppIcons.Backspace,
+                        contentDescription = "Delete",
+                        tint = InkDark,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }

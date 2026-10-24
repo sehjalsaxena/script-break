@@ -2,6 +2,8 @@ package com.example.scriptbreak.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,6 +69,7 @@ fun PayToUpiScreen(
             .fillMaxSize()
             .background(AppBackground)
             .padding(16.dp)
+            .navigationBarsPadding()
     ) {
         AppTopBar(
             title = stringResource(R.string.pay_upi_title),
@@ -144,7 +147,9 @@ fun PayToUpiScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             recentPayees.forEach { (id, name) ->
@@ -195,11 +200,12 @@ fun PayToUpiScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         DemoPrimaryButton(
             text = stringResource(R.string.continue_btn),
             onClick = onContinue,
-            enabled = upiId.isNotBlank(),
-            modifier = Modifier.navigationBarsPadding()
+            enabled = upiId.isNotBlank()
         )
     }
 }

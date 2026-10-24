@@ -30,13 +30,20 @@ import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
 import com.example.scriptbreak.ui.theme.SafeGreen
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 /** Sehjal's phone, waiting for an "Ask family" alert. */
 @Composable
 fun FamilyWaitingScreen(online: Boolean, onBack: () -> Unit) {
-    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp)) {
+    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp).navigationBarsPadding()) {
         AppTopBar(title = "Sehjal's phone", onBack = onBack, showScriptBreakBadge = true)
         Column(
-            Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -74,7 +75,7 @@ fun ReportPacketScreen(
     onShare: () -> Unit,
     onBack: () -> Unit,
 ) {
-    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp).verticalScroll(rememberScrollState()),
+    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp).navigationBarsPadding().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         AppTopBar(title = "Report this payment", onBack = onBack, showScriptBreakBadge = true)
         Surface(color = Color(0xFFFBEAEA), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
@@ -119,7 +120,7 @@ fun TrustedContactScreen(
     var relation by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
-    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp).verticalScroll(rememberScrollState()),
+    Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp).navigationBarsPadding().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         AppTopBar(title = "Trusted contact", onBack = onBack, showScriptBreakBadge = true)
         WhiteCard {

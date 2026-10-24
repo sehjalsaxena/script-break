@@ -38,6 +38,8 @@ import com.example.scriptbreak.ui.theme.LineBorder
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+
 @Composable
 fun PinScreen(
     amountText: String,
@@ -54,13 +56,14 @@ fun PinScreen(
             .fillMaxSize()
             .background(AppBackground)
             .padding(16.dp)
+            .navigationBarsPadding()
     ) {
         AppTopBar(
             onBack = onBack,
             showScriptBreakBadge = true
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -74,7 +77,7 @@ fun PinScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = stringResource(R.string.enter_upi_pin),
@@ -83,7 +86,7 @@ fun PinScreen(
                 color = InkDark
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // 4 Pin dots
             Row(

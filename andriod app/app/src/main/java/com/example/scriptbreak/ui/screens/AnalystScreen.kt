@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,7 +63,7 @@ import java.util.Locale
 @Composable
 fun AnalystScreen(analyst: AnalystMode, onRunInApp: () -> Unit, onBack: () -> Unit) {
     val d = analyst.discovery
-    Column(Modifier.fillMaxSize().background(AppBackground)) {
+    Column(Modifier.fillMaxSize().background(AppBackground).navigationBarsPadding()) {
         AppTopBar(title = "Analyst console", onBack = onBack, showScriptBreakBadge = true, modifier = Modifier.padding(horizontal = 8.dp))
         if (d == null) {
             Text("Discovery data could not be loaded.", fontSize = 16.sp, color = CritRed, modifier = Modifier.padding(16.dp))

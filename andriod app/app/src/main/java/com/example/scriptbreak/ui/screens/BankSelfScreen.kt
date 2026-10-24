@@ -91,7 +91,7 @@ fun BankSelfScreen(
         // Tabs: Bank Account vs To Self
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = Color.White,
+            containerColor = AppSurface,
             contentColor = AppBlue,
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
@@ -153,9 +153,9 @@ fun BankSelfScreen(
                                 unfocusedTextColor = InkDark,
                                 cursorColor = AppBlue,
                                 focusedBorderColor = AppBlue,
-                                unfocusedBorderColor = Color(0xFFDDE2EA),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
+                                focusedContainerColor = AppSurface,
+                                unfocusedContainerColor = AppSurface
                             ),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -172,9 +172,9 @@ fun BankSelfScreen(
                                 unfocusedTextColor = InkDark,
                                 cursorColor = AppBlue,
                                 focusedBorderColor = AppBlue,
-                                unfocusedBorderColor = Color(0xFFDDE2EA),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
+                                focusedContainerColor = AppSurface,
+                                unfocusedContainerColor = AppSurface
                             ),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -191,9 +191,9 @@ fun BankSelfScreen(
                                 unfocusedTextColor = InkDark,
                                 cursorColor = AppBlue,
                                 focusedBorderColor = AppBlue,
-                                unfocusedBorderColor = Color(0xFFDDE2EA),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
+                                focusedContainerColor = AppSurface,
+                                unfocusedContainerColor = AppSurface
                             ),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -210,9 +210,9 @@ fun BankSelfScreen(
                                 unfocusedTextColor = InkDark,
                                 cursorColor = AppBlue,
                                 focusedBorderColor = AppBlue,
-                                unfocusedBorderColor = Color(0xFFDDE2EA),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
+                                focusedContainerColor = AppSurface,
+                                unfocusedContainerColor = AppSurface
                             ),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -305,6 +305,8 @@ fun BankSelfScreen(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         DemoPrimaryButton(
             text = if (selectedTab == 0) "Proceed" else "Transfer to Self",

@@ -32,6 +32,8 @@ import com.example.scriptbreak.ui.theme.NudgeAmber
 import com.example.scriptbreak.ui.theme.NudgeAmberTint
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+
 @Composable
 fun WaitingScreen(
     onHome: () -> Unit,
@@ -41,10 +43,11 @@ fun WaitingScreen(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
-            .padding(24.dp),
+            .padding(24.dp)
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Box(
             contentAlignment = Alignment.Center,

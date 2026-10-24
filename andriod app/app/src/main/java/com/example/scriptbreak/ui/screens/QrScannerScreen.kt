@@ -78,7 +78,7 @@ fun QrScannerScreen(
     }
     LaunchedEffect(Unit) { if (!hasCamera) askCamera.launch(Manifest.permission.CAMERA) }
 
-    Column(modifier = Modifier.fillMaxSize().background(AppBackground).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppBackground).navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
         AppTopBar(title = title, onBack = onBack, showScriptBreakBadge = true)
         Spacer(Modifier.height(12.dp))
         if (hasCamera) {
@@ -110,8 +110,8 @@ fun QrScannerScreen(
                 }
             }
         }
-        Spacer(Modifier.height(12.dp))
-        DemoSecondaryButton("Pick a QR image instead", onPickImage, Modifier.navigationBarsPadding())
+        Spacer(Modifier.height(14.dp))
+        DemoSecondaryButton("Pick a QR image instead", onPickImage)
     }
 }
 

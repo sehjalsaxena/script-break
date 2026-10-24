@@ -1,6 +1,8 @@
 package com.example.scriptbreak.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,19 +58,21 @@ fun PayeeScreen(
             .fillMaxSize()
             .background(AppBackground)
             .padding(16.dp)
+            .navigationBarsPadding()
     ) {
         AppTopBar(
             onBack = onBack,
             showScriptBreakBadge = true
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
             val initials = state.name.split(" ")
                 .mapNotNull { it.firstOrNull()?.toString() }
@@ -194,10 +198,11 @@ fun PayeeScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         DemoPrimaryButton(
             text = stringResource(R.string.pay),
-            onClick = onPay,
-            modifier = Modifier.navigationBarsPadding()
+            onClick = onPay
         )
     }
 }

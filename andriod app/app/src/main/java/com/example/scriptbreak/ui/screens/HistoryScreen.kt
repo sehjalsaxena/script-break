@@ -172,7 +172,12 @@ fun HistoryScreen(
                                         .background(AppOrangeLight)
                                         .align(Alignment.BottomEnd)
                                 ) {
-                                    Text("↑", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = AppOrange)
+                                    Icon(
+                                        imageVector = AppIcons.CallMade,
+                                        contentDescription = null,
+                                        tint = AppOrange,
+                                        modifier = Modifier.size(10.dp)
+                                    )
                                 }
                             }
 

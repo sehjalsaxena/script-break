@@ -5,6 +5,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,40 +89,44 @@ fun CheckBalanceScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Security Info Banner
-        Surface(
-            color = SafeGreenTint,
-            shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(14.dp)
+            // Security Info Banner
+            Surface(
+                color = SafeGreenTint,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = AppIcons.Security,
-                    contentDescription = null,
-                    tint = SafeGreen,
-                    modifier = Modifier.size(22.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Demo balance: no real bank is contacted",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = SafeGreen
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(14.dp)
+                ) {
+                    Icon(
+                        imageVector = AppIcons.Security,
+                        contentDescription = null,
+                        tint = SafeGreen,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Demo balance: no real bank is contacted",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = SafeGreen
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(18.dp))
-
-        Text(
-            text = "Linked Bank Accounts",
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = MutedText
-        )
+            Text(
+                text = "Linked Bank Accounts",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = MutedText
+            )
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -434,8 +440,9 @@ fun CheckBalanceScreen(
                 }
             }
         }
+    }
 
-        Spacer(modifier = Modifier.weight(1f))
+    Spacer(modifier = Modifier.height(16.dp))
 
         DemoPrimaryButton(
             text = "Done",
