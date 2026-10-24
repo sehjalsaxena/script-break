@@ -53,18 +53,21 @@ fun DemoPayLogoText(
     fontSize: androidx.compose.ui.unit.TextUnit = 22.sp,
     fontWeight: FontWeight = FontWeight.Bold
 ) {
+    val isDark = LocalDarkTheme.current
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         Text(
             text = "Demo",
             fontSize = fontSize,
             fontWeight = fontWeight,
-            color = if (LocalDarkTheme.current) AppBlueElectric else AppBlue
+            color = if (isDark) Color(0xFFF1F5F9) else com.example.scriptbreak.ui.theme.AppBluePrimary,
+            letterSpacing = (-0.5).sp
         )
         Text(
             text = "Pay",
             fontSize = fontSize,
             fontWeight = fontWeight,
-            color = AppOrange
+            color = if (isDark) Color(0xFFFF8533) else com.example.scriptbreak.ui.theme.AppOrangePrimary,
+            letterSpacing = (-0.5).sp
         )
     }
 }

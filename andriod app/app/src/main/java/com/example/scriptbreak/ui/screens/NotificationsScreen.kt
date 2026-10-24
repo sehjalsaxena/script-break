@@ -70,10 +70,14 @@ fun NotificationsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val blue = AppBlue
+    val orange = AppOrange
+    val green = SafeGreen
     val blueLight = AppBlueLight
     val orangeLight = AppOrangeLight
+    val greenTint = SafeGreenTint
 
-    val notifications = remember(blueLight, orangeLight) {
+    val notifications = remember(blue, orange, green, blueLight, orangeLight, greenTint) {
         mutableStateListOf(
             NotificationItem(
                 id = "1",
@@ -82,8 +86,8 @@ fun NotificationsScreen(
                 time = "Just now",
                 category = "Security",
                 icon = AppIcons.Security,
-                iconTint = SafeGreen,
-                iconBg = SafeGreenTint,
+                iconTint = green,
+                iconBg = greenTint,
                 unread = true
             ),
             NotificationItem(
@@ -93,8 +97,8 @@ fun NotificationsScreen(
                 time = "Today 10:42 AM",
                 category = "Transactions",
                 icon = AppIcons.Check,
-                iconTint = SafeGreen,
-                iconBg = SafeGreenTint,
+                iconTint = green,
+                iconBg = greenTint,
                 unread = true
             ),
             NotificationItem(
@@ -104,7 +108,7 @@ fun NotificationsScreen(
                 time = "2 hours ago",
                 category = "Security",
                 icon = AppIcons.Person,
-                iconTint = AppBlue,
+                iconTint = blue,
                 iconBg = blueLight,
                 unread = false
             ),
@@ -115,7 +119,7 @@ fun NotificationsScreen(
                 time = "Yesterday",
                 category = "Security",
                 icon = AppIcons.Lock,
-                iconTint = AppOrange,
+                iconTint = orange,
                 iconBg = orangeLight,
                 unread = false
             ),
@@ -126,7 +130,7 @@ fun NotificationsScreen(
                 time = "2 days ago",
                 category = "Transactions",
                 icon = AppIcons.AccountBalance,
-                iconTint = AppBlue,
+                iconTint = blue,
                 iconBg = blueLight,
                 unread = false
             )

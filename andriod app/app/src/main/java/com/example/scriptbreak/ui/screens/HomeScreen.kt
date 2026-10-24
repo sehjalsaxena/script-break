@@ -60,7 +60,9 @@ import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
 import com.example.scriptbreak.ui.theme.AppSurface
-import com.example.scriptbreak.ui.theme.AppBlueElectric
+import androidx.compose.foundation.BorderStroke
+import com.example.scriptbreak.ui.theme.LineBorder
+import com.example.scriptbreak.ui.theme.PanelBg
 import com.example.scriptbreak.ui.theme.LocalDarkTheme
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
@@ -178,9 +180,10 @@ fun HomeScreen(
             // Search bar with QR scan icon button
             item {
                 Surface(
-                    color = AppSurface,
+                    color = PanelBg,
                     shape = RoundedCornerShape(24.dp),
-                    shadowElevation = 1.dp,
+                    border = BorderStroke(1.dp, LineBorder),
+                    shadowElevation = 0.5.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -479,9 +482,9 @@ fun HomeScreen(
                 icon = { Icon(AppIcons.Home, contentDescription = "Home") },
                 label = { Text(stringResource(R.string.nav_home), fontSize = 14.sp, fontWeight = FontWeight.SemiBold) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = if (LocalDarkTheme.current) AppBlueElectric else AppBlue,
-                    selectedTextColor = if (LocalDarkTheme.current) AppBlueElectric else AppBlue,
-                    indicatorColor = if (LocalDarkTheme.current) Color(0xFF1E2E46) else AppBlueLight,
+                    selectedIconColor = AppBlue,
+                    selectedTextColor = AppBlue,
+                    indicatorColor = AppBlueLight,
                     unselectedIconColor = MutedText,
                     unselectedTextColor = MutedText
                 )
@@ -490,13 +493,27 @@ fun HomeScreen(
                 selected = false,
                 onClick = onHistory,
                 icon = { Icon(AppIcons.History, contentDescription = "History") },
-                label = { Text(stringResource(R.string.nav_history), fontSize = 14.sp) }
+                label = { Text(stringResource(R.string.nav_history), fontSize = 14.sp) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = AppBlue,
+                    selectedTextColor = AppBlue,
+                    indicatorColor = AppBlueLight,
+                    unselectedIconColor = MutedText,
+                    unselectedTextColor = MutedText
+                )
             )
             NavigationBarItem(
                 selected = false,
                 onClick = onSettings ?: onHistory,
                 icon = { Icon(AppIcons.Settings, contentDescription = "Settings") },
-                label = { Text(stringResource(R.string.nav_settings), fontSize = 14.sp) }
+                label = { Text(stringResource(R.string.nav_settings), fontSize = 14.sp) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = AppBlue,
+                    selectedTextColor = AppBlue,
+                    indicatorColor = AppBlueLight,
+                    unselectedIconColor = MutedText,
+                    unselectedTextColor = MutedText
+                )
             )
         }
     }

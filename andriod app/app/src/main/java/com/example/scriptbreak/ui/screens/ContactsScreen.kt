@@ -123,7 +123,7 @@ fun ContactsScreen(
                 unfocusedTextColor = InkDark,
                 cursorColor = AppBlue,
                 focusedBorderColor = AppBlue,
-                unfocusedBorderColor = Color(0xFFDDE2EA),
+                unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
                 focusedContainerColor = AppSurface,
                 unfocusedContainerColor = AppSurface
             ),
