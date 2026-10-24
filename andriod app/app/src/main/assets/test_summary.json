@@ -1,5 +1,5 @@
 {
- "when_utc": "2026-10-24 15:44",
+ "when_utc": "2026-10-24 18:45",
  "environment": {
   "python": "3.13.14",
   "platform": "Windows-11-10.0.26300-SP0",
@@ -8,14 +8,14 @@
   "scikit-learn": "1.9.1",
   "joblib": "1.6.0"
  },
- "seconds": 284,
+ "seconds": 230,
  "step_seconds": {
   "make_dataset": 4.6,
-  "train": 38.2,
-  "export_model": 1.6,
-  "evaluate": 179.0,
-  "discovery_unseen": 41.6,
-  "discovery": 2.8
+  "train": 36.9,
+  "export_model": 1.5,
+  "evaluate": 138.3,
+  "discovery_unseen": 31.1,
+  "discovery": 2.6
  },
  "dataset_sha256": {
   "train.jsonl": "7615cedab94db55269777d6dd63c61426247f2a2f66a47c6b24488f72d193041",
@@ -62,12 +62,17 @@
   {
    "name": "G4: 'Yes' at Pause or above gives Critical",
    "passed": true,
-   "detail": "3,111 paused payments answered Yes: 0 not Critical"
+   "detail": "3,110 paused payments answered Yes: 0 not Critical"
   },
   {
-   "name": "Guardrails never lower the model's level",
+   "name": "G1-G4 never lower the model's level; only C1 does, to Nudge, with no coaching sign",
    "passed": true,
-   "detail": "0 lowered"
+   "detail": "1 lowered by C1 (no call, screen share, paste, app switch or new-payee activity), 0 wrongly"
+  },
+  {
+   "name": "C1: no full-screen popup without a sign of coaching (flagged/warned payees excepted)",
+   "passed": true,
+   "detail": "0 found"
   },
   {
    "name": "G1: bank-flagged payee is always Critical",
@@ -120,7 +125,7 @@
    "detail": "10 cases, 0 failed"
   }
  ],
- "passed": 19,
+ "passed": 20,
  "failed": 0,
  "error_bars_95": {
   "scams_flagged_in_scope6": {
@@ -138,18 +143,18 @@
    "high": 0.8159913799469983
   },
   "genuine_interrupted": {
-   "k": 219,
+   "k": 218,
    "n": 30000,
-   "rate": 0.0073,
-   "low": 0.006397772386753106,
-   "high": 0.008328395211732013
+   "rate": 0.007266666666666667,
+   "low": 0.00636662393651553,
+   "high": 0.008292885531098776
   },
   "genuine_nudged": {
-   "k": 606,
+   "k": 607,
    "n": 30000,
-   "rate": 0.0202,
-   "low": 0.018668360920098243,
-   "high": 0.02185450332539224
+   "rate": 0.020233333333333332,
+   "low": 0.018700405310424453,
+   "high": 0.021889117065936846
   },
   "by_workflow": {
    "chat_task": {
@@ -181,11 +186,11 @@
     "high": 0.9127418196539678
    },
    "genuine": {
-    "k": 219,
+    "k": 218,
     "n": 30000,
-    "rate": 0.0073,
-    "low": 0.006397772386753106,
-    "high": 0.008328395211732013
+    "rate": 0.007266666666666667,
+    "low": 0.00636662393651553,
+    "high": 0.008292885531098776
    },
    "hang_up_and_pay": {
     "k": 356,
@@ -226,18 +231,18 @@
    "high": 0.018875736276562784
   },
   "Regular users": {
-   "k": 197,
+   "k": 196,
    "n": 28242,
-   "rate": 0.006975426669499327,
-   "low": 0.006069558705361534,
-   "high": 0.008015403096590934
+   "rate": 0.006940018412293747,
+   "low": 0.006036598440095376,
+   "high": 0.00797755647890693
   },
   "Paying a person": {
-   "k": 185,
+   "k": 184,
    "n": 9867,
-   "rate": 0.018749366575453532,
-   "low": 0.01625426299110854,
-   "high": 0.021619062825405426
+   "rate": 0.018648018648018648,
+   "low": 0.01616003838584814,
+   "high": 0.021510670462321406
   },
   "Paying a merchant": {
    "k": 32,
@@ -254,11 +259,11 @@
    "high": 0.010914549990615315
   },
   "Day": {
-   "k": 210,
+   "k": 209,
    "n": 28438,
-   "rate": 0.007384485547506857,
-   "low": 0.006453789278915498,
-   "high": 0.008448255601328824
+   "rate": 0.007349321330613967,
+   "low": 0.006420978553687156,
+   "high": 0.008410747391935154
   }
  },
  "edge_cases": [
@@ -350,5 +355,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.139
+ "python_scorer_ms_per_payment": 0.13
 }

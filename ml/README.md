@@ -69,7 +69,7 @@ or the Q1/Q2 answers.
 | `train.py` | Trains Logistic Regression, Random Forest, Gradient Boosting; picks the best on validation |
 | `export_model.py` | Writes `scam_model.json` (the model as plain JSON) |
 | `scorer.py` | Reads `scam_model.json` and scores a payment, no ML library: the same logic as the Kotlin code |
-| `policy.py` | Safety layer: thresholds + guardrails G1, G2, G3, G4 |
+| `policy.py` | Safety layer: thresholds + C1 coaching check + guardrails G1, G2, G3, G4 |
 | `make_test_vectors.py` | Python-vs-JSON parity check; writes 500 test payments for Kotlin |
 | `evaluate.py` | All the numbers for judges |
 | `analyst_discovery.py` | AI pattern discovery for the analyst console |

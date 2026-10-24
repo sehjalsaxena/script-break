@@ -72,7 +72,7 @@ Dataset checksums (SHA-256, line endings normalised to `\n`):
 | Behaviour stories | The 28 Round 1 stories through model + safety layer | `REPORT.md` |
 | Failures | Missed scams by type, false-alarm patterns, named failure stories | `REPORT.md` |
 | Calibration | Does a score of 0.8 mean about 80% scam? | `REPORT.md` |
-| Safety | Answers only raise the level; "No" changes nothing; guardrails G1–G4 always fire and never lower; no Nudge under ₹1,000; Q1/Q2 never reach the model | `TEST_SUMMARY.md` |
+| Safety | Answers only raise the level; "No" changes nothing; guardrails G1–G4 always fire and never lower; only the C1 coaching check lowers, to Nudge, and only with no coaching sign; no popup without a coaching sign; no Nudge under ₹1,000; Q1/Q2 never reach the model | `TEST_SUMMARY.md` |
 | Explanations | Every reason shown names a signal that is really present (25,041 reasons checked) | same |
 | Fairness | Genuine interruptions per 1,000: first-time vs regular users, person vs merchant, night vs day | `TEST_SUMMARY.md` |
 | Robustness of code | Edge cases: ₹0, ₹1, ₹100 crore, no history, missing or unknown fields; determinism | same |

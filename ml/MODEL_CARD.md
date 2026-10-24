@@ -35,6 +35,12 @@ The thresholds are set on validation data so that about 6.5 per 1,000 genuine pa
 interrupted (budget ≤ 8).
 
 **Fixed guardrails on top** (`policy.py`, same in Kotlin):
+- C1 coaching check (added 25 Oct): a full-screen Pause or Critical needs at least one sign that someone may be
+  steering the payment: a call now or in the last 30 minutes, screen sharing, a pasted UPI ID, leaving the app,
+  new payees in the last hour, money already sent to new payees today, money received from a stranger, or a
+  repeat payment to a new payee. With none, a big amount alone (a TV bought in a shop) gets the amber Nudge line.
+  It is the only step that can lower a level. Measured on the test set: 0 scams lost, the 28 stories unchanged,
+  1 genuine false alarm removed (7.30 → 7.27 per 1,000). On the 1,200 analyst reports, 3 more are missed (270 → 273).
 - G1: a bank-flagged payee is always Critical.
 - G2: a warned payee gets at least a Nudge, or Critical with a live call.
 - G3: a rule approved by analysts gives at least a Pause.

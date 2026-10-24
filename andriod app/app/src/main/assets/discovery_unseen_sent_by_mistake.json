@@ -1,13 +1,13 @@
 {
  "model": "unseen:sent_by_mistake",
  "reports": 1200,
- "missed_by_model": 270,
+ "missed_by_model": 273,
  "missed_by_type": {
-  "digital_arrest": 15,
+  "digital_arrest": 17,
   "customer_care": 42,
   "kyc_official": 43,
   "courier": 15,
-  "voice_clone": 9,
+  "voice_clone": 10,
   "hang_up_and_pay": 20,
   "sent_by_mistake": 89,
   "chat_task": 37
@@ -15,7 +15,7 @@
  "clustering": {
   "method": "average-linkage, Jaccard distance",
   "cut_height": 0.6,
-  "silhouette": 0.322
+  "silhouette": 0.326
  },
  "policy": {
   "new_rule_budget_per_1000": 0.5,
@@ -51,7 +51,7 @@
    }
   },
   {
-   "cluster_id": "C5",
+   "cluster_id": "C2",
    "size": 58,
    "pattern": [
     "on a call now",
@@ -75,7 +75,7 @@
    }
   },
   {
-   "cluster_id": "C2",
+   "cluster_id": "C3",
    "size": 50,
    "pattern": [
     "left and returned to the app",
@@ -98,8 +98,8 @@
    }
   },
   {
-   "cluster_id": "C3",
-   "size": 30,
+   "cluster_id": "C4",
+   "size": 31,
    "pattern": [
     "unusual amount",
     "new payee"
@@ -109,7 +109,7 @@
     "customer_care": 5,
     "kyc_official": 5,
     "courier": 3,
-    "voice_clone": 2,
+    "voice_clone": 3,
     "digital_arrest": 1,
     "chat_task": 1
    },
@@ -119,11 +119,11 @@
      "amount_big",
      "payee_new"
     ],
-    "added_false_alarms_per_1000": 20.51
+    "added_false_alarms_per_1000": 20.52
    }
   },
   {
-   "cluster_id": "C4",
+   "cluster_id": "C5",
    "size": 28,
    "pattern": [
     "new payee",

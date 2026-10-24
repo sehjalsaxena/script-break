@@ -144,8 +144,19 @@ def main(test_path: Path | None = None) -> dict:
     checks.append(check("G4: 'Yes' at Pause or above gives Critical", all(l == "CRITICAL" for l in yes_crit),
                         f"{len(yes_crit):,} paused payments answered Yes: {sum(l != 'CRITICAL' for l in yes_crit)} not Critical"))
 
-    lower_than_score = sum(R[b] < R[score_only_level(f, s, m)] for f, s, b in zip(raws, scores, base))
-    checks.append(check("Guardrails never lower the model's level", lower_than_score == 0, f"{lower_than_score} lowered"))
+    # Only C1 may lower a level: only to Nudge (None below Rs 1,000), only with NO coaching sign at all.
+    lowered_ok, lowered_bad = 0, 0
+    for f, s, b in zip(raws, scores, base):
+        sl = score_only_level(f, s, m)
+        if R[b] < R[sl]:
+            ok = not policy.coaching_signs(f) and b in ("NUDGE", "NONE") and f.get("payee_status") not in ("flagged", "warned")
+            lowered_ok += ok; lowered_bad += not ok
+    checks.append(check("G1-G4 never lower the model's level; only C1 does, to Nudge, with no coaching sign", lowered_bad == 0,
+                        f"{lowered_ok} lowered by C1 (no call, screen share, paste, app switch or new-payee activity), {lowered_bad} wrongly"))
+    popup_without_sign = sum(R[b] >= R["PAUSE"] and not policy.coaching_signs(f) and f.get("payee_status") not in ("flagged", "warned")
+                             for f, b in zip(raws, base))
+    checks.append(check("C1: no full-screen popup without a sign of coaching (flagged/warned payees excepted)", popup_without_sign == 0,
+                        f"{popup_without_sign} found"))
 
     rng = random.Random(42)
     sample = rng.sample(raws, 2000)

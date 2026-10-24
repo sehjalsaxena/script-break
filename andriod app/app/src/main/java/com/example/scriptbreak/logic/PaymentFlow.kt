@@ -112,6 +112,9 @@ class PaymentFlow(
     private val handledAlerts = mutableSetOf<Long>()   // alerts Rohit already answered on this phone
     /** Called when Rohit logs in: MainActivity reads the latest alert from Firebase right away. */
     var onFamilyLogin: () -> Unit = {}
+    /** Who last logged in on THIS phone (saved by MainActivity), so only Rohit's phone buzzes on the login screen. */
+    var phoneOwner: String? = null
+    var onLoggedIn: (String) -> Unit = {}
     var success by mutableStateOf<SuccessUi?>(null); private set
     var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
@@ -207,6 +210,7 @@ class PaymentFlow(
         val a = DemoWorld.account(username)
         if (a == null || !a.checkLogin(pin)) { message = "Wrong username or PIN"; return false }
         account = a
+        phoneOwner = a.username; onLoggedIn(a.username)
         pickProfile(a.mode)
         return true
     }
@@ -445,7 +449,7 @@ class PaymentFlow(
                 if (screen == Screen.FamilyWaiting || !same) screen = Screen.FamilyAlert
                 !same                                            // buzz once per alert, not again on login
             }
-            account == null -> !same                             // login screen: buzz, it opens when Rohit logs in
+            account == null -> !same && phoneOwner == "rohit"    // login screen of ROHIT's phone: buzz; other phones keep it quietly
             else -> false                                        // someone else is using this phone: keep it quietly
         }
     }

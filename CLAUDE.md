@@ -100,7 +100,9 @@ Always say: synthetic results test our assumptions, not real-world accuracy.
 → `Result(level, score, reasons[≤3], guardrails, modelVersion)`. Reasons are grouped plain sentences,
 e.g. "The amount is 74 times your usual payment · You have never paid this payee before · You are on a call right now".
 
-**Safety layer (`policy.py` = Kotlin `assess`):** score → level; G1 flagged payee → Critical;
+**Safety layer (`policy.py` = Kotlin `assess`):** score → level; C1 coaching check (25 Oct): Pause/Critical
+only with at least one coaching sign (call, recent call, screen share, paste, app switch, new-payee activity,
+money from a stranger), else at most Nudge, e.g. a TV bought in a shop (0 scams lost on test); G1 flagged payee → Critical;
 G2 warned payee → ≥ Nudge (Critical with live call/screen-share); G3 analyst-approved rule → ≥ Pause;
 G4 "Yes" to Q1/Q2 at Pause+ → Critical. Answers only RAISE the level. App: "Continue anyway" always
 available; if scoring throws, the payment goes through (fail-open).

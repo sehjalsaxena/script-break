@@ -1,8 +1,8 @@
 {
  "model_type": "gradient_boosting",
- "model_version": "20261024-0637",
+ "model_version": "20261024-0701",
  "thresholds": {
-  "nudge": 0.07086418758277964,
+  "nudge": 0.07086418758277967,
   "pause": 0.48645956275991725,
   "critical": 0.941773364674707
  },
@@ -14,9 +14,9 @@
  "model": {
   "scams_flagged_all8": 0.8033333333333333,
   "scams_flagged_in_scope6": 0.797037037037037,
-  "genuine_interrupted_per_1000": 7.3,
-  "genuine_nudged_per_1000": 20.2,
-  "precision_on_this_test_mix": 0.9296046287367405,
+  "genuine_interrupted_per_1000": 7.266666666666667,
+  "genuine_nudged_per_1000": 20.23333333333333,
+  "precision_on_this_test_mix": 0.929903536977492,
   "roc_auc": 0.9941315092592594,
   "brier": 0.019708309716146885,
   "by_workflow": {
@@ -113,7 +113,7 @@
    {
     "bin": "0.4-0.5",
     "n": 229,
-    "mean_score": 0.45184666376391175,
+    "mean_score": 0.4518466637639117,
     "share_scam": 0.6681222707423581
    },
    {
@@ -152,7 +152,7 @@
   "ai_model": {
    "scams_flagged_all8": 0.8033333333333333,
    "scams_flagged_in_scope6": 0.797037037037037,
-   "genuine_interrupted_per_1000": 7.3,
+   "genuine_interrupted_per_1000": 7.266666666666667,
    "by_workflow": {
     "digital_arrest": 0.8866666666666667,
     "customer_care": 0.7444444444444445,
@@ -789,7 +789,7 @@
     "payee": "new",
     "kind": "person",
     "call": "no call",
-    "count": 52
+    "count": 51
    },
    {
     "payee": "new",

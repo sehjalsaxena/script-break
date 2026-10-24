@@ -1,8 +1,8 @@
 # ScriptBreak test summary
 
-Run 2026-10-24 15:44 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 4 min 44 s. Committed model version 20261024-0701.
+Run 2026-10-24 18:45 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 3 min 50 s. Committed model version 20261024-0701.
 
-**19 checks passed, 0 failed.** All data synthetic (generation code in this folder); these numbers test our assumptions, not real-world accuracy.
+**20 checks passed, 0 failed.** All data synthetic (generation code in this folder); these numbers test our assumptions, not real-world accuracy.
 
 ## Checks
 
@@ -15,8 +15,9 @@ Run 2026-10-24 15:44 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-le
 | ✅ PASS | Analyst discovery (discovery_unseen_sent_by_mistake.json) reproduces | identical |
 | ✅ PASS | Answers never lower the level | 33,600 test payments x 8 answer combinations: 0 lowered |
 | ✅ PASS | 'No' or no answer changes nothing | 0 payments changed level after 'No' |
-| ✅ PASS | G4: 'Yes' at Pause or above gives Critical | 3,111 paused payments answered Yes: 0 not Critical |
-| ✅ PASS | Guardrails never lower the model's level | 0 lowered |
+| ✅ PASS | G4: 'Yes' at Pause or above gives Critical | 3,110 paused payments answered Yes: 0 not Critical |
+| ✅ PASS | G1-G4 never lower the model's level; only C1 does, to Nudge, with no coaching sign | 1 lowered by C1 (no call, screen share, paste, app switch or new-payee activity), 0 wrongly |
+| ✅ PASS | C1: no full-screen popup without a sign of coaching (flagged/warned payees excepted) | 0 found |
 | ✅ PASS | G1: bank-flagged payee is always Critical | 2,000 payments made flagged: 0 not Critical |
 | ✅ PASS | G2: warned payee + live call is Critical | 0 of 2,000 not Critical |
 | ✅ PASS | G2: warned payee without a call is at least Nudge | 0 of 2,000 below Nudge |
@@ -54,11 +55,11 @@ Reported, not tuned: thresholds are set on validation data only. Budget: 8 per 1
 | Group | Genuine payments | Interrupted per 1,000 | 95% range |
 |---|---|---|---|
 | First-time users (little history) | 1,758 | 12.5 | 8.3–18.9 |
-| Regular users | 28,242 | 7.0 | 6.1–8.0 |
-| Paying a person | 9,867 | 18.7 | 16.3–21.6 |
+| Regular users | 28,242 | 6.9 | 6.0–8.0 |
+| Paying a person | 9,867 | 18.6 | 16.2–21.5 |
 | Paying a merchant | 17,690 | 1.8 | 1.3–2.6 |
 | Night (23:00-06:00) | 1,562 | 5.8 | 3.0–10.9 |
-| Day | 28,438 | 7.4 | 6.5–8.4 |
+| Day | 28,438 | 7.3 | 6.4–8.4 |
 
 ## Edge cases
 
@@ -77,7 +78,7 @@ Reported, not tuned: thresholds are set on validation data only. Budget: 8 per 1
 
 Negative amount: rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through).
 
-Python reference scorer: 0.139 ms per payment (the phone is measured separately).
+Python reference scorer: 0.13 ms per payment (the phone is measured separately).
 
 ## Dataset checksums (SHA-256, line endings normalised)
 

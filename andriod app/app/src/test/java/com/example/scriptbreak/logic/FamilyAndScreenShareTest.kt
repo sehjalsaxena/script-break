@@ -32,14 +32,25 @@ class FamilyAndScreenShareTest {
 
     @Test
     fun alertArrivingBeforeRohitLogsInIsShownWhenHeDoes() {
-        val rohitPhone = phone()                                         // still on the login screen
+        val rohitPhone = phone().apply { phoneOwner = "rohit" }         // Rohit's phone, on the login screen
         assertEquals(Screen.Login, rohitPhone.screen)
-        assertTrue("buzzes even before login", rohitPhone.onIncomingAlert(alert))
+        assertTrue("Rohit's phone buzzes even before login", rohitPhone.onIncomingAlert(alert))
         assertEquals(Screen.Login, rohitPhone.screen)
         now += 2 * 60_000
         assertTrue(rohitPhone.login("rohit", "3333"))
         assertEquals(Screen.FamilyAlert, rohitPhone.screen)
         assertEquals("Papa", rohitPhone.lastAlert!!.fromName)
+    }
+
+    @Test
+    fun otherPhonesOnTheLoginScreenDoNotBuzz() {
+        val judgePhone = phone().apply { phoneOwner = "judge" }
+        assertFalse("not Rohit's phone: no buzz", judgePhone.onIncomingAlert(alert))
+        val newPhone = phone()                                           // nobody has logged in here yet
+        assertFalse(newPhone.onIncomingAlert(alert))
+        judgePhone.login("rohit", "3333")                                // but Rohit can still read it there
+        assertEquals(Screen.FamilyAlert, judgePhone.screen)
+        assertEquals("rohit", judgePhone.phoneOwner)
     }
 
     @Test

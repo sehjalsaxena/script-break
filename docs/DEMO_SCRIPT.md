@@ -28,6 +28,11 @@ Other logins: `priya` / 2222 (UPI PIN 7316).
 **1. Normal day: no interruption (30 s).** Phone A, no call: pay **Suresh Verma ₹18,000** (rent, the usual landlord). No warning, PIN 4821, paid.
 *Say:* "Normal payments are never interrupted. The AI only speaks up when the pattern looks like a coached scam."
 
+**1b. A big genuine purchase: no popup (30 s).** Still no call: pay **Gupta Electronics ₹90,000** (a TV).
+The amber line appears ("…138× your usual payment"), tap **What the AI sees**: score 0.54 but **Nudge**, then straight to the PIN.
+*Say:* "The model alone would pause this. Our coaching check says a full-screen stop needs a sign that someone is steering
+the payment: a call, screen sharing, a pasted ID, switching apps. In a shop there is none, so he just sees one line."
+
 **2. The scam call (1 min).** Deepak calls Phone A from Phone C as a "CBI officer" (digital-arrest script). Phone A's Home shows **"Active phone call detected"**.
 Pay to UPI ID → type `ramesh.k@demoupi` → amount **₹20,000**.
 - The amber line appears while typing: "First payment to Ramesh K. ₹20,000 is 31× your usual payment…"

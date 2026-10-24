@@ -187,6 +187,12 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 - [ ] Type a UPI ID with keyboard suggestions on: NOT counted as pasted. Paste a whole ID: counted as pasted.
 - [ ] Let the screen turn off on the Amount screen, turn it on again: "Left the app" is NOT listed.
 
+## 7e. Coaching check (C1): big genuine purchases are not interrupted
+
+- [ ] No call: pay **Gupta Electronics ₹90,000** → amber line, "What the AI sees" shows **Nudge**, Continue goes straight to the PIN.
+- [ ] Same payment while on a call → Pause/Critical as before.
+- [ ] Same payment with a **pasted** UPI ID, or after leaving the app and coming back → Pause.
+
 ## 8. Not built yet (don't report as bugs)
 
 - Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).

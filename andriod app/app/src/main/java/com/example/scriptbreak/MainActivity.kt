@@ -63,6 +63,10 @@ class MainActivity : ComponentActivity() {
             onCleared = { flow.onAlertCleared() },
         )
         flow.onFamilyLogin = { family.fetchLatest() }
+        // remember who uses this phone, so only Rohit's phone buzzes while it is on the login screen
+        val prefs = getSharedPreferences("scriptbreak", MODE_PRIVATE)
+        flow.phoneOwner = prefs.getString("last_user", null)
+        flow.onLoggedIn = { user -> prefs.edit().putString("last_user", user).apply() }
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }
         judge = JudgeMode(model, stories)

@@ -41,6 +41,10 @@ data class Payment(
     val appSwitch: Boolean = false,
     val night: Boolean = false,
 ) {
+    /** C1: any sign that someone may be steering this payment (same list as policy.py coaching_signs). */
+    fun hasCoachingSign(): Boolean = callNow || callSeen30m || screenShare || payeePasted || appSwitch ||
+        newPayees60m > 0 || sentNew24h > 0 || creditUnknown48h > 0 || samePayee24h > 0
+
     /** Event tokens, used to match rules approved in the analyst console. */
     fun tokens(): Set<String> = buildSet {
         if (callNow) add("call_now")
@@ -252,7 +256,8 @@ class ScamModel private constructor(private val m: JSONObject) {
     }
 
     /**
-     * Score -> level, then the safety layer (policy.py). Answers can only RAISE the level.
+     * Score -> level, then the safety layer (policy.py): C1 coaching check, then G1-G4.
+     * Answers can only RAISE the level.
      * If anything throws, the caller must let the payment go through (fail-open).
      */
     fun assess(p: Payment, q1: Boolean? = null, q2: Boolean? = null, approved: List<ApprovedRule> = emptyList()): Result {
@@ -266,6 +271,11 @@ class ScamModel private constructor(private val m: JSONObject) {
         }
         val fired = ArrayList<String>()
         val reasons = ArrayList(reasons(x, contrib))
+        // C1 coaching check: a full-screen Pause/Critical needs at least one sign that someone may be steering
+        // the payment. A big amount alone (e.g. a TV in a shop) gets the amber Nudge line. Same as policy.py.
+        if (rank(level) > rank("NUDGE") && !p.hasCoachingSign()) {
+            level = if (p.amount >= nudgeMinAmount) "NUDGE" else "NONE"; fired.add("C1")
+        }
         val live = p.callNow || p.callSeen30m || p.screenShare
         if (p.payeeStatus == "flagged") { level = "CRITICAL"; fired.add("G1") }
         if (p.payeeStatus == "warned") { level = atLeast(level, if (live) "CRITICAL" else "NUDGE"); fired.add("G2") }

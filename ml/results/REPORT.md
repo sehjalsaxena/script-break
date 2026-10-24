@@ -1,6 +1,6 @@
 # ScriptBreak AI model: test report
 
-Model: **gradient_boosting** (version 20261024-0637). All data synthetic. Test set: 30,000 genuine + 3,600 scam sessions, shifted settings, never seen in training.
+Model: **gradient_boosting** (version 20261024-0701). All data synthetic. Test set: 30,000 genuine + 3,600 scam sessions, shifted settings, never seen in training.
 
 ## Headline
 
@@ -69,7 +69,7 @@ Missed scams by type: Hang up, then pay 94, Fake customer care / refund 115, Cou
 Most common genuine false alarms:
 
 - new person, on call: 126
-- new person, no call: 52
+- new person, no call: 51
 - new merchant, on call: 19
 - new merchant, no call: 10
 - recent person, on call: 3
