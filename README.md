@@ -99,7 +99,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 | `andriod app/app/src/main/java/com/example/scriptbreak/ml/` | `ScamModel.kt`: the on-phone scorer and safety layer |
 | `andriod app/app/src/main/java/com/example/scriptbreak/logic/` | Payment flow, phone signals, Judge mode, Analyst mode, family alert |
 | `andriod app/app/src/main/java/com/example/scriptbreak/ui/` | All screens |
-| `andriod app/app/src/test/` | 81 unit tests |
+| `andriod app/app/src/test/` | 86 unit tests |
 | [`ml/`](ml/) | Data generator, training, export, evaluation, analyst discovery, one-command test runner |
 | [`reference/`](reference/) | Round 1 Python code (rules engine, generator), reused as declared |
 | [`tests/cases.json`](tests/cases.json) | The 28 Round 1 behaviour stories (never used for training) |
@@ -128,7 +128,7 @@ Then log out and log in as sehjal: the alert is there. For two or three phones, 
 ## Run the tests
 
 ```bash
-# Android: 81 unit tests (needs a JDK, e.g. Android Studio's)
+# Android: 86 unit tests (needs a JDK, e.g. Android Studio's)
 cd "andriod app"
 gradlew.bat testDebugUnitTest
 

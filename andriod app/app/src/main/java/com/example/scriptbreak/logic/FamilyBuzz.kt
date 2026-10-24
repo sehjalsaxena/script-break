@@ -20,6 +20,12 @@ import com.example.scriptbreak.ui.model.FamilyAlertUi
 /** Makes the trusted contact's phone buzz: a strong vibration and a high-priority notification. */
 object FamilyBuzz {
     private const val CHANNEL = "family_alerts"
+    /** Set on the notification's intent: tapping it opens the alert ("Call now / I've called"). */
+    const val EXTRA_OPEN_ALERT = "open_family_alert"
+    private const val NOTIFICATION_ID = 1
+
+    /** The alert was opened in the app: remove it from the phone's notifications. */
+    fun cancel(context: Context) = try { NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID) } catch (e: Exception) { }
 
     fun buzz(context: Context, alert: FamilyAlertUi) {
         vibrate(context)
@@ -41,8 +47,10 @@ object FamilyBuzz {
         nm.createNotificationChannel(NotificationChannel(CHANNEL, "Family alerts", NotificationManager.IMPORTANCE_HIGH).apply {
             description = "When a family member asks you to call them about a payment"
         })
-        val open = PendingIntent.getActivity(context, 0,
-            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+        val open = PendingIntent.getActivity(context, NOTIFICATION_ID,
+            Intent(context, MainActivity::class.java)
+                .putExtra(EXTRA_OPEN_ALERT, true)
+                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val n = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_warning)
@@ -53,6 +61,6 @@ object FamilyBuzz {
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()
-        try { NotificationManagerCompat.from(context).notify(1, n) } catch (e: SecurityException) { }
+        try { NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, n) } catch (e: SecurityException) { }
     }
 }

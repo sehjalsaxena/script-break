@@ -105,18 +105,19 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
-| 6a.1 | Phone B: log in as **sehjal** (3333); allow notifications | "Waiting for alerts from Sambhav", **● Connected** | |
+| 6a.1 | Phone B: log in as **sehjal** (3333); allow notifications | "Sehjal's alerts": "No alerts yet", **● Connected** | |
 | 6a.2 | Phone A: log in as **sambhav**, on a call, pay Ramesh ₹20,000 → Pause → **Ask Sehjal to call me** | Phone A: "Sehjal has been alerted" | |
-| 6a.3 | Phone B, within a few seconds | **Vibrates**, shows the alert: Sambhav, ₹20,000, Ramesh K., reasons | |
-| 6a.4 | Phone B with the app in the background, repeat 6a.2 | Notification "Sambhav may be on a scam call"; tap opens the alert | |
+| 6a.3 | Phone B, within a few seconds | **Vibrates** and shows a phone notification "Sambhav may be on a scam call". The app does NOT jump; the alert is in the list with a red dot | |
+| 6a.4 | Tap the phone notification (app open, in the background, or on the login page) | The alert opens: Sambhav, ₹20,000, Ramesh K., reasons, **Call Sambhav now / I've called** (on the login page: right after logging in as sehjal) | |
 | 6a.5 | Phone B: **Call Sambhav now** | Dialer opens on B; Phone A shows "Sehjal is calling you now" | |
-| 6a.6 | Phone B: **I've called** | B back to waiting; A shows "Sehjal says they have called you" | |
+| 6a.6 | Phone B: **I've called** | B back to the list, the alert marked **Answered**; A shows "Sehjal says they have called you" | |
 | 6a.7 | Turn off internet on A, ask Sehjal, turn internet back on | Alert arrives on B once A is back online | |
-| 6a.8 | Phone B **logged out** (login screen). Phone A asks Sehjal | B vibrates + notification on the login screen. Log in as sehjal → the alert opens straight away | |
-| 6a.9 | Phone B logged in as **judge**. Phone A asks Sehjal | B does NOT buzz (someone else is using it). Log out → log in as sehjal → the alert opens | |
-| 6a.10 | Phone B: **close the app** (swipe it away). Phone A asks Sehjal. Wait 15 minutes, open the app on B, log in as sehjal | The alert opens, marked **"Missed alert · Sent at 10:42 PM · 15 min ago"** | |
-| 6a.12 | Phone B: on the alert, tap Back (logs out), log in as sehjal again | The same alert is shown again (no second buzz) until **I've called** is tapped | |
-| 6a.11 | Phone C also logged out while B taps **I've called** | C forgets the alert: logging in as sehjal on C shows "Waiting" | |
+| 6a.8 | Phone B **logged out** (login screen). Phone A asks Sehjal | B vibrates + notification. Log in as sehjal → the alert is in the list; tap it to open | |
+| 6a.9 | Phone B logged in as **judge**. Phone A asks Sehjal | B does NOT buzz (someone else is using it). Log out → log in as sehjal → the alert is in the list | |
+| 6a.10 | Phone B: **close the app** (swipe it away). Phone A asks Sehjal. Wait 15 minutes, open the app on B, log in as sehjal | The alert is in the list; opening it shows **"Missed alert · Sent at 10:42 PM · 15 min ago"** | |
+| 6a.12 | Phone B: on the alert, tap **Back** | Back to Sehjal's alerts list (not logged out); the alert is still open until **I've called** | |
+| 6a.11 | Phone C also received the alert while B taps **I've called** | On C the alert is listed as **Answered** | |
+| 6a.13 | Phone A (sambhav): Home → bell → **Clear all** → Back → bell again | Still cleared. Tapping a notification removes its unread dot. Money received shows here too | |
 
 ## 6. Family phone (same phone)
 

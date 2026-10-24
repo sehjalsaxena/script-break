@@ -27,7 +27,7 @@ For the technical team, have ready:
 - the repo link and the check-in commit `f14de57`
 - [README.md](../README.md), which maps every form promise to the file that implements it
 - [DISCLOSURE.md](../DISCLOSURE.md)
-- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (81 tests) and `python run_all_tests.py` (21 passed) were already run, with the output on screen
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (86 tests) and `python run_all_tests.py` (21 passed) were already run, with the output on screen
 - the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
 
 ## Who holds what
@@ -83,7 +83,7 @@ Tap Continue → **Pause** ("Before you pay", the reasons, Q1 and Q2).
 **4. The truth comes out → Critical (30 s).** Change Q1 to **Yes** → Next → **Critical** (red). Point at the last line: "If someone is telling you to ignore this screen, that is the scam." Show EN | हिंदी and read-aloud.
 
 **5. Family breaks the script (1 min).** On Phone A tap **Ask Sehjal to call me**. Phone A shows "Sehjal has been alerted".
-- Phone B **vibrates** and shows: Sambhav, ₹20,000, Ramesh K., the reasons, and "Sehjal can't see the account or stop the payment".
+- Phone B **vibrates** and shows a phone notification: "Sambhav may be on a scam call". Sehjal **taps the notification** and the alert opens: Sambhav, ₹20,000, Ramesh K., the reasons, and "Sehjal can't see the account or stop the payment". (It is also in Sehjal's alerts list inside the app.)
 - Sehjal taps **Call Sambhav now**. Phone A shows "Sehjal is calling you now".
 - Sambhav hangs up on the "officer" (Phone C) and answers Sehjal.
 - Sehjal taps **I've called**. Phone A shows "Sehjal says they have called you", and the alert is deleted from Firebase.
@@ -112,7 +112,7 @@ Tap Continue → **Pause** ("Before you pay", the reasons, Q1 and Q2).
 
 | Problem | Fix |
 |---|---|
-| Phone B didn't buzz | Is B online and showing **● Connected**? If B was logged out or the app was closed, log in as sehjal: the alert opens with "Sent at …". |
+| Phone B didn't buzz | Is B online and showing **● Connected**? Notifications allowed for DemoPay? If B was logged out or the app was closed, log in as sehjal: the alert is in the list with "Sent at …"; tap it. |
 | No "on call" banner | The call must be active while DemoPay is open. Plan B: Judge mode → Simulate a phone call. |
 | Levels differ from the rehearsal | Tap **What the AI sees** on the Amount screen: one of the facts differs (call, pasted ID, left the app, payments made earlier). Reset demo. |
 | No internet at the venue | Same-phone fallback: Phone A asks Sehjal, log out, log in as sehjal on Phone A: the alert is there. |

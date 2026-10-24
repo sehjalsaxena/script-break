@@ -62,12 +62,18 @@ data class NotificationItem(
     val icon: ImageVector,
     val iconTint: Color,
     val iconBg: Color,
-    var unread: Boolean = false
+    val unread: Boolean = false
 )
 
 @Composable
 fun NotificationsScreen(
     onBack: () -> Unit,
+    // kept by the app (per person), so "Clear all" and read marks survive leaving this screen
+    clearedIds: Set<String> = emptySet(),
+    readIds: Set<String> = emptySet(),
+    extraItems: List<NotificationItem> = emptyList(),   // e.g. money received from another demo person
+    onClearAll: (List<String>) -> Unit = {},
+    onRead: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val blue = AppBlue
@@ -77,8 +83,8 @@ fun NotificationsScreen(
     val orangeLight = AppOrangeLight
     val greenTint = SafeGreenTint
 
-    val notifications = remember(blue, orange, green, blueLight, orangeLight, greenTint) {
-        mutableStateListOf(
+    val demoNotices = remember(blue, orange, green, blueLight, orangeLight, greenTint) {
+        listOf(
             NotificationItem(
                 id = "1",
                 title = "ScriptBreak Shield Active",
@@ -137,11 +143,12 @@ fun NotificationsScreen(
         )
     }
 
+    val notifications = (extraItems + demoNotices)
+        .filter { it.id !in clearedIds }
+        .map { if (it.id in readIds) it.copy(unread = false) else it }
+
     var selectedFilter by remember { mutableStateOf("All") }
-    val filteredList = remember(selectedFilter, notifications.toList()) {
-        if (selectedFilter == "All") notifications
-        else notifications.filter { it.category == selectedFilter }
-    }
+    val filteredList = if (selectedFilter == "All") notifications else notifications.filter { it.category == selectedFilter }
 
     Column(
         modifier = modifier
@@ -163,7 +170,7 @@ fun NotificationsScreen(
                         color = AppOrange,
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .clickable { notifications.clear() }
+                            .clickable { onClearAll(notifications.map { it.id }) }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -258,7 +265,7 @@ fun NotificationsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(14.dp))
-                            .clickable { item.unread = false }
+                            .clickable { onRead(item.id) }
                     ) {
                         Row(
                             modifier = Modifier.padding(14.dp),

@@ -24,6 +24,9 @@ enum class Screen {
 }
 
 /** A payment made during this demo session (the app's own payment record). */
+/** One alert in the trusted contact's alerts list (Sehjal's phone), newest first. */
+data class FamilyInboxItem(val alert: FamilyAlertUi, val key: Long, val read: Boolean = false, val done: Boolean = false)
+
 /** Money between the demo people (e.g. Sambhav pays Deepak): it arrives on the receiver's phone through Firebase. */
 data class DemoTransfer(
     val id: String,
@@ -123,6 +126,12 @@ class PaymentFlow(
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
     private var lastAlertAt = 0L   // when it was sent (or got here, if unknown), so a very old alert is not shown
     private val handledAlerts = mutableSetOf<Long>()   // alerts Sehjal already answered on this phone
+    /** Sehjal's alerts list: every alert this phone got, newest first. Tapping one opens "Call now / I've called". */
+    val familyInbox = mutableStateListOf<FamilyInboxItem>()
+    private var openAlertAfterLogin = false            // the phone notification was tapped before Sehjal logged in
+    /** In-app notifications (bell on Home) that this person cleared or read, kept as "profileId:noticeId". */
+    private val clearedNotices = mutableStateListOf<String>()
+    private val readNotices = mutableStateListOf<String>()
     /** Called when Sehjal logs in: MainActivity reads the latest alert from Firebase right away. */
     var onFamilyLogin: () -> Unit = {}
     /** Who last logged in on THIS phone (saved by MainActivity), so only Sehjal's phone buzzes on the login screen. */
@@ -271,7 +280,9 @@ class PaymentFlow(
             "rohit" -> {
                 familyMode = true
                 if (freshAlert == null) lastAlert = null
-                screen = if (lastAlert != null) Screen.FamilyAlert else Screen.FamilyWaiting
+                familyInbox.removeAll { clock() - it.key >= KEEP_ALERT }
+                screen = Screen.FamilyWaiting   // Sehjal's alerts list; an alert opens when tapped
+                if (openAlertAfterLogin) familyInbox.firstOrNull { !it.done }?.let { openAlertAfterLogin = false; openAlert(it.key) }
                 onFamilyLogin()   // also ask Firebase, in case the alert came while this app was closed
             }
             "judge" -> screen = Screen.Judge
@@ -284,7 +295,8 @@ class PaymentFlow(
     fun back(): Boolean {
         when (screen) {
             Screen.Login -> return false
-            Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyAlert, Screen.FamilyWaiting -> logout()
+            Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyWaiting -> logout()
+            Screen.FamilyAlert -> screen = Screen.FamilyWaiting
             Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.History, Screen.BankSelf, Screen.CheckBalance,
             Screen.Notifications, Screen.Account, Screen.Settings, Screen.Payee, Screen.Waiting -> finish()
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
@@ -530,6 +542,7 @@ class PaymentFlow(
         val reasons = (live + (all - live.toSet())).take(3)
         val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock())
         lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Sehjal)
+        addToInbox(alert)
         askedFamily = true
         family.send(alert)
         message = "${contact.name} has been alerted"
@@ -544,18 +557,47 @@ class PaymentFlow(
         if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // Sehjal already answered it
         val same = lastAlert != null && lastAlert?.sentAtMs == alert.sentAtMs && alert.sentAtMs != null
         lastAlert = alert; lastAlertAt = alert.sentAtMs ?: clock()
+        addToInbox(alert)
         return when {
-            familyMode -> {                                      // Sehjal is logged in: show it now
-                if (screen == Screen.FamilyWaiting || !same) screen = Screen.FamilyAlert
+            familyMode -> {
+                // never jumps to the alert by itself: the phone notification (or the alerts list) opens it
+                if (openAlertAfterLogin) { openAlertAfterLogin = false; openAlert(alert.sentAtMs ?: lastAlertAt) }
                 !same                                            // buzz once per alert, not again on login
             }
-            account == null -> !same && phoneOwner == "rohit"    // login screen of ROHIT's phone: buzz; other phones keep it quietly
+            account == null -> !same && phoneOwner == "rohit"    // login screen of Sehjal's phone: buzz; other phones keep it quietly
             else -> false                                        // someone else is using this phone: keep it quietly
         }
     }
 
+    private fun addToInbox(alert: FamilyAlertUi) {
+        val key = alert.sentAtMs ?: clock()
+        if (familyInbox.none { it.key == key }) familyInbox.add(0, FamilyInboxItem(alert, key))
+    }
+
+    /** Sehjal taps an alert in the list: the "Call now / I've called" screen opens. */
+    fun openAlert(key: Long) {
+        val i = familyInbox.indexOfFirst { it.key == key }
+        if (i < 0) return
+        familyInbox[i] = familyInbox[i].copy(read = true)
+        lastAlert = familyInbox[i].alert; lastAlertAt = key
+        screen = Screen.FamilyAlert
+    }
+
+    /** Sehjal tapped the phone notification: open the newest open alert (right after login, if needed). */
+    fun openAlertFromNotification() {
+        when {
+            familyMode -> familyInbox.firstOrNull { !it.done }?.let { openAlert(it.key) } ?: run { openAlertAfterLogin = true }
+            account == null -> openAlertAfterLogin = true
+            else -> message = "This alert is for Sehjal. Log in as sehjal to open it."
+        }
+    }
+
     /** The alert was handled, deleted or became too old: stop keeping it (unless it is on screen now). */
-    fun onAlertCleared() { if (screen != Screen.FamilyAlert) lastAlert = null }
+    fun onAlertCleared() {
+        if (screen != Screen.FamilyAlert) lastAlert = null
+        // answered on another phone (or deleted): the list shows it as answered, not as still open
+        familyInbox.indices.forEach { i -> if (!familyInbox[i].done) familyInbox[i] = familyInbox[i].copy(done = true) }
+    }
 
     /** A kept alert, if it is under 24 hours old (the same as Firebase keeps it). */
     private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < KEEP_ALERT }
@@ -571,9 +613,19 @@ class PaymentFlow(
 
     /** Sehjal handled the alert: back to waiting for the next one. */
     fun familyDone() {
-        lastAlert?.sentAtMs?.let { handledAlerts += it }
+        lastAlert?.sentAtMs?.let { k ->
+            handledAlerts += k
+            val i = familyInbox.indexOfFirst { it.key == k }
+            if (i >= 0) familyInbox[i] = familyInbox[i].copy(read = true, done = true)
+        }
         lastAlert = null; screen = Screen.FamilyWaiting
     }
+
+    // ---- in-app notifications (the bell on Home): Clear all and read are remembered, per person ----
+    val clearedNoticeIds: Set<String> get() = clearedNotices.filter { it.startsWith("${profile.id}:") }.map { it.substringAfter(':') }.toSet()
+    val readNoticeIds: Set<String> get() = readNotices.filter { it.startsWith("${profile.id}:") }.map { it.substringAfter(':') }.toSet()
+    fun clearNotices(ids: List<String>) { ids.map { "${profile.id}:$it" }.filter { it !in clearedNotices }.forEach { clearedNotices.add(it) } }
+    fun readNotice(id: String) { "${profile.id}:$id".let { if (it !in readNotices) readNotices.add(it) } }
 
     // ---- PIN and result ----------------------------------------------------------------------
     private fun goPin() {
@@ -756,6 +808,8 @@ class PaymentFlow(
         ledgers.clear(); contacts.clear(); contacts.putAll(DEFAULT_CONTACTS); pendingContacts.clear()
         otpFor = null; demoOtp = null; lastAlert = null; simulateCall = false; simulateScreenShare = false
         incoming.removeAll { it.toProfile == profile.id }; onResetMoney(profile.id)
+        clearedNotices.removeAll { it.startsWith("${profile.id}:") }; readNotices.removeAll { it.startsWith("${profile.id}:") }
+        familyInbox.clear(); handledAlerts.clear(); openAlertAfterLogin = false
         resetPayment()
         message = "Demo reset: payment history is back to the start"
     }

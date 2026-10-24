@@ -38,8 +38,47 @@ class FamilyAndScreenShareTest {
         assertEquals(Screen.Login, rohitPhone.screen)
         now += 2 * 60_000
         assertTrue(rohitPhone.login("sehjal", "3333"))
+        assertEquals("Sehjal's alerts list, not a jump", Screen.FamilyWaiting, rohitPhone.screen)
+        val item = rohitPhone.familyInbox.single()
+        assertEquals("Sambhav", item.alert.fromName)
+        assertFalse("unread", item.read)
+        rohitPhone.openAlert(item.key)                                   // tap it in the list
         assertEquals(Screen.FamilyAlert, rohitPhone.screen)
         assertEquals("Sambhav", rohitPhone.lastAlert!!.fromName)
+        rohitPhone.back()
+        assertEquals("Back returns to the list, it does not log out", Screen.FamilyWaiting, rohitPhone.screen)
+        assertTrue(rohitPhone.familyInbox.single().read)
+    }
+
+    @Test
+    fun tappingThePhoneNotificationOpensTheAlert() {
+        val p = phone().apply { phoneOwner = "rohit"; login("sehjal", "3333") }
+        assertTrue("buzz + phone notification", p.onIncomingAlert(alert.copy(sentAtMs = now)))
+        assertEquals("nothing jumps open by itself", Screen.FamilyWaiting, p.screen)
+        p.openAlertFromNotification()
+        assertEquals(Screen.FamilyAlert, p.screen)
+
+        // the notification tapped while the phone is on the login page: opens right after Sehjal logs in
+        val q = phone().apply { phoneOwner = "rohit" }
+        q.onIncomingAlert(alert.copy(sentAtMs = now))
+        q.openAlertFromNotification()
+        assertEquals(Screen.Login, q.screen)
+        q.login("sehjal", "3333")
+        assertEquals(Screen.FamilyAlert, q.screen)
+
+        // ...also when the alert only arrives from Firebase after the login
+        val r = phone().apply { phoneOwner = "rohit" }
+        r.openAlertFromNotification()
+        r.login("sehjal", "3333")
+        assertEquals(Screen.FamilyWaiting, r.screen)
+        r.onIncomingAlert(alert.copy(sentAtMs = now))
+        assertEquals(Screen.FamilyAlert, r.screen)
+
+        // someone else is using the phone: it says who the alert is for
+        val s = phone().apply { login("sambhav", "1111") }
+        s.openAlertFromNotification()
+        assertEquals("This alert is for Sehjal. Log in as sehjal to open it.", s.message)
+        assertEquals(Screen.Home, s.screen)
     }
 
     @Test
@@ -49,7 +88,8 @@ class FamilyAndScreenShareTest {
         val newPhone = phone()                                           // nobody has logged in here yet
         assertFalse(newPhone.onIncomingAlert(alert))
         judgePhone.login("sehjal", "3333")                                // but Sehjal can still read it there
-        assertEquals(Screen.FamilyAlert, judgePhone.screen)
+        assertEquals(Screen.FamilyWaiting, judgePhone.screen)
+        assertEquals(1, judgePhone.familyInbox.size)
         assertEquals("rohit", judgePhone.phoneOwner)
     }
 
@@ -59,7 +99,8 @@ class FamilyAndScreenShareTest {
         assertFalse("no buzz in the middle of Judge mode", p.onIncomingAlert(alert))
         assertEquals(Screen.Judge, p.screen)
         p.logout(); p.login("sehjal", "3333")
-        assertEquals(Screen.FamilyAlert, p.screen)
+        assertEquals(Screen.FamilyWaiting, p.screen)
+        assertEquals("Sambhav", p.familyInbox.single().alert.fromName)
     }
 
     @Test
@@ -71,16 +112,19 @@ class FamilyAndScreenShareTest {
         p.onIncomingAlert(sent)
         now += 45 * 60_000                                               // Sehjal logs in 45 minutes later
         p.login("sehjal", "3333")
-        assertEquals(Screen.FamilyAlert, p.screen)
-        assertEquals("the screen shows when it was sent", sent.sentAtMs, p.lastAlert!!.sentAtMs)
-        assertEquals("Sehjal's login also asks Firebase", 1, fetched)
-        // Firebase answers with the same alert: shown, but no second buzz
-        assertFalse(p.onIncomingAlert(sent))
-        assertEquals(Screen.FamilyAlert, p.screen)
-        // once Sehjal has answered, the same alert never comes back
-        p.familyDone()
-        assertFalse(p.onIncomingAlert(sent))
         assertEquals(Screen.FamilyWaiting, p.screen)
+        assertEquals("the list shows when it was sent", sent.sentAtMs, p.familyInbox.single().key)
+        assertEquals("Sehjal's login also asks Firebase", 1, fetched)
+        // Firebase answers with the same alert: listed once, no second buzz
+        assertFalse(p.onIncomingAlert(sent))
+        assertEquals(1, p.familyInbox.size)
+        p.openAlert(sent.sentAtMs!!)
+        assertEquals(Screen.FamilyAlert, p.screen)
+        // once Sehjal has answered, it is marked done and never comes back
+        p.familyDone()
+        assertEquals(Screen.FamilyWaiting, p.screen)
+        assertTrue(p.familyInbox.single().done)
+        assertFalse(p.onIncomingAlert(sent))
     }
 
     @Test
@@ -89,7 +133,8 @@ class FamilyAndScreenShareTest {
         p.login("sehjal", "3333")                                         // app was closed when it was sent
         assertEquals(Screen.FamilyWaiting, p.screen)
         assertTrue(p.onIncomingAlert(alert.copy(sentAtMs = now - 20 * 60_000)))
-        assertEquals(Screen.FamilyAlert, p.screen)
+        assertEquals("listed (and the phone notification shown), no jump", Screen.FamilyWaiting, p.screen)
+        assertEquals(1, p.familyInbox.size)
     }
 
     @Test
@@ -106,6 +151,7 @@ class FamilyAndScreenShareTest {
         q.login("sehjal", "3333")
         assertEquals(Screen.FamilyWaiting, q.screen)
         assertNull(q.lastAlert)
+        assertTrue("listed as answered, not open", q.familyInbox.single().done)
     }
 
     @Test

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
@@ -100,6 +101,7 @@ class MainActivity : ComponentActivity() {
                 try { assets.open("test_summary.json").bufferedReader().use { it.readText() } } catch (e: Exception) { null },
             )
         } catch (e: Exception) { null }
+        openAlertIfAsked(intent)   // the app was started by tapping the alert notification
         setContent {
             val isDark = flow.isDarkMode
             val isHindi = flow.hindi
@@ -137,6 +139,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Sehjal tapped the phone notification while the app was already open in the background. */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openAlertIfAsked(intent)
+    }
+
+    private fun openAlertIfAsked(intent: Intent?) {
+        if (intent?.getBooleanExtra(FamilyBuzz.EXTRA_OPEN_ALERT, false) != true) return
+        intent.removeExtra(FamilyBuzz.EXTRA_OPEN_ALERT)   // only once, not again when the screen turns
+        flow.openAlertFromNotification()
     }
 
     override fun onStart() {

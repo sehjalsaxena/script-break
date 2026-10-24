@@ -91,6 +91,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.scriptbreak.logic.FamilyBuzz
+import com.example.scriptbreak.ui.components.AppIcons
+import com.example.scriptbreak.ui.screens.NotificationItem
+import com.example.scriptbreak.ui.theme.SafeGreen
+import com.example.scriptbreak.ui.theme.SafeGreenTint
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
@@ -400,7 +407,20 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 )
 
                 Screen.Notifications -> NotificationsScreen(
-                    onBack = { flow.back() }
+                    onBack = { flow.back() },
+                    clearedIds = flow.clearedNoticeIds,
+                    readIds = flow.readNoticeIds,
+                    extraItems = flow.received.map {
+                        NotificationItem(
+                            id = "r-${it.id}", title = "Received ${rupees(it.amount)}",
+                            description = "From ${it.fromName} (${it.fromUpi}). UPI ref ${it.upiRef}.",
+                            time = SimpleDateFormat("d MMM, h:mm a", Locale.ENGLISH).format(Date(it.atMs)),
+                            category = "Transactions", icon = AppIcons.AccountBalance,
+                            iconTint = SafeGreen, iconBg = SafeGreenTint, unread = true,
+                        )
+                    },
+                    onClearAll = flow::clearNotices,
+                    onRead = flow::readNotice,
                 )
 
                 Screen.Account -> AccountScreen(
@@ -463,13 +483,18 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() },
                 )
 
-                Screen.FamilyWaiting -> FamilyWaitingScreen(online = family.online, onBack = { flow.back() })
+                Screen.FamilyWaiting -> FamilyWaitingScreen(
+                    online = family.online,
+                    alerts = flow.familyInbox,
+                    onOpen = flow::openAlert,
+                    onBack = { flow.back() },
+                )
 
                 Screen.FamilyAlert -> flow.lastAlert?.let { a ->
                     FamilyAlertScreen(
                         state = a,
                         onCallNow = { family.setStatus("calling"); dial(context, null) },
-                        onCalled = { family.setStatus("called"); flow.familyDone() },
+                        onCalled = { family.setStatus("called"); FamilyBuzz.cancel(context); flow.familyDone() },
                         onBack = { flow.back() },
                     )
                 }

@@ -269,6 +269,8 @@ class PaymentFlowTest {
         sharmaPhone.payTyped("ramesh.k@demoupi", 20_000)
         sharmaPhone.askFamily()
         assertTrue("Sehjal's phone buzzes", rohitPhone.onIncomingAlert(sent.single()))
+        assertEquals("listed; opened from the notification or the list", Screen.FamilyWaiting, rohitPhone.screen)
+        rohitPhone.openAlertFromNotification()
         assertEquals(Screen.FamilyAlert, rohitPhone.screen)
         assertEquals("Sambhav", rohitPhone.lastAlert!!.fromName)
         assertFalse("the sender's own echo doesn't buzz", sharmaPhone.onIncomingAlert(sent.single()))
