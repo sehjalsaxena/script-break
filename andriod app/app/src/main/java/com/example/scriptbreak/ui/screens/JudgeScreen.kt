@@ -152,6 +152,7 @@ private fun InputsTab(judge: JudgeMode, simulateCall: Boolean, onSimulateCall: (
     }
 }
 
+@Composable
 private fun levelColors(level: String): Pair<Color, Color> = when (level) {
     "NUDGE" -> NudgeAmber to NudgeAmberTint
     "PAUSE" -> PauseOrange to PauseOrangeTint

@@ -11,24 +11,24 @@ import androidx.compose.ui.graphics.Color
 val LocalDarkTheme = staticCompositionLocalOf { false }
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AppOrange,
-    secondary = Color(0xFF60A5FA),
-    tertiary = SafeGreen,
-    background = Color(0xFF0B1322),
-    surface = Color(0xFF132238),
-    surfaceVariant = Color(0xFF1E2E46),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFFF8FAFC),
-    onSurface = Color(0xFFF8FAFC),
-    outline = Color(0xFF1E2E46)
+    primary = Color(0xFFA8C7FA),          // Google Blue 300
+    secondary = Color(0xFFFF8533),        // Google Pay warm orange
+    tertiary = Color(0xFF6DD58C),         // Google Green 300
+    background = Color(0xFF111318),       // Google Pay Material 3 dark background
+    surface = Color(0xFF1E1F22),          // Google Pay elevated card surface
+    surfaceVariant = Color(0xFF282A2F),   // Google Pay panel / search pill
+    onPrimary = Color(0xFF00325B),
+    onSecondary = Color(0xFF552100),
+    onTertiary = Color(0xFF00391E),
+    onBackground = Color(0xFFE2E2E6),
+    onSurface = Color(0xFFE2E2E6),
+    outline = Color(0xFF36383B)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = AppBlue,
-    secondary = AppOrange,
-    tertiary = SafeGreen,
+    primary = Color(0xFF10223F),
+    secondary = Color(0xFFFD600D),
+    tertiary = Color(0xFF0E7F5B),
     background = Color(0xFFF8FAFC),
     surface = Color(0xFFFFFFFF),
     surfaceVariant = Color(0xFFF1F5F9),
@@ -46,9 +46,8 @@ fun ScriptBreakTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    CompositionLocalProvider(
-        LocalDarkTheme provides darkTheme
-    ) {
+
+    CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

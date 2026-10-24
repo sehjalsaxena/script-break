@@ -127,12 +127,12 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(CircleShape)
-                                .background(if (isDarkMode) Color(0xFF312E81) else AppBlueLight)
+                                .background(if (isDarkMode) Color(0xFF282A2F) else AppBlueLight)
                         ) {
                             Icon(
                                 imageVector = AppIcons.DarkMode,
                                 contentDescription = null,
-                                tint = if (isDarkMode) Color(0xFFFDE047) else AppBlue,
+                                tint = if (isDarkMode) Color(0xFFFDD663) else AppBlue,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -209,7 +209,7 @@ fun SettingsScreen(
 
                         // Segmented Interactive Pill
                         Surface(
-                            color = if (isDarkMode) Color(0xFF1E2E46) else Color(0xFFE2E8F0),
+                            color = if (isDarkMode) Color(0xFF282A2F) else Color(0xFFE2E8F0),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.padding(2.dp)
                         ) {

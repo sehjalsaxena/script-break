@@ -121,7 +121,7 @@ fun PayToUpiScreen(
                         focusedTextColor = InkDark,
                         unfocusedTextColor = InkDark,
                         focusedBorderColor = AppBlue,
-                        unfocusedBorderColor = Color(0xFFDDE2EA),
+                        unfocusedBorderColor = com.example.scriptbreak.ui.theme.LineBorder,
                         cursorColor = AppBlue,
                         focusedContainerColor = AppSurface,
                         unfocusedContainerColor = AppSurface
