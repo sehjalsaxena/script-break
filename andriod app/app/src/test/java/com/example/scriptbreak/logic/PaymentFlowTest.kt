@@ -24,7 +24,7 @@ class PaymentFlowTest {
     private val sent = mutableListOf<FamilyAlertUi>()
 
     private fun newFlow(signals: SignalSource, m: ScamModel? = model) =
-        PaymentFlow(m, signals, { sent += it }, clock = { now }).apply { pickProfile("sharma") }
+        PaymentFlow(m, signals, { sent += it }, clock = { now }).apply { assertTrue(login("sharma", "1111")) }
 
     private fun PaymentFlow.typeAmount(amount: Long) = amount.toString().forEach { amountDigit(it.digitToInt()) }
 
@@ -38,7 +38,8 @@ class PaymentFlowTest {
         pay()
     }
 
-    private fun PaymentFlow.finishPin() { repeat(4) { pinDigit() }; pinSubmit() }
+    /** Mr. Sharma's own UPI PIN (demo). */
+    private fun PaymentFlow.finishPin(pin: String = "4821") { pin.forEach { pinDigit(it.digitToInt()) }; pinSubmit() }
 
     @Test
     fun digitalArrestPausesThenYesGivesCriticalWithCountdown() {
@@ -180,6 +181,87 @@ class PaymentFlowTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun loginOpensTheRightModeAndRejectsWrongPins() {
+        val f = PaymentFlow(model, FakeSignals(), { })
+        assertEquals(Screen.Login, f.screen)
+        assertFalse(f.login("sharma", "9999"))
+        assertFalse(f.login("nobody", "1111"))
+        assertEquals(Screen.Login, f.screen)
+        assertTrue(f.login("  Sharma ", "1111"))                   // username is not case-sensitive
+        assertEquals(Screen.Home, f.screen)
+        assertEquals("Mr. Sharma", f.profile.displayName)
+        assertTrue(f.back())                                        // Back on Home logs out
+        assertEquals(Screen.Login, f.screen)
+        assertNull(f.account)
+        assertTrue(f.login("judge", "0000")); assertEquals(Screen.Judge, f.screen); f.logout()
+        assertTrue(f.login("analyst", "9999")); assertEquals(Screen.Analyst, f.screen); f.logout()
+        assertTrue(f.login("rohit", "3333")); assertEquals(Screen.FamilyWaiting, f.screen)
+        assertTrue(f.back())                                        // Back on Rohit's screen logs out
+        assertEquals(Screen.Login, f.screen)
+        assertFalse(f.back())                                       // on Login there is nothing to go back to
+    }
+
+    @Test
+    fun everyPersonHasTheirOwnUpiPinAndThreeWrongTriesCancel() {
+        val f = newFlow(FakeSignals())
+        f.openPerson("suresh"); f.toAmount(); f.typeAmount(500); f.pay()
+        assertEquals(Screen.Pin, f.screen)
+        f.finishPin("7316")                                         // Priya's UPI PIN: wrong for Mr. Sharma
+        assertEquals(Screen.Pin, f.screen)
+        assertEquals("Incorrect UPI PIN. 2 attempts left", f.message)
+        f.finishPin("0000")
+        assertEquals("Incorrect UPI PIN. 1 attempt left", f.message)
+        f.finishPin("1234")
+        assertEquals(Screen.Home, f.screen)                         // cancelled, nothing paid
+        assertTrue(f.ledger.isEmpty())
+
+        val priya = PaymentFlow(model, FakeSignals(), { }).apply { login("priya", "2222") }
+        priya.openPerson("suresh"); priya.toAmount(); priya.typeAmount(500); priya.pay()
+        priya.finishPin("7316")
+        assertEquals(Screen.Success, priya.screen)
+    }
+
+    @Test
+    fun oneLakhIsTheMostForOnePayment() {
+        val f = newFlow(FakeSignals())
+        f.openPerson("suresh"); f.toAmount()
+        f.typeAmount(100_000)
+        assertEquals(100_000L, f.amount)
+        f.amountDigit(0)                                            // ₹10,00,000: refused
+        assertEquals(100_000L, f.amount)
+        assertEquals(PaymentFlow.LIMIT_MESSAGE, f.message)
+        f.amountDelete(); f.amountDigit(5)                          // ₹1,00,005: also refused
+        assertEquals(10_000L, f.amount)
+        f.amountDelete(); f.amountDigit(5)                          // ₹10,005 is fine
+        assertEquals(10_005L, f.amount)
+
+        // a Judge test above the limit is refused at Pay
+        f.logout(); f.login("judge", "0000")
+        f.runJudge(com.example.scriptbreak.ml.Payment(amount = 150_000.0, median90d = 650.0, payments90d = 42), null, null)
+        f.pay()
+        assertEquals(Screen.Amount, f.screen)
+        assertEquals(PaymentFlow.LIMIT_MESSAGE, f.message)
+    }
+
+    @Test
+    fun familyAlertReachesRohitsPhoneAndHisAnswerComesBack() {
+        val rohitPhone = PaymentFlow(model, FakeSignals(), { }).apply { login("rohit", "3333") }
+        assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
+        val sharmaPhone = newFlow(FakeSignals(call = true))
+        sharmaPhone.payTyped("ramesh.k@demoupi", 20_000)
+        sharmaPhone.askFamily()
+        assertTrue("Rohit's phone buzzes", rohitPhone.onIncomingAlert(sent.single()))
+        assertEquals(Screen.FamilyAlert, rohitPhone.screen)
+        assertEquals("Papa", rohitPhone.lastAlert!!.fromName)
+        assertFalse("the sender's own echo doesn't buzz", sharmaPhone.onIncomingAlert(sent.single()))
+        sharmaPhone.consumeMessage()
+        sharmaPhone.onFamilyStatus("calling")
+        assertEquals("Rohit is calling you now", sharmaPhone.message)
+        rohitPhone.familyDone()
+        assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
     }
 
     @Test

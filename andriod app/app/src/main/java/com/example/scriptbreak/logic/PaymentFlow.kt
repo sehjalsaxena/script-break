@@ -16,7 +16,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
-enum class Screen { UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, Judge, Analyst }
+enum class Screen { Login, UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst }
 
 /** A payment made during this demo session (the app's own payment record). */
 data class SessionPayment(
@@ -48,7 +48,9 @@ class PaymentFlow(
     private val family: FamilyAlertSender,
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
-    var screen by mutableStateOf(Screen.UserPicker); private set
+    var screen by mutableStateOf(Screen.Login); private set
+    /** Who is signed in (demo login: username + PIN). */
+    var account by mutableStateOf<Account?>(null); private set
     var profile by mutableStateOf(DemoWorld.profiles.getValue("sharma")); private set
     var upiInput by mutableStateOf(""); private set
     var payee by mutableStateOf<PayeeRecord?>(null); private set
@@ -59,7 +61,10 @@ class PaymentFlow(
     var askedFamily by mutableStateOf(false); private set
     var hindi by mutableStateOf(false); private set
     var secondsLeft by mutableIntStateOf(0); private set
-    var pinDigits by mutableIntStateOf(0); private set
+    /** Digits typed on the UPI PIN pad (kept only until the PIN is checked, never stored or sent). */
+    private var pinEntry by mutableStateOf("")
+    val pinDigits: Int get() = pinEntry.length
+    private var pinAttempts = 0
     var pauseResult by mutableStateOf<Result?>(null); private set
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
@@ -80,6 +85,9 @@ class PaymentFlow(
     /** Analyst demo: score this one payment with a different model (the "before the new scam wave" one). */
     private var runModel: ScamModel? = null
 
+    /** This phone is being used as the trusted contact's (Rohit's) phone. */
+    var familyMode by mutableStateOf(false); private set
+
     private var pasted = false            // payee UPI ID pasted, not typed or picked
     private var leftApp = false           // left the app and came back during this payment
     private var warnedThisPayment = false // a Pause or Critical screen was shown for this payment
@@ -90,6 +98,21 @@ class PaymentFlow(
 
     fun consumeMessage() { message = null }
 
+    // ---- login ---------------------------------------------------------------------------------
+    fun login(username: String, pin: String): Boolean {
+        val a = DemoWorld.account(username)
+        if (a == null || !a.checkLogin(pin)) { message = "Wrong username or PIN"; return false }
+        account = a
+        pickProfile(a.mode)
+        return true
+    }
+
+    fun logout() {
+        account = null; familyMode = false
+        resetPayment()
+        screen = Screen.Login
+    }
+
     // ---- profiles and navigation ----------------------------------------------------------
     fun pickProfile(id: String) {
         when (id) {
@@ -98,8 +121,10 @@ class PaymentFlow(
                 resetPayment()
                 screen = Screen.Home
             }
-            "rohit" -> if (lastAlert != null) screen = Screen.FamilyAlert
-                       else message = "No alert yet. When someone taps \"Ask Rohit to call me\", it appears here."
+            "rohit" -> {
+                familyMode = true
+                screen = if (lastAlert != null) Screen.FamilyAlert else Screen.FamilyWaiting
+            }
             "judge" -> screen = Screen.Judge
             "analyst" -> screen = Screen.Analyst
             else -> message = "Unknown profile"
@@ -109,8 +134,8 @@ class PaymentFlow(
     /** System back button. Returns false when there is nowhere to go back to (leave the app). */
     fun back(): Boolean {
         when (screen) {
-            Screen.UserPicker -> return false
-            Screen.Home, Screen.FamilyAlert, Screen.Judge, Screen.Analyst -> screen = Screen.UserPicker
+            Screen.Login -> return false
+            Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyAlert, Screen.FamilyWaiting -> logout()
             Screen.PayToUpi, Screen.Payee, Screen.Waiting -> finish()
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
             Screen.Pause, Screen.Critical, Screen.Pin -> backToAmount()
@@ -179,7 +204,9 @@ class PaymentFlow(
 
     // ---- amount ------------------------------------------------------------------------------
     fun amountDigit(d: Int) {
-        if (amountDigits.length >= 7 || (amountDigits.isEmpty() && d == 0)) return
+        if (amountDigits.isEmpty() && d == 0) return
+        val next = (amountDigits + d).toLongOrNull() ?: return
+        if (next > DemoWorld.UPI_LIMIT) { message = LIMIT_MESSAGE; return }
         amountDigits += d.toString()
     }
     fun amountDelete() { amountDigits = amountDigits.dropLast(1) }
@@ -194,6 +221,7 @@ class PaymentFlow(
 
     fun pay() {
         if (amount <= 0) return
+        if (amount > DemoWorld.UPI_LIMIT) { message = LIMIT_MESSAGE; return }
         val r = assessSafely(null, null)
         if (r == null) {                     // fail-open: never block a payment because of our own error
             message = "Safety check unavailable. You can still pay."
@@ -244,14 +272,53 @@ class PaymentFlow(
         message = "${profile.contactName} has been alerted"
     }
 
+    // ---- the trusted contact's side (Rohit's phone) -----------------------------------------
+    /** An alert arrived from the family link. Returns true if this phone should buzz. */
+    fun onIncomingAlert(alert: FamilyAlertUi): Boolean {
+        if (!familyMode) return false          // the sender's own alert echoing back
+        lastAlert = alert
+        screen = Screen.FamilyAlert
+        return true
+    }
+
+    /** Rohit's answer reached the sender's phone. */
+    fun onFamilyStatus(status: String) {
+        if (familyMode) return
+        when (status) {
+            "calling" -> message = "${profile.contactName} is calling you now"
+            "called" -> message = "${profile.contactName} says they have called you"
+        }
+    }
+
+    /** Rohit handled the alert: back to waiting for the next one. */
+    fun familyDone() { lastAlert = null; screen = Screen.FamilyWaiting }
+
     // ---- PIN and result ----------------------------------------------------------------------
-    private fun goPin() { pinDigits = 0; screen = Screen.Pin }
-    fun pinDigit() { if (pinDigits < PIN_LENGTH) pinDigits++ }
-    fun pinDelete() { if (pinDigits > 0) pinDigits-- }
+    private fun goPin() {
+        pinEntry = ""
+        screen = Screen.Pin
+        if (returnTo != null) message = "Test payment: any 4-digit PIN works"
+    }
+    fun pinDigit(d: Int) { if (pinEntry.length < PIN_LENGTH) pinEntry += d.toString() }
+    fun pinDelete() { pinEntry = pinEntry.dropLast(1) }
 
     fun pinSubmit() {
         val p = payee ?: return
-        if (pinDigits < PIN_LENGTH || amount <= 0) return
+        if (pinEntry.length < PIN_LENGTH || amount <= 0) return
+        // Test payments from Judge/Analyst accept any PIN; real ones need this person's own UPI PIN
+        val pinOk = returnTo != null || account?.checkUpiPin(pinEntry) == true
+        pinEntry = ""
+        if (!pinOk) {
+            pinAttempts++
+            if (pinAttempts >= MAX_PIN_ATTEMPTS) {
+                message = "Wrong UPI PIN $MAX_PIN_ATTEMPTS times. Payment cancelled; nothing left your account."
+                finish()
+            } else {
+                val left = MAX_PIN_ATTEMPTS - pinAttempts
+                message = "Incorrect UPI PIN. $left attempt${if (left == 1) "" else "s"} left"
+            }
+            return
+        }
         val now = clock()
         val status = statusOf(p)
         ledger.add(SessionPayment(p.id, p.name, amount, now, status == "new" || status == "recent", warnedThisPayment))
@@ -356,7 +423,7 @@ class PaymentFlow(
 
     private fun resetPayment() {
         upiInput = ""; payee = null; amountDigits = ""; note = ""
-        q1 = null; q2 = null; askedFamily = false; secondsLeft = 0; pinDigits = 0
+        q1 = null; q2 = null; askedFamily = false; secondsLeft = 0; pinEntry = ""; pinAttempts = 0
         pauseResult = null; criticalResult = null
         pasted = false; leftApp = false; warnedThisPayment = false
         judgeInputs = null; judgeAnswers = null to null; returnTo = null; runModel = null
@@ -365,6 +432,8 @@ class PaymentFlow(
     companion object {
         const val CONTINUE_DELAY_SECONDS = 10
         const val PIN_LENGTH = 4
+        const val MAX_PIN_ATTEMPTS = 3
+        const val LIMIT_MESSAGE = "UPI allows up to ₹1,00,000 per payment"
         private const val HOUR = 60 * 60 * 1000L
         private const val DAY = 24 * HOUR
         private const val SEVEN_DAYS = 7 * DAY

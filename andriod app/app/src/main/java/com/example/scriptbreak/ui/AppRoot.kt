@@ -1,10 +1,12 @@
 package com.example.scriptbreak.ui
 
+import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.scriptbreak.R
 import com.example.scriptbreak.logic.AnalystMode
+import com.example.scriptbreak.logic.FamilyLink
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.KitResult
 import com.example.scriptbreak.logic.PaymentFlow
@@ -42,8 +45,10 @@ import com.example.scriptbreak.ui.screens.AmountScreen
 import com.example.scriptbreak.ui.screens.AnalystScreen
 import com.example.scriptbreak.ui.screens.CriticalScreen
 import com.example.scriptbreak.ui.screens.FamilyAlertScreen
+import com.example.scriptbreak.ui.screens.FamilyWaitingScreen
 import com.example.scriptbreak.ui.screens.HomeScreen
 import com.example.scriptbreak.ui.screens.JudgeScreen
+import com.example.scriptbreak.ui.screens.LoginScreen
 import com.example.scriptbreak.ui.screens.PauseScreen
 import com.example.scriptbreak.ui.screens.PayToUpiScreen
 import com.example.scriptbreak.ui.screens.PayeeScreen
@@ -60,7 +65,7 @@ import java.util.Locale
 
 /** The real app: Sehjal's screens driven by PaymentFlow (AI model + safety layer + phone signals). */
 @Composable
-fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst: AnalystMode) {
+fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst: AnalystMode, family: FamilyLink) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -78,6 +83,11 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             }
             judge.kitLoading = false
         }
+    }
+    // Rohit's phone needs permission to show the alert as a notification (Android 13+)
+    val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    LaunchedEffect(flow.familyMode) {
+        if (flow.familyMode && Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) scoreKit({ context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() } }, displayName(context, uri))
@@ -104,13 +114,15 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             flow.consumeMessage()
         }
     }
-    BackHandler(enabled = flow.screen != Screen.UserPicker) { flow.back() }
+    BackHandler(enabled = flow.screen != Screen.Login) { flow.back() }
 
     val tts = rememberTextToSpeech(context)
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Crossfade(targetState = flow.screen, label = "screens") { screen ->
             when (screen) {
+                Screen.Login -> LoginScreen(accounts = DemoWorld.accounts, onLogin = { u, p -> flow.login(u, p) })
+
                 Screen.UserPicker -> UserPickerScreen(onPick = flow::pickProfile)
 
                 Screen.Home -> HomeScreen(
@@ -162,7 +174,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             amountText = if (flow.amount > 0) grouped(flow.amount) else "",
                             note = flow.note,
                             nudge = flow.nudge,
-                            payEnabled = flow.amount > 0,
+                            payEnabled = flow.amount in 1..DemoWorld.UPI_LIMIT,
                         ),
                         onDigit = flow::amountDigit,
                         onDelete = flow::amountDelete,
@@ -221,7 +233,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         amountText = rupees(flow.amount),
                         payeeName = p.name,
                         pinDigits = flow.pinDigits,
-                        onDigit = { flow.pinDigit() },
+                        onDigit = flow::pinDigit,
                         onDelete = flow::pinDelete,
                         onSubmit = flow::pinSubmit,
                         onBack = { flow.back() },
@@ -253,11 +265,13 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() },
                 )
 
+                Screen.FamilyWaiting -> FamilyWaitingScreen(online = family.online, onBack = { flow.back() })
+
                 Screen.FamilyAlert -> flow.lastAlert?.let { a ->
                     FamilyAlertScreen(
                         state = a,
-                        onCallNow = { dial(context, null) },
-                        onCalled = { flow.back() },
+                        onCallNow = { family.setStatus("calling"); dial(context, null) },
+                        onCalled = { family.setStatus("called"); flow.familyDone() },
                         onBack = { flow.back() },
                     )
                 }

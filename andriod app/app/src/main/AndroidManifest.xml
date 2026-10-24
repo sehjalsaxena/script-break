@@ -6,6 +6,12 @@
          A normal permission: no popup, and it never gives access to screen contents. -->
     <uses-permission android:name="android.permission.DETECT_SCREEN_RECORDING" />
 
+    <!-- "Ask family": the alert goes to the trusted contact's phone through Firebase -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- On the trusted contact's phone: buzz and show the alert as a notification -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- Read-aloud on the Critical screen uses the phone's text-to-speech engine -->
     <queries>
         <intent>

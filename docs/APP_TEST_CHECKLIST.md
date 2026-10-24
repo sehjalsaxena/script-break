@@ -18,6 +18,22 @@ Demo UPI IDs: `ramesh.k@demoupi` (new), `anil.mehta@demoupi` (new), `manoj.elec@
 | 0.4 | Android Studio → **Logcat** tab → filter `package:com.example.scriptbreak level:error` | Keep it open: any crash appears here in red | |
 | 0.5 | Optional, all logic tests: `cd "andriod app"` then `gradlew testDebugUnitTest` | BUILD SUCCESSFUL (25 tests) | |
 
+## 1a. Login, UPI PIN, limit
+
+Demo accounts (also listed on the login screen): sharma 1111 (UPI PIN 4821), priya 2222 (UPI PIN 7316),
+rohit 3333, judge 0000, analyst 9999.
+
+| # | Steps | Expected | ✅/❌ |
+|---|---|---|---|
+| 1a.1 | Open the app | Login screen with "Demo accounts (tap to fill)" | |
+| 1a.2 | Username `sharma`, PIN `9999` → Log in | "Wrong username or PIN"; stays on login | |
+| 1a.3 | Tap Mr. Sharma in Demo accounts → Log in | Mr. Sharma's Home | |
+| 1a.4 | Pay Suresh ₹500 → PIN `7316` (Priya's) → Submit | "Incorrect UPI PIN. 2 attempts left" | |
+| 1a.5 | Two more wrong PINs | "Wrong UPI PIN 3 times. Payment cancelled…" → Home, nothing paid | |
+| 1a.6 | Pay again → PIN `4821` | Success | |
+| 1a.7 | Amount: type 100000, then one more 0 | Stays ₹1,00,000; message "UPI allows up to ₹1,00,000 per payment" | |
+| 1a.8 | Back on Home | Logs out to the login screen | |
+
 ## 1. Start and profiles
 
 | # | Steps | Expected | ✅/❌ |
@@ -81,7 +97,19 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 5.1 | Be on a call with the app open for a few seconds, **hang up**, then pay Ramesh ₹20,000 | Still warned: reason "You were on a call in the last 30 minutes" | |
 | 5.2 | Android 15+: start **Screen record** (quick settings), open the app, pay Ramesh ₹9,999 | Critical (screen-share signal; reason mentions screen being shared) | |
 
-## 6. Family phone (same phone until Firebase is added)
+## 6a. Family alert on TWO phones (internet on both)
+
+| # | Steps | Expected | ✅/❌ |
+|---|---|---|---|
+| 6a.1 | Phone B: log in as **rohit** (3333); allow notifications | "Waiting for alerts from Papa", **● Connected** | |
+| 6a.2 | Phone A: log in as **sharma**, on a call, pay Ramesh ₹20,000 → Pause → **Ask Rohit to call me** | Phone A: "Rohit has been alerted" | |
+| 6a.3 | Phone B, within a few seconds | **Vibrates**, shows the alert: Papa, ₹20,000, Ramesh K., reasons | |
+| 6a.4 | Phone B with the app in the background, repeat 6a.2 | Notification "Papa may be on a scam call"; tap opens the alert | |
+| 6a.5 | Phone B: **Call Papa now** | Dialer opens on B; Phone A shows "Rohit is calling you now" | |
+| 6a.6 | Phone B: **I've called** | B back to waiting; A shows "Rohit says they have called you" | |
+| 6a.7 | Turn off internet on A, ask Rohit, turn internet back on | Alert arrives on B once A is back online | |
+
+## 6. Family phone (same phone)
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
@@ -130,6 +158,5 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 ## 8. Not built yet (don't report as bugs)
 
 - Results tab, report packet screen (Report opens the dialer only).
-- Family alert to a **second** phone (Firebase): for now the alert shows on the same phone under Rohit.
 - History and Balance (show a "not part of this demo" message).
 - Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).

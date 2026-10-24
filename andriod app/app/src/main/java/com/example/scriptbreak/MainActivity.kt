@@ -12,7 +12,8 @@ import androidx.compose.ui.Modifier
 import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.AndroidSignals
 import com.example.scriptbreak.logic.Discovery
-import com.example.scriptbreak.logic.FamilyAlertSender
+import com.example.scriptbreak.logic.FamilyBuzz
+import com.example.scriptbreak.logic.FamilyLink
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.PaymentFlow
 import com.example.scriptbreak.ml.ScamModel
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var flow: PaymentFlow
     private lateinit var judge: JudgeMode
     private lateinit var analyst: AnalystMode
+    private lateinit var family: FamilyLink
 
     // Android 15+: is this app's own window being recorded or shared right now?
     private val screenRecording = Consumer<Int> { state ->
@@ -38,8 +40,13 @@ class MainActivity : ComponentActivity() {
         // If the model file can't be loaded, the app still works: every payment goes straight
         // to the PIN (fail-open), as promised. It never blocks a payment because of our own error.
         val model = try { ScamModel.fromAssets(this) } catch (e: Exception) { null }
-        // Until the Firebase relay is added, the alert is kept on this phone (Rohit's profile shows it).
-        flow = PaymentFlow(model, signals, FamilyAlertSender { })
+        // "Ask family" goes to the trusted contact's phone through Firebase (and is kept on this phone too)
+        family = FamilyLink(applicationContext)
+        flow = PaymentFlow(model, signals, family)
+        family.listen(
+            onAlert = { _, alert -> if (flow.onIncomingAlert(alert)) FamilyBuzz.buzz(applicationContext, alert) },
+            onStatus = { _, status -> flow.onFamilyStatus(status) },
+        )
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }
         judge = JudgeMode(model, stories)
@@ -54,7 +61,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = com.example.scriptbreak.ui.theme.AppBackground
                 ) {
-                    AppRoot(flow, signals, judge, analyst)
+                    AppRoot(flow, signals, judge, analyst, family)
                 }
             }
         }
@@ -66,6 +73,11 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= 35) {
             screenRecording.accept(windowManager.addScreenRecordingCallback(mainExecutor, screenRecording))
         }
+    }
+
+    override fun onDestroy() {
+        family.stop()
+        super.onDestroy()
     }
 
     override fun onStop() {
