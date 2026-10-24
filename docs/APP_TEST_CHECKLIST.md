@@ -155,8 +155,20 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 | 7b.6 | **Run the scam payment in the app** → Pay | **Pause** with the reason "This sends back money you received from someone you have never paid…"; footer shows model "…-without-sent_by_mistake" → finish → back in the Analyst console | |
 | 7b.7 | Tap **Shadow mode**, then **Reject** on C1 | Try it goes back to **NONE** (only approved rules reach phones) | |
 
+## 7c. Report packet, trusted contact, scoreboard
+
+| # | Steps | Expected | ✅/❌ |
+|---|---|---|---|
+| 7c.1 | Sharma, on a call: pay Ramesh ₹20,000 → Pause → Next → PIN 4821 → Success → **Report payment** | Report packet: amount, Ramesh K., ramesh.k@demoupi, 12-digit UPI ref, date/time, "Warning shown: PAUSE" + reasons | |
+| 7c.2 | Tap **Call 1930** / **Report online** / **Share** | Dialer with 1930 / browser at cybercrime.gov.in / share sheet with the packet text | |
+| 7c.3 | Home → **Settings** (bottom bar) | Trusted contact: Rohit (son), +91 98••••3210, Active | |
+| 7c.4 | Change contact: name, relation, mobile `9811122233` → Send code | Code screen with "Demo: no SMS is sent. The code is …" | |
+| 7c.5 | Enter a wrong code, then the right one | "Wrong code"; then "Change requested … Active in 24 hours"; Rohit still active | |
+| 7c.6 | Pay Ramesh on a call → Pause | "Ask **Rohit** to call me" (the new contact is not active yet) | |
+| 7c.7 | Settings → **Cancel this change** | Pending change removed | |
+| 7c.8 | Log in as judge → **Results** tab | Live check runs: 28 stories (14/16, 2/10), 400 payments scored with ms per payment, error ranges; full test table AI vs rules vs bank rule; per-type bars; fairness; where it fails | |
+
 ## 8. Not built yet (don't report as bugs)
 
-- Results tab, report packet screen (Report opens the dialer only).
 - History and Balance (show a "not part of this demo" message).
 - Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).

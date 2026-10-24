@@ -74,6 +74,7 @@ Dataset checksums (SHA-256, line endings normalised to `\n`):
 | Calibration | Does a score of 0.8 mean about 80% scam? | `REPORT.md` |
 | Safety | Answers only raise the level; "No" changes nothing; guardrails G1–G4 always fire and never lower; no Nudge under ₹1,000; Q1/Q2 never reach the model | `TEST_SUMMARY.md` |
 | Explanations | Every reason shown names a signal that is really present (25,041 reasons checked) | same |
+| Fairness | Genuine interruptions per 1,000: first-time vs regular users, person vs merchant, night vs day | `TEST_SUMMARY.md` |
 | Robustness of code | Edge cases: ₹0, ₹1, ₹100 crore, no history, missing or unknown fields; determinism | same |
 | Phone = training | Kotlin scorer gives the same score and reasons as Python on 500 payments | `andriod app/.../ScamModelParityTest.kt` |
 | Reproducibility | Dataset checksums; rebuilt model and report equal the committed ones | `TEST_SUMMARY.md` |
@@ -96,6 +97,11 @@ Per type, hidden-type results and the 28 stories: `ml/results/REPORT.md`.
 - **A scam mechanism it has never seen** ("sent by mistake" removed from training): only 11% caught.
   The analyst loop then finds it as one pure cluster and proposes a rule that catches 100% of it.
 - The false-alarm rate is 7.3 per 1,000; the **upper end of its 95% range (8.3) is slightly above our budget of 8**.
+- **Fairness finding: first-time users (little payment history) are interrupted 12.5 per 1,000
+  (95% range 8.3–18.9) vs 7.0 for regular users**, and payments to a new *person* far more than to
+  merchants. With no history, the model leans on the amount alone. We report it rather than tune it on
+  test data; the fix would be a separate threshold for low-history users, set on validation data and
+  checked in shadow mode. Table: `ml/results/TEST_SUMMARY.md`.
 - Precision (93%) is optimistic: scams are about 11% of the test set, far more than in real life.
 - A negative amount is rejected by the scorer; the app only scores amounts above ₹0 and lets the
   payment go through if scoring ever fails.
@@ -105,5 +111,5 @@ Per type, hidden-type results and the 28 stories: `ml/results/REPORT.md`.
 ## 6. Still being added
 
 - Attack tests (split payments, hang up first, merchant accounts, removed signals).
-- Stress tests (more genuine calls, missed call detection) and a fairness check (first-time users vs others).
+- Stress tests (more genuine calls, missed call detection).
 - Time per payment measured on the demo phone.

@@ -3,6 +3,7 @@ package com.example.scriptbreak.logic
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.scriptbreak.ml.ApprovedRule
@@ -16,7 +17,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
-enum class Screen { Login, UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst }
+enum class Screen { Login, UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst, Report, TrustedContact }
 
 /** A payment made during this demo session (the app's own payment record). */
 data class SessionPayment(
@@ -27,6 +28,38 @@ data class SessionPayment(
     val payeeWasNew: Boolean,   // new or first paid < 7 days ago at the time
     val afterWarning: Boolean,  // a Pause or Critical screen was shown and the person continued
 )
+
+/** Everything the 1930 cyber-crime helpline asks for, for one payment (stays on the phone). */
+data class ReportPacket(
+    val amountText: String,
+    val payeeName: String,
+    val payeeUpiId: String,
+    val upiRef: String,
+    val whenText: String,
+    val levelShown: String,          // the warning shown before paying (NONE if none)
+    val reasons: List<String>,
+) {
+    /** Plain text for "Share" (the person chooses where it goes). */
+    fun asText(): String = buildString {
+        appendLine("Report packet (DemoPay, protected by ScriptBreak)")
+        appendLine("Amount: $amountText")
+        appendLine("Paid to: $payeeName ($payeeUpiId)")
+        appendLine("UPI reference: $upiRef")
+        appendLine("Date and time: $whenText")
+        if (levelShown != "NONE") appendLine("Warning shown before paying: $levelShown")
+        reasons.forEach { appendLine("- $it") }
+        append("Call 1930 or report at cybercrime.gov.in")
+    }
+}
+
+/** The person "Ask family" reaches. */
+data class TrustedContact(val name: String, val relation: String, val phone: String) {
+    val label get() = if (relation.isBlank()) name else "$name ($relation)"
+    val maskedPhone get() = "+91 " + phone.take(2) + "••••" + phone.takeLast(4)
+}
+
+/** A new contact waiting out its 24-hour delay. */
+data class PendingContact(val contact: TrustedContact, val activeAtMs: Long)
 
 /** Sends "please call" to the trusted contact's phone. Firebase in the app; a list in tests. */
 fun interface FamilyAlertSender {
@@ -69,6 +102,7 @@ class PaymentFlow(
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
     var success by mutableStateOf<SuccessUi?>(null); private set
+    var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
     var message by mutableStateOf<String?>(null); private set
     val ledger = mutableStateListOf<SessionPayment>()
@@ -85,6 +119,16 @@ class PaymentFlow(
     /** Analyst demo: score this one payment with a different model (the "before the new scam wave" one). */
     private var runModel: ScamModel? = null
 
+    // ---- trusted contact (per person) ----
+    private val contacts = mutableStateMapOf(
+        "sharma" to TrustedContact("Rohit", "son", "9876543210"),
+        "priya" to TrustedContact("Rohit", "brother", "9876543210"),
+    )
+    private val pendingContacts = mutableStateMapOf<String, PendingContact>()
+    /** Demo OTP: no SMS is sent, the code is shown on screen. Never a real OTP. */
+    var otpFor by mutableStateOf<TrustedContact?>(null); private set
+    var demoOtp by mutableStateOf<String?>(null); private set
+
     /** This phone is being used as the trusted contact's (Rohit's) phone. */
     var familyMode by mutableStateOf(false); private set
 
@@ -97,6 +141,42 @@ class PaymentFlow(
     val callNow: Boolean get() = signals.callNow || simulateCall
 
     fun consumeMessage() { message = null }
+
+    /** The trusted contact in charge now (a pending one takes over only after its 24 hours). */
+    val contact: TrustedContact
+        get() {
+            val id = profile.id
+            pendingContacts[id]?.let { if (clock() >= it.activeAtMs) { contacts[id] = it.contact; pendingContacts.remove(id) } }
+            return contacts[id] ?: TrustedContact(profile.contactName, "", "")
+        }
+    val pendingContact: PendingContact? get() = pendingContacts[profile.id]?.takeIf { clock() < it.activeAtMs }
+
+    fun openTrustedContact() { otpFor = null; demoOtp = null; screen = Screen.TrustedContact }
+
+    /** Step 1: the person enters the new contact; a one-time code goes to that number (demo: shown). */
+    fun requestContactChange(name: String, relation: String, phone: String) {
+        val digits = phone.filter(Char::isDigit).takeLast(10)
+        when {
+            name.isBlank() -> message = "Enter the contact's name"
+            !Regex("^[6-9][0-9]{9}$").matches(digits) -> message = "Enter a 10-digit Indian mobile number"
+            else -> {
+                otpFor = TrustedContact(name.trim(), relation.trim(), digits)
+                demoOtp = (100000 + (clock() % 900000)).toString()
+                message = "Code sent to +91 ••••••${digits.takeLast(4)}"
+            }
+        }
+    }
+
+    /** Step 2: the code from the new contact's phone. The new contact becomes active in 24 hours. */
+    fun verifyContactOtp(code: String) {
+        val c = otpFor ?: return
+        if (code.trim() != demoOtp) { message = "Wrong code"; return }
+        pendingContacts[profile.id] = PendingContact(c, clock() + TWENTY_FOUR_HOURS)
+        otpFor = null; demoOtp = null
+        message = "${c.name} will be your trusted contact in 24 hours. ${contact.name} stays until then."
+    }
+
+    fun cancelPendingContact() { pendingContacts.remove(profile.id); otpFor = null; demoOtp = null }
 
     // ---- login ---------------------------------------------------------------------------------
     fun login(username: String, pin: String): Boolean {
@@ -140,6 +220,8 @@ class PaymentFlow(
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
             Screen.Pause, Screen.Critical, Screen.Pin -> backToAmount()
             Screen.Success -> done()
+            Screen.Report -> screen = Screen.Success
+            Screen.TrustedContact -> screen = Screen.Home
         }
         return true
     }
@@ -269,7 +351,7 @@ class PaymentFlow(
         lastAlert = alert
         askedFamily = true
         family.send(alert)
-        message = "${profile.contactName} has been alerted"
+        message = "${contact.name} has been alerted"
     }
 
     // ---- the trusted contact's side (Rohit's phone) -----------------------------------------
@@ -285,8 +367,8 @@ class PaymentFlow(
     fun onFamilyStatus(status: String) {
         if (familyMode) return
         when (status) {
-            "calling" -> message = "${profile.contactName} is calling you now"
-            "called" -> message = "${profile.contactName} says they have called you"
+            "calling" -> message = "${contact.name} is calling you now"
+            "called" -> message = "${contact.name} says they have called you"
         }
     }
 
@@ -322,10 +404,17 @@ class PaymentFlow(
         val now = clock()
         val status = statusOf(p)
         ledger.add(SessionPayment(p.id, p.name, amount, now, status == "new" || status == "recent", warnedThisPayment))
+        val shown = criticalResult ?: pauseResult
+        val upiRef = "4" + (now % 100_000_000_000L).toString().padStart(11, '0')
+        reportPacket = ReportPacket(
+            amountText = rupees(amount), payeeName = p.name, payeeUpiId = p.upiId, upiRef = upiRef,
+            whenText = SimpleDateFormat("d MMM yyyy, h:mm a", Locale.ENGLISH).format(Date(now)),
+            levelShown = shown?.level ?: "NONE", reasons = shown?.reasons.orEmpty(),
+        )
         success = SuccessUi(
             amountText = rupees(amount),
             payeeName = p.name,
-            upiRef = "4" + (now % 100_000_000_000L).toString().padStart(11, '0'),
+            upiRef = upiRef,
             time = SimpleDateFormat("'Today,' h:mm a", Locale.ENGLISH).format(Date(now)),
             showReportLine = warnedThisPayment,
         )
@@ -333,6 +422,9 @@ class PaymentFlow(
     }
 
     fun done() = finish()
+
+    /** "Report payment" on the Success screen. */
+    fun openReport() { if (reportPacket != null) screen = Screen.Report }
 
     /** End of a payment: back to Home, or to Judge/Analyst if a test payment started there. */
     private fun finish() {
@@ -433,6 +525,7 @@ class PaymentFlow(
         const val CONTINUE_DELAY_SECONDS = 10
         const val PIN_LENGTH = 4
         const val MAX_PIN_ATTEMPTS = 3
+        const val TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000L
         const val LIMIT_MESSAGE = "UPI allows up to ₹1,00,000 per payment"
         private const val HOUR = 60 * 60 * 1000L
         private const val DAY = 24 * HOUR

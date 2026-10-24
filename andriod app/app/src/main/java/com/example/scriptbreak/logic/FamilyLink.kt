@@ -59,6 +59,12 @@ class FamilyLink(context: Context) : FamilyAlertSender {
         signedIn { n.child("status").setValue(status) }
     }
 
+    /** Delete the alert from Firebase: nothing is kept once it has been handled. */
+    fun clear() {
+        val n = node ?: return
+        signedIn { n.removeValue() }
+    }
+
     private var listener: ValueEventListener? = null
 
     /**
@@ -74,7 +80,10 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                     val id = (s.child("id").value as? Number)?.toLong() ?: return
                     val sentAt = (s.child("sentAt").value as? Number)?.toLong() ?: 0L
                     val status = s.child("status").value as? String ?: "sent"
-                    if (status == "sent" && System.currentTimeMillis() - sentAt < TEN_MINUTES) {
+                    if (System.currentTimeMillis() - sentAt >= TEN_MINUTES) {   // stale: delete, keep nothing
+                        s.ref.removeValue(); return
+                    }
+                    if (status == "sent") {
                         onAlert(id, FamilyAlertUi(
                             fromName = s.child("fromName").value as? String ?: "",
                             amountText = s.child("amountText").value as? String ?: "",

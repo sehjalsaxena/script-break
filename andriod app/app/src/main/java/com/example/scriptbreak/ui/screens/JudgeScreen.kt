@@ -83,11 +83,12 @@ fun JudgeScreen(
     onPickFile: () -> Unit,
     onLoadSample: () -> Unit,
     onBack: () -> Unit,
+    resultsContent: @Composable () -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize().background(AppBackground)) {
         AppTopBar(title = "Judge mode", onBack = onBack, showScriptBreakBadge = true, modifier = Modifier.padding(horizontal = 8.dp))
         TabRow(selectedTabIndex = judge.tab, containerColor = AppBackground, contentColor = AppPurple) {
-            listOf("Try inputs", "28 stories", "Test file").forEachIndexed { i, t ->
+            listOf("Inputs", "Stories", "Test file", "Results").forEachIndexed { i, t ->
                 Tab(selected = judge.tab == i, onClick = { judge.tab = i },
                     text = { Text(t, fontSize = 15.sp, fontWeight = if (judge.tab == i) FontWeight.Bold else FontWeight.Normal) })
             }
@@ -95,7 +96,8 @@ fun JudgeScreen(
         when (judge.tab) {
             0 -> InputsTab(judge, simulateCall, onSimulateCall, onRunInApp)
             1 -> StoriesTab(judge)
-            else -> FileTab(judge, onPickFile, onLoadSample)
+            2 -> FileTab(judge, onPickFile, onLoadSample)
+            else -> resultsContent()
         }
     }
 }

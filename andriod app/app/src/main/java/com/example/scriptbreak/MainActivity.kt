@@ -16,6 +16,7 @@ import com.example.scriptbreak.logic.FamilyBuzz
 import com.example.scriptbreak.logic.FamilyLink
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.PaymentFlow
+import com.example.scriptbreak.logic.ResultsData
 import com.example.scriptbreak.ml.ScamModel
 import com.example.scriptbreak.ui.AppRoot
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -45,7 +46,11 @@ class MainActivity : ComponentActivity() {
         flow = PaymentFlow(model, signals, family)
         family.listen(
             onAlert = { _, alert -> if (flow.onIncomingAlert(alert)) FamilyBuzz.buzz(applicationContext, alert) },
-            onStatus = { _, status -> flow.onFamilyStatus(status) },
+            onStatus = { _, status ->
+                flow.onFamilyStatus(status)
+                // Rohit has called: the alert has done its job, so the sender's phone deletes it from Firebase
+                if (status == "called" && !flow.familyMode) family.clear()
+            },
         )
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }
@@ -55,13 +60,20 @@ class MainActivity : ComponentActivity() {
         val discovery = try { Discovery.parse(assets.open("discovery_unseen_sent_by_mistake.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { null }
         // Approved rules become guardrail G3 everywhere in the app
         analyst = AnalystMode(beforeModel, discovery) { rules -> flow.approvedRules = rules }
+        // Full test results for the scoreboard (ml/results, made by ml/run_all_tests.py)
+        val results = try {
+            ResultsData.parse(
+                assets.open("report.json").bufferedReader().use { it.readText() },
+                try { assets.open("test_summary.json").bufferedReader().use { it.readText() } } catch (e: Exception) { null },
+            )
+        } catch (e: Exception) { null }
         setContent {
             ScriptBreakTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = com.example.scriptbreak.ui.theme.AppBackground
                 ) {
-                    AppRoot(flow, signals, judge, analyst, family)
+                    AppRoot(flow, signals, judge, analyst, family, results)
                 }
             }
         }

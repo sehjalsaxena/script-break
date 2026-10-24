@@ -1,5 +1,5 @@
 {
- "when_utc": "2026-10-24 11:03",
+ "when_utc": "2026-10-24 15:44",
  "environment": {
   "python": "3.13.14",
   "platform": "Windows-11-10.0.26300-SP0",
@@ -8,14 +8,14 @@
   "scikit-learn": "1.9.1",
   "joblib": "1.6.0"
  },
- "seconds": 276,
+ "seconds": 284,
  "step_seconds": {
-  "make_dataset": 5.0,
-  "train": 38.9,
-  "export_model": 1.5,
-  "evaluate": 172.4,
-  "discovery_unseen": 34.8,
-  "discovery": 2.7
+  "make_dataset": 4.6,
+  "train": 38.2,
+  "export_model": 1.6,
+  "evaluate": 179.0,
+  "discovery_unseen": 41.6,
+  "discovery": 2.8
  },
  "dataset_sha256": {
   "train.jsonl": "7615cedab94db55269777d6dd63c61426247f2a2f66a47c6b24488f72d193041",
@@ -118,14 +118,9 @@
    "name": "Edge cases score without crashing (score 0-1, valid level)",
    "passed": true,
    "detail": "10 cases, 0 failed"
-  },
-  {
-   "name": "Android: Kotlin = Python on 500 payments",
-   "passed": true,
-   "detail": "ScamModelParityTest: matchesPython, answersOnlyRaise | tests 2, failures 0, errors 0"
   }
  ],
- "passed": 20,
+ "passed": 19,
  "failed": 0,
  "error_bars_95": {
   "scams_flagged_in_scope6": {
@@ -222,6 +217,50 @@
    }
   }
  },
+ "fairness": {
+  "First-time users (little history)": {
+   "k": 22,
+   "n": 1758,
+   "rate": 0.012514220705346985,
+   "low": 0.008278577709439138,
+   "high": 0.018875736276562784
+  },
+  "Regular users": {
+   "k": 197,
+   "n": 28242,
+   "rate": 0.006975426669499327,
+   "low": 0.006069558705361534,
+   "high": 0.008015403096590934
+  },
+  "Paying a person": {
+   "k": 185,
+   "n": 9867,
+   "rate": 0.018749366575453532,
+   "low": 0.01625426299110854,
+   "high": 0.021619062825405426
+  },
+  "Paying a merchant": {
+   "k": 32,
+   "n": 17690,
+   "rate": 0.0018089315997738835,
+   "low": 0.0012816945423928573,
+   "high": 0.002552498253817096
+  },
+  "Night (23:00-06:00)": {
+   "k": 9,
+   "n": 1562,
+   "rate": 0.005761843790012804,
+   "low": 0.0030342427863807734,
+   "high": 0.010914549990615315
+  },
+  "Day": {
+   "k": 210,
+   "n": 28438,
+   "rate": 0.007384485547506857,
+   "low": 0.006453789278915498,
+   "high": 0.008448255601328824
+  }
+ },
  "edge_cases": [
   {
    "case": "Rs 0",
@@ -311,5 +350,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.14
+ "python_scorer_ms_per_payment": 0.139
 }

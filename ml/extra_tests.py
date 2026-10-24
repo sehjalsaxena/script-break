@@ -11,6 +11,8 @@ the 28 Round 1 stories, and hand-made edge cases.
                    signals that are actually present; scoring is deterministic
   3. Edge cases    Rs 0, Rs 1, Rs 100 crore, no history, missing or unknown fields
   4. Speed         Python scorer time per payment (the phone is measured separately)
+  5. Fairness      genuine payments interrupted per 1,000, by group (first-time users vs regular
+                   users, person vs merchant payee, night vs day): reported, never tuned on test data
 
 Run:  python extra_tests.py [path/to/test.jsonl]      (run_all_tests.py calls this for you)
 """
@@ -231,14 +233,29 @@ def main(test_path: Path | None = None) -> dict:
     except ValueError as e:
         negative = f"rejected with {type(e).__name__} (the app must only score amounts > 0; on any error it lets the payment through)"
 
-    # ---- 4. speed (Python reference scorer; the phone is measured separately) --------------
+    # ---- 4. fairness: who gets interrupted by mistake? (Round 1 PDF: compare first-time users) ----
+    hist = lambda f: f["payments_90d"] >= 10 and f["median_90d"] > 0
+    groups = {
+        "First-time users (little history)": lambda f: not hist(f),
+        "Regular users": hist,
+        "Paying a person": lambda f: f["payee_kind"] == "person",
+        "Paying a merchant": lambda f: f["payee_kind"] == "merchant",
+        "Night (23:00-06:00)": lambda f: f["night"],
+        "Day": lambda f: not f["night"],
+    }
+    fairness = {}
+    for name, fn in groups.items():
+        idx = [i for i in gen if fn(raws[i])]
+        fairness[name] = wilson(sum(base[i] in FLAGGED for i in idx), len(idx))
+
+    # ---- 5. speed (Python reference scorer; the phone is measured separately) --------------
     t0 = time.perf_counter()
     for f in sample[:1000]:
         scorer.score(f, m)
     py_ms = (time.perf_counter() - t0) / 1000 * 1000
 
     out = {"model_version": m["model_version"], "test_file": str(test_path.name), "test_payments": len(rows),
-           "error_bars_95": error_bars, "checks": checks, "edge_cases": edge_rows, "negative_amount": negative,
+           "error_bars_95": error_bars, "fairness_genuine_interrupted": fairness, "checks": checks, "edge_cases": edge_rows, "negative_amount": negative,
            "python_scorer_ms_per_payment": round(py_ms, 3)}
     (HERE / "results").mkdir(exist_ok=True)
     (HERE / "results" / "extra_tests.json").write_text(json.dumps(out, indent=1, default=str), encoding="utf-8")

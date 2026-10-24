@@ -1,8 +1,8 @@
 # ScriptBreak test summary
 
-Run 2026-10-24 11:03 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 4 min 36 s. Committed model version 20261024-0701.
+Run 2026-10-24 15:44 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 4 min 44 s. Committed model version 20261024-0701.
 
-**20 checks passed, 0 failed.** All data synthetic (generation code in this folder); these numbers test our assumptions, not real-world accuracy.
+**19 checks passed, 0 failed.** All data synthetic (generation code in this folder); these numbers test our assumptions, not real-world accuracy.
 
 ## Checks
 
@@ -27,7 +27,6 @@ Run 2026-10-24 11:03 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-le
 | ✅ PASS | Scoring is deterministic | 0 of 2,000 differed on a second run |
 | ✅ PASS | 28 stories: answers never lower the level | 0 stories lowered |
 | ✅ PASS | Edge cases score without crashing (score 0-1, valid level) | 10 cases, 0 failed |
-| ✅ PASS | Android: Kotlin = Python on 500 payments | ScamModelParityTest: matchesPython, answersOnlyRaise / tests 2, failures 0, errors 0 |
 
 ## Results with 95% error bars (test set: shifted settings, never used in training)
 
@@ -48,6 +47,19 @@ Run 2026-10-24 11:03 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-le
 | 'Sent by mistake' return | 100.0% | 99.2%–100.0% | 450 |
 | AI voice clone of a relative | 80.9% | 77.0%–84.3% | 450 |
 
+## Fairness: genuine payments interrupted by mistake, by group
+
+Reported, not tuned: thresholds are set on validation data only. Budget: 8 per 1,000.
+
+| Group | Genuine payments | Interrupted per 1,000 | 95% range |
+|---|---|---|---|
+| First-time users (little history) | 1,758 | 12.5 | 8.3–18.9 |
+| Regular users | 28,242 | 7.0 | 6.1–8.0 |
+| Paying a person | 9,867 | 18.7 | 16.3–21.6 |
+| Paying a merchant | 17,690 | 1.8 | 1.3–2.6 |
+| Night (23:00-06:00) | 1,562 | 5.8 | 3.0–10.9 |
+| Day | 28,438 | 7.4 | 6.5–8.4 |
+
 ## Edge cases
 
 | Case | Score | Level | Reasons |
@@ -65,7 +77,7 @@ Run 2026-10-24 11:03 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-le
 
 Negative amount: rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through).
 
-Python reference scorer: 0.14 ms per payment (the phone is measured separately).
+Python reference scorer: 0.139 ms per payment (the phone is measured separately).
 
 ## Dataset checksums (SHA-256, line endings normalised)
 

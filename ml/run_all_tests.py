@@ -189,7 +189,8 @@ def main():
                "seconds": round(time.time() - t_start), "step_seconds": timings, "dataset_sha256": data_sha,
                "committed_model_version": committed["model_version"], "checks": checks,
                "passed": sum(c["passed"] for c in checks), "failed": sum(not c["passed"] for c in checks),
-               "error_bars_95": extra["error_bars_95"], "edge_cases": extra["edge_cases"],
+               "error_bars_95": extra["error_bars_95"], "fairness": extra["fairness_genuine_interrupted"],
+               "edge_cases": extra["edge_cases"],
                "negative_amount": extra["negative_amount"], "python_scorer_ms_per_payment": extra["python_scorer_ms_per_payment"]}
     (RESULTS / "test_summary.json").write_text(json.dumps(summary, indent=1, default=str), encoding="utf-8")
     write_markdown(summary, report)
@@ -228,6 +229,11 @@ def write_markdown(s, report):
     for w, v in eb["by_workflow"].items():
         name = labels.get(w, "Genuine (should be low)" if w == "genuine" else w)
         L.append(f"| {name} | {pct(v['rate'])} | {pct(v['low'])}–{pct(v['high'])} | {v['n']:,} |")
+    L += ["\n## Fairness: genuine payments interrupted by mistake, by group\n",
+          "Reported, not tuned: thresholds are set on validation data only. Budget: 8 per 1,000.\n",
+          "| Group | Genuine payments | Interrupted per 1,000 | 95% range |", "|---|---|---|---|"]
+    for g, w in s["fairness"].items():
+        L.append(f"| {g} | {w['n']:,} | {w['rate'] * 1000:.1f} | {w['low'] * 1000:.1f}–{w['high'] * 1000:.1f} |")
     L += ["\n## Edge cases\n", "| Case | Score | Level | Reasons |", "|---|---|---|---|"]
     for e in s["edge_cases"]:
         L.append(f"| {e['case']} | {e.get('score', e.get('error'))} | {e.get('level', '-')} | {'; '.join(e.get('reasons', []))} |")

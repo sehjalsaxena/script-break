@@ -62,6 +62,8 @@ fun HomeScreen(
     onPerson: (id: String) -> Unit,
     onHistory: () -> Unit,
     onBalance: () -> Unit,
+    // Settings (trusted contact). Optional so older callers still compile.
+    onSettings: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -404,7 +406,7 @@ fun HomeScreen(
             )
             NavigationBarItem(
                 selected = false,
-                onClick = onHistory,
+                onClick = onSettings ?: onHistory,
                 icon = { Icon(AppIcons.Settings, contentDescription = "Settings") },
                 label = { Text(stringResource(R.string.nav_settings), fontSize = 14.sp) }
             )

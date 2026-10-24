@@ -97,6 +97,50 @@
    }
   }
  },
+ "fairness_genuine_interrupted": {
+  "First-time users (little history)": {
+   "k": 22,
+   "n": 1758,
+   "rate": 0.012514220705346985,
+   "low": 0.008278577709439138,
+   "high": 0.018875736276562784
+  },
+  "Regular users": {
+   "k": 197,
+   "n": 28242,
+   "rate": 0.006975426669499327,
+   "low": 0.006069558705361534,
+   "high": 0.008015403096590934
+  },
+  "Paying a person": {
+   "k": 185,
+   "n": 9867,
+   "rate": 0.018749366575453532,
+   "low": 0.01625426299110854,
+   "high": 0.021619062825405426
+  },
+  "Paying a merchant": {
+   "k": 32,
+   "n": 17690,
+   "rate": 0.0018089315997738835,
+   "low": 0.0012816945423928573,
+   "high": 0.002552498253817096
+  },
+  "Night (23:00-06:00)": {
+   "k": 9,
+   "n": 1562,
+   "rate": 0.005761843790012804,
+   "low": 0.0030342427863807734,
+   "high": 0.010914549990615315
+  },
+  "Day": {
+   "k": 210,
+   "n": 28438,
+   "rate": 0.007384485547506857,
+   "low": 0.006453789278915498,
+   "high": 0.008448255601328824
+  }
+ },
  "checks": [
   {
    "name": "Answers never lower the level",
@@ -258,5 +302,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.14
+ "python_scorer_ms_per_payment": 0.139
 }

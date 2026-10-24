@@ -20,7 +20,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +33,8 @@ import com.example.scriptbreak.logic.FamilyLink
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.KitResult
 import com.example.scriptbreak.logic.PaymentFlow
+import com.example.scriptbreak.logic.ResultsData
+import com.example.scriptbreak.logic.Story
 import com.example.scriptbreak.logic.PaymentFlow.Companion.grouped
 import com.example.scriptbreak.logic.PaymentFlow.Companion.rupees
 import com.example.scriptbreak.logic.Screen
@@ -48,7 +53,11 @@ import com.example.scriptbreak.ui.screens.FamilyAlertScreen
 import com.example.scriptbreak.ui.screens.FamilyWaitingScreen
 import com.example.scriptbreak.ui.screens.HomeScreen
 import com.example.scriptbreak.ui.screens.JudgeScreen
+import com.example.scriptbreak.ui.screens.LiveCheck
 import com.example.scriptbreak.ui.screens.LoginScreen
+import com.example.scriptbreak.ui.screens.ReportPacketScreen
+import com.example.scriptbreak.ui.screens.ResultsTab
+import com.example.scriptbreak.ui.screens.TrustedContactScreen
 import com.example.scriptbreak.ui.screens.PauseScreen
 import com.example.scriptbreak.ui.screens.PayToUpiScreen
 import com.example.scriptbreak.ui.screens.PayeeScreen
@@ -65,9 +74,32 @@ import java.util.Locale
 
 /** The real app: Sehjal's screens driven by PaymentFlow (AI model + safety layer + phone signals). */
 @Composable
-fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst: AnalystMode, family: FamilyLink) {
+fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst: AnalystMode, family: FamilyLink, results: ResultsData?) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Live scoreboard: the 28 stories and 400 test payments, scored on this phone and timed
+    var live by remember { mutableStateOf<LiveCheck?>(null) }
+    var liveRunning by remember { mutableStateOf(false) }
+    fun runLive() {
+        if (liveRunning) return
+        liveRunning = true
+        scope.launch {
+            live = withContext(Dispatchers.Default) {
+                try {
+                    val text = context.assets.open("sample_kit.jsonl").bufferedReader().use { it.readText() }
+                    val t0 = System.nanoTime()
+                    val kit = judge.scoreKit(text, "sample_kit.jsonl")
+                    val ms = (System.nanoTime() - t0) / 1e6
+                    val flagged = { s: Story -> judge.levelOf(s) in setOf("PAUSE", "CRITICAL") }
+                    val scams = judge.stories.filter { it.kind == "scam" }
+                    val genuine = judge.stories.filter { it.kind == "legit" }
+                    LiveCheck(scams.count(flagged), scams.size, genuine.count(flagged), genuine.size, kit, ms)
+                } catch (e: Exception) { null }
+            }
+            liveRunning = false
+        }
+    }
 
     // Judge mode: score a test file off the main thread (a big file must not freeze the screen)
     fun scoreKit(read: () -> String?, name: String) {
@@ -138,6 +170,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onPerson = flow::openPerson,
                     onHistory = { toast(context, "Full history is not part of this demo") },
                     onBalance = { toast(context, "Demo app: no real bank balance") },
+                    onSettings = flow::openTrustedContact,
                 )
 
                 Screen.PayToUpi -> {
@@ -192,7 +225,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             reasons = flow.pauseResult?.reasons.orEmpty(),
                             q1 = flow.q1,
                             q2 = flow.q2,
-                            contactName = flow.profile.contactName,
+                            contactName = flow.contact.name,
                             askedFamily = flow.askedFamily,
                             modelVersion = flow.modelVersion,
                         ),
@@ -212,7 +245,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         payeeName = p.name,
                         isNewPayee = status == "new" || status == "recent",
                         reasons = flow.criticalResult?.reasons.orEmpty(),
-                        contactName = flow.profile.contactName,
+                        contactName = flow.contact.name,
                         askedFamily = flow.askedFamily,
                         continueSecondsLeft = flow.secondsLeft,
                         hindi = flow.hindi,
@@ -241,10 +274,31 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 }
 
                 Screen.Success -> flow.success?.let { s ->
-                    SuccessScreen(state = s, onDone = flow::done, onReport = { dial(context, "1930") })
+                    SuccessScreen(state = s, onDone = flow::done, onReport = flow::openReport)
                 }
 
                 Screen.Waiting -> WaitingScreen(onHome = flow::done)
+
+                Screen.Report -> flow.reportPacket?.let { p ->
+                    ReportPacketScreen(
+                        packet = p,
+                        onCall1930 = { dial(context, "1930") },
+                        onReportOnline = { openWeb(context, "https://cybercrime.gov.in") },
+                        onShare = { share(context, p.asText()) },
+                        onBack = { flow.back() },
+                    )
+                }
+
+                Screen.TrustedContact -> TrustedContactScreen(
+                    current = flow.contact,
+                    pending = flow.pendingContact,
+                    otpFor = flow.otpFor,
+                    demoOtp = flow.demoOtp,
+                    onSendCode = flow::requestContactChange,
+                    onVerify = flow::verifyContactOtp,
+                    onCancelPending = flow::cancelPendingContact,
+                    onBack = { flow.back() },
+                )
 
                 Screen.Judge -> JudgeScreen(
                     judge = judge,
@@ -254,6 +308,10 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onPickFile = { pickFile.launch(arrayOf("application/json", "text/csv", "text/comma-separated-values", "text/plain", "application/octet-stream", "*/*")) },
                     onLoadSample = { scoreKit({ context.assets.open("sample_kit.jsonl").bufferedReader().use { it.readText() } }, "sample_kit.jsonl (400 synthetic test payments)") },
                     onBack = { flow.back() },
+                    resultsContent = {
+                        LaunchedEffect(Unit) { if (live == null) runLive() }
+                        ResultsTab(results, live, liveRunning, flow.ledger.size, flow.ledger.count { it.afterWarning }, ::runLive)
+                    },
                 )
 
                 Screen.Analyst -> AnalystScreen(
@@ -284,6 +342,16 @@ private fun displayName(context: Context, uri: Uri): String =
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
         if (c.moveToFirst()) c.getString(0) else null
     } ?: "test file"
+
+private fun openWeb(context: Context, url: String) {
+    try { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) } catch (e: Exception) { toast(context, url) }
+}
+
+/** The person chooses where the report packet goes (WhatsApp, email, notes and so on). */
+private fun share(context: Context, text: String) {
+    val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }
+    try { context.startActivity(Intent.createChooser(send, "Share report packet")) } catch (e: Exception) { toast(context, "No app to share with") }
+}
 
 private fun toast(context: Context, text: String) = Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
 
