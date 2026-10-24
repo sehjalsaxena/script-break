@@ -39,8 +39,8 @@ rank >= 2 (Pause or Critical).
 
 ## 2. Inputs: `Session`
 
-All amounts are whole rupees. Field names are the Python names, and the TypeScript port keeps
-them as they are (see CONTRACT.md).
+All amounts are whole rupees. Field names are the Python names (the ML kit's `ml/schema.json`
+uses the same 16 names).
 
 | Field | Type | Default | Meaning |
 |---|---|---|---|
