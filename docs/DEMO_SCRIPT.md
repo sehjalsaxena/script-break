@@ -12,10 +12,10 @@ delivery against the Round 1 plan (15).
 | Time | Who | What |
 |---|---|---|
 | 0:00–0:45 | Sambhav | The one-liner (README, first line). "A scammer on a call talks the victim through the payment. Banks check amounts; we check the pattern, on the phone, before the PIN." |
-| 0:45–4:00 | All three | Live story below: scenes 1, 1b, 2, 3, 4, 5 (rent, no popup → TV, amber line only → scam call → Pause → "No, No" stays → Yes → Critical → Rohit's phone buzzes → Rohit calls → "I've called") |
+| 0:45–4:00 | All three | **Scenario 1, legitimate:** rent to the usual landlord → nothing; ₹90,000 TV in a shop → amber line only (scenes 1, 1b). **Scenario 2, obviously suspicious:** scam call → ₹20,000 to a new payee → Pause ("What the AI sees" shows why) → "No, No" stays → Yes → Critical → Rohit's phone buzzes → Rohit calls → "I've called" (scenes 2–5). Keep it moving: no explanations mid-flow |
 | 4:00–6:30 | Judge + Deepak | Hand Phone C (judge mode) to a judge: "Change anything." Inputs tab, then **Run in app**. Then Test file → load the sample, or their own file: error rates with 95% ranges |
-| 6:30–8:30 | Deepak | Results tab: 80% vs 60% (our rules) vs 24% (bank rule) at 7.3 per 1,000 false alarms, with 95% ranges. Scam types never seen (sent by mistake only 11%). **Named failures:** S06 (small splits to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 new-landlord deposit, wrongly Paused), most false alarms = genuine first payment to a new person during a call, first-time users get 1.8× more false alarms (12.5 vs 6.9 per 1,000). "We report these instead of tuning on test data." Reproduce: `python run_all_tests.py`, 20 checks |
-| 8:30–9:30 | Sambhav | Analyst: log in as analyst on Phone C → the AI found 89 "sent by mistake" reports → Approve → Run in app → Pause. "The AI proposes, a human approves." |
+| 6:30–8:30 | Deepak (or Sambhav) | **AI vs rules:** Judge → Stories → S12 "hang up and pay": Round 1 rules Nudge, AI Critical; hang-up scams 23% (rules) vs 79% (AI) on the same test set. Results tab: 80% vs 60% (our rules) vs 24% (bank rule) at 7.3 per 1,000 false alarms, with 95% ranges. Scam types never seen (sent by mistake only 11%). **Named failures:** S06 (small splits to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 new-landlord deposit, wrongly Paused), most false alarms = genuine first payment to a new person during a call, first-time users get 1.8× more false alarms (12.5 vs 6.9 per 1,000). "We report these instead of tuning on test data." Reproduce: `python run_all_tests.py`, 20 checks |
+| 8:30–9:30 | Sambhav | **Scenario 3, a scam the model misses:** analyst on Phone C → **Run in app first: the "sent by mistake" payment goes straight to the PIN (missed)** → the AI grouped 89 such missed reports, all one pattern, and proposes one rule (catches 100%, +0.05 false alarms per 1,000) → a human taps **Approve** → Run in app again → Pause. "The AI proposes, a human approves before anything reaches phones." No architecture talk |
 | 9:30–12:00 | All | Questions. Changes from Round 1: web app → native Android (a website can't see calls); rules decide → trained AI decides, rules stay as guardrails. Deliberate cuts: no push to a fully closed app (needs a server); screen-share detection is Android 15+ |
 
 Who answers what (but everyone must manage the 30-second version of everything):
@@ -27,7 +27,7 @@ For the technical team, have ready:
 - the repo link and the check-in commit `f14de57`
 - [README.md](../README.md), which maps every form promise to the file that implements it
 - [DISCLOSURE.md](../DISCLOSURE.md)
-- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (63 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (66 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
 - the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
 
 ## Who holds what
@@ -91,7 +91,11 @@ Tap Continue → **Pause** ("Before you pay", the reasons, Q1 and Q2).
 - **Test file:** load the 400-payment sample or the judges' own JSON/CSV and get error rates with 95% intervals.
 - **Results:** AI vs rules vs bank rule, per-type numbers, known failures.
 
-**9. The AI learns a new scam wave (Phone C, 1 min).** Log out and log in as **analyst**. The model never saw "sent by mistake" scams. Clustering found a pure group of 89 missed reports and proposed one rule (catches 100%, +0.05 false alarms per 1,000). Tap **Approve** → **Run in app** → the payment now gets a Pause.
+**9. The AI learns a new scam wave (Phone C, 1 min).** Log out and log in as **analyst**. The model never saw "sent by mistake" scams.
+1. Tap **Run in app** BEFORE approving: the stranger's "please return my ₹5,000" payment goes straight to the PIN. The model misses it.
+2. Back on the analyst screen: the AI grouped the missed reports, found one pure group of 89, and proposes one rule (catches 100%, +0.05 false alarms per 1,000).
+3. Tap **Approve** → **Run in app** → now it's a Pause.
+4. Show that returning the money to the real sender still passes (the rule excludes it).
 *Say:* "The AI proposes, a human approves. It never changes the phone by itself."
 
 ## If something goes wrong

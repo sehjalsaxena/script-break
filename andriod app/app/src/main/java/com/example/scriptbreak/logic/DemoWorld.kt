@@ -99,7 +99,7 @@ object DemoWorld {
         ContactItem("c3", "Sunita Iyer", "+91 98222 33445", "sunita.iyer@demoupi", "SI", "#D0679A", "sunita"),
         ContactItem("c4", "Sharma Kirana Store", "+91 98333 44556", "sharmakirana@demoupi", "SK", "#4F9B7A", "kirana"),
         ContactItem("c5", "Anil Mehta", "+91 98444 55667", "anil.mehta@demoupi", "AM", "#B07A3A", "anil"),
-        ContactItem("c6", "Ramesh K.", "+91 98555 66778", "ramesh.k@demoupi", "RK", "#6B74D6", "ramesh"),
+        // Ramesh K. (the scammer's account in the demo) is deliberately NOT a saved contact: the caller dictates his UPI ID
         ContactItem("c7", "Manoj Electricals", "+91 98666 11223", "manoj.elec@demoupi", "ME", "#7A8A3A", "manoj"),
         ContactItem("c8", "Gupta Electronics", "+91 98777 22334", "guptaelectronics@demoupi", "GE", "#8A5BB0", "gupta"),
     )

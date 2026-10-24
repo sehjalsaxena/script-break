@@ -44,6 +44,7 @@ phone signals + payment history ──► 16 facts ──► AI model (gradient 
   - night time
   - the payment history: usual amount (90-day median), new payees, money sent today
 - **Never read:** call audio, the caller's number, the call log, messages, contacts, location or clipboard contents.
+- **What's real and what's simulated:** call detection, pasting, app switching and night are real. Screen sharing is real on Android 15+ (and casting on any Android). Money from a stranger and flagged payees exist only in Judge mode. The full table, and what a production version inside a payment app would use, is in [ml/JUDGE_QA.md](ml/JUDGE_QA.md).
 - **Model:** trained only on synthetic data from our generator ([ml/](ml/)). It is exported to JSON (91 KB) and scored
   in Kotlin with no network and no ML library. The Kotlin scores match Python exactly on 500 test payments.
 - **Safety layer** ([ml/policy.py](ml/policy.py), same logic in Kotlin `ScamModel.assess`):
@@ -90,7 +91,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 | `andriod app/app/src/main/java/com/example/scriptbreak/ml/` | `ScamModel.kt`: the on-phone scorer and safety layer |
 | `andriod app/app/src/main/java/com/example/scriptbreak/logic/` | Payment flow, phone signals, Judge mode, Analyst mode, family alert |
 | `andriod app/app/src/main/java/com/example/scriptbreak/ui/` | All screens |
-| `andriod app/app/src/test/` | 63 unit tests |
+| `andriod app/app/src/test/` | 66 unit tests |
 | [`ml/`](ml/) | Data generator, training, export, evaluation, analyst discovery, one-command test runner |
 | [`reference/`](reference/) | Round 1 Python code (rules engine, generator), reused as declared |
 | [`tests/cases.json`](tests/cases.json) | The 28 Round 1 behaviour stories (never used for training) |
@@ -119,7 +120,7 @@ Then log out and log in as rohit: the alert is there. For two or three phones, s
 ## Run the tests
 
 ```bash
-# Android: 63 unit tests (needs a JDK, e.g. Android Studio's)
+# Android: 66 unit tests (needs a JDK, e.g. Android Studio's)
 cd "andriod app"
 gradlew.bat testDebugUnitTest
 

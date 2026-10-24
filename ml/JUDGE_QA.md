@@ -1,4 +1,88 @@
-# Judge questions about the AI, with answers (Deepak, learn these)
+# Judge questions about the AI, with answers (all three of us, learn these)
+
+## One-page technical facts
+
+**Data** (`make_dataset.py`, using the Round 1 generator `round1/generator.py`, Python's built-in `random` only, so it is byte-identical on any computer)
+- Each record is one payment: 16 facts about the payment and the phone, plus a label (1 = scam, 0 = genuine). The label comes from the scenario we generated, never from our rules.
+- The generator's numbers are written assumptions, taken from police and government advisories about how each scam works (e.g. digital-arrest victims are on a call about 90% of the time).
+
+| Split | Seed | Genuine | Scams |
+|---|---|---|---|
+| train | 1001 | 1,40,000 + 10,000 "lookalikes" | 2,100 × 8 types |
+| validation | 2002 | 30,000 | 450 × 8 |
+| test | 3003 | 30,000 | 450 × 8 |
+
+- **Lookalikes** are tricky genuine payments, such as a first payment to a new person while on a call, so the model doesn't learn "new payee = scam".
+- **How the test set differs from training:**
+  - it uses new seeds, so all payments are new
+  - the scam settings are shifted: digital-arrest amounts around 20× usual and more app switching; KYC callers on a call only 70% of the time but pasting more; customer care with more screen sharing; "sent by mistake" on a call only 40% of the time
+  - genuine people make 20% more calls
+  - the test set was used once, for the final numbers. Thresholds were set on validation.
+- The **28 Round 1 stories** are never training data. They are a separate behaviour check.
+
+**The 24 features** (`features.py`, mirrored exactly in Kotlin)
+
+| Group | Features | Count |
+|---|---|---|
+| Amount | log amount, has history (≥ 10 payments in 90 days), log(amount ÷ 90-day median), the same including today's payments to new payees, log of money already sent to new payees today | 5 |
+| Live signals | call now, call in the last 30 min, screen share | 3 |
+| Payee status | known, new, recent (first paid < 7 days ago), warned, flagged (one-hot) | 5 |
+| Payee kind | person, merchant, biller (one-hot) | 3 |
+| Velocity | repeat payments to this payee today, other new payees in the last hour (both capped at 5) | 2 |
+| Money from a stranger | money received from an unknown sender in 48 h, this amount matches it (within 2%), paying back the sender | 3 |
+| Behaviour | UPI ID pasted, left the app mid-payment | 2 |
+| Time | night (23:00–06:00) | 1 |
+
+The model never sees the Q1/Q2 answers, the scenario label or anything personal.
+
+**Model** (`train.py`)
+- **Chosen:** gradient boosting, 200 trees of depth 3, learning rate 0.1, subsample 0.8, seed 7 (scikit-learn). Each tree corrects the errors of the ones before it.
+- **Compared on validation at the same false-alarm budget:** logistic regression (scams caught 83.5%), random forest of 100 trees (83.3%), gradient boosting (86.3%), so we chose gradient boosting.
+- **Thresholds**, set on validation so about 6.5 per 1,000 genuine payments are interrupted (budget ≤ 8): Nudge > 0.071 (and ₹1,000+), Pause > 0.486, Critical > 0.942.
+- **On the phone:** exported to a 91 KB JSON file and scored by our own Kotlin. The scores equal Python's on 500 test payments; a unit test checks this.
+- **Reasons:** each tree records how much each feature pushed the score. We add these up per group and show the top 3 groups that pushed it up.
+
+**Results on the test set** (synthetic):
+- Scams stopped: 79.7% of the 6 in-scope types (95% range 78.1–81.2); 80.3% of all 8 types
+- Genuine payments interrupted: 7.3 per 1,000 (6.4–8.3); Nudge only on 20 per 1,000
+- Precision 93% on this test mix; ROC AUC 0.994; accuracy 97.2%. Don't lead with accuracy: calling everything genuine already scores 89%.
+
+**AI vs our Round 1 rules, same test set**
+
+| Scam type | Rules | AI | Why the AI wins |
+|---|---|---|---|
+| Hang up, then pay | 23% | **79%** | The rules need a live call; the AI also weighs a recent call, a pasted ID and the amount |
+| Task scam over chat | 31% | **64%** | No call at all; the AI combines new payees in an hour, money sent today and pasting |
+| Voice clone | 64% | **81%** | |
+| Courier | 69% | **82%** | |
+| Customer care | 59% | **74%** | |
+| KYC | 63% | **73%** | |
+| Digital arrest | 82% | **89%** | |
+| Sent by mistake | 100% | 100% | |
+
+Demo of the difference: Judge mode → Stories → **S12**, "Told to hang up and pay; whole payment made after the call". Round 1 rules: Nudge. AI: Critical (0.98).
+
+**Limitations, say these yourself**
+- **Synthetic data:** the results test our assumptions, not real-world accuracy. A pilot on real, consented data is the next step.
+- **Unseen mechanisms are weak:** retrained without "sent by mistake", the model catches only 11% of them. That's why the analyst console exists.
+- **Named failures:** S06 (split small payments to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 deposit to a new landlord, wrongly Paused).
+- **Fairness:** first-time users get more false alarms, 12.5 vs 6.9 per 1,000. Most false alarms are genuine first payments to a new person during a call.
+- **The score is not a real-world probability:** on our test mix 11% of payments are scams, far more than in real life.
+
+## What the phone really detects, and what is simulated
+
+| Signal | In our app | In a real deployment |
+|---|---|---|
+| Active call (phone or most internet calls) | **Real**, from the audio mode, while the app is open. Best effort: some calling apps may not set it | Inside the bank/UPI app, with the permitted phone-state API, tested per phone maker |
+| Call in the last 30 minutes | Real only if our app was open during the call. We don't read the call log, by design | The same permitted API, with the user's consent |
+| Screen sharing | **Real on Android 15+** (this app's screen being recorded or shared), plus casting to another display on any Android. On older phones: the Judge-mode switch | Android 15+ API, secure windows, and the payment provider's remote-access-app detection |
+| Pasted UPI ID, left the app, night | **Real** | Same |
+| Payment history (usual amount, new payees) | Synthetic starting history plus the real payments made in the demo | The UPI app's own transaction records |
+| Money received from a stranger, flagged payee (G1) | **Not available in our app**; Judge mode only | The bank's transaction feed and the fraud registry |
+
+Say it this way: "The app really detects calls, pasting, app switching and, on Android 15+, screen sharing. A production version would live inside the payment app with permitted signals from the payment provider. We don't claim to catch every call or screen-sharing session on every phone."
+
+## Questions and answers
 
 **What model is it, and why?**
 Gradient boosting: 200 small decision trees, each correcting the previous ones. We trained three
