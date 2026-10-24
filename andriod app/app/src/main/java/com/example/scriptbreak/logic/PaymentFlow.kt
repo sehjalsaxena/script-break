@@ -109,7 +109,10 @@ class PaymentFlow(
     var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
     var message by mutableStateOf<String?>(null); private set
-    val ledger = mutableStateListOf<SessionPayment>()
+    /** Each person's own payment record: Priya never sees, or is scored on, Mr. Sharma's payments. */
+    private val ledgers = mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>>()
+    val ledger: androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>
+        get() = ledgers.getOrPut(profile.id) { mutableStateListOf() }
     /** Rules approved in the analyst console (guardrail G3). */
     var approvedRules: List<ApprovedRule> = emptyList()
 
@@ -150,7 +153,7 @@ class PaymentFlow(
     val contact: TrustedContact
         get() {
             val id = profile.id
-            pendingContacts[id]?.let { if (clock() >= it.activeAtMs) { contacts[id] = it.contact; pendingContacts.remove(id) } }
+            pendingContacts[id]?.let { if (clock() >= it.activeAtMs) return it.contact }   // its 24 hours have passed
             return contacts[id] ?: TrustedContact(profile.contactName, "", "")
         }
     val pendingContact: PendingContact? get() = pendingContacts[profile.id]?.takeIf { clock() < it.activeAtMs }
@@ -175,12 +178,22 @@ class PaymentFlow(
     fun verifyContactOtp(code: String) {
         val c = otpFor ?: return
         if (code.trim() != demoOtp) { message = "Wrong code"; return }
+        settleContact()   // an earlier change whose 24 hours have passed is kept, not overwritten
         pendingContacts[profile.id] = PendingContact(c, clock() + TWENTY_FOUR_HOURS)
         otpFor = null; demoOtp = null
         message = "${c.name} will be your trusted contact in 24 hours. ${contact.name} stays until then."
     }
 
-    fun cancelPendingContact() { pendingContacts.remove(profile.id); otpFor = null; demoOtp = null }
+    /** Cancels a change that is still waiting; one whose 24 hours have passed is already in charge and stays. */
+    fun cancelPendingContact() {
+        settleContact()
+        pendingContacts.remove(profile.id); otpFor = null; demoOtp = null
+    }
+
+    private fun settleContact() {
+        val id = profile.id
+        pendingContacts[id]?.let { if (clock() >= it.activeAtMs) { contacts[id] = it.contact; pendingContacts.remove(id) } }
+    }
 
     // ---- login ---------------------------------------------------------------------------------
     fun login(username: String, pin: String): Boolean {
@@ -308,6 +321,25 @@ class PaymentFlow(
         screen = Screen.Payee
     }
 
+    /** "To Bank A/c": a transfer to an account number gets the same ScriptBreak check as a UPI payment. */
+    fun openBankAccount(holderName: String, accountNumber: String, ifsc: String) {
+        val acct = accountNumber.filter(Char::isDigit)
+        val name = holderName.trim().ifBlank { "Account holder" }
+        resetPayment()
+        payee = DemoWorld.payees.firstOrNull { it.id == "acct:$acct" } ?: PayeeRecord(
+            id = "acct:$acct", name = name, upiId = "A/c ••••${acct.takeLast(4)} · ${ifsc.trim().uppercase()}",
+            bankingName = name.uppercase(), initials = name.split(' ').filter { it.isNotBlank() }.take(2)
+                .joinToString("") { it.first().uppercase() }.ifBlank { "AC" }, colorHex = "#6B74D6")
+        screen = Screen.Payee
+    }
+
+    /** "To Self A/c": moving money to the person's own second demo account (a payee they have paid before). */
+    fun openSelfTransfer() {
+        resetPayment()
+        payee = SELF_ACCOUNT
+        screen = Screen.Payee
+    }
+
     fun toAmount() { amountDigits = ""; note = ""; screen = Screen.Amount }
 
     // ---- amount ------------------------------------------------------------------------------
@@ -429,7 +461,8 @@ class PaymentFlow(
         }
         val now = clock()
         val status = statusOf(p)
-        ledger.add(SessionPayment(p.id, p.name, amount, now, status == "new" || status == "recent", warnedThisPayment))
+        // Judge/Analyst test payments are not real: they must not change anyone's history or the model's inputs
+        if (returnTo == null) ledger.add(SessionPayment(p.id, p.name, amount, now, status == "new" || status == "recent", warnedThisPayment))
         val shown = criticalResult ?: pauseResult
         val upiRef = "4" + (now % 100_000_000_000L).toString().padStart(11, '0')
         reportPacket = ReportPacket(
@@ -531,8 +564,10 @@ class PaymentFlow(
         val p = payee ?: return ""
         val parts = mutableListOf<String>()
         if (statusOf(p) == "new") parts += "First payment to ${endSentence(p.name)}"
-        val hasHistory = profile.payments90d >= 10 && profile.median90d > 0
-        val ratio = amount / profile.median90d
+        val seen = currentPayment(refreshSignals = false)
+        val median = seen?.median90d ?: profile.median90d
+        val hasHistory = (seen?.payments90d ?: profile.payments90d) >= 10 && median > 0
+        val ratio = if (median > 0) amount / median else 0.0
         if (hasHistory && ratio >= 3) parts += "${rupees(amount)} is ${ratio.roundToLong()}× your usual payment."
         else r.reasons.firstOrNull { it != NEVER_PAID }?.let { parts += endSentence(it) }
         parts += "Check you know who this is."
@@ -551,6 +586,9 @@ class PaymentFlow(
         const val CONTINUE_DELAY_SECONDS = 10
         const val PIN_LENGTH = 4
         const val MAX_PIN_ATTEMPTS = 3
+        /** The person's own second account in the demo (fictional bank). */
+        val SELF_ACCOUNT = PayeeRecord("self", "Your Sample Bank A/c", "A/c ••••7319 · SMPL0007319", "YOUR OWN ACCOUNT",
+            status = "known", paidTimes = 4, initials = "SB", colorHex = "#6B74D6")
         const val TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000L
         const val LIMIT_MESSAGE = "UPI allows up to ₹1,00,000 per payment"
         private const val HOUR = 60 * 60 * 1000L

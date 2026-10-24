@@ -152,7 +152,7 @@ object KitParser {
         }
         val out = ArrayList<Parsed>(); val problems = ArrayList<String>()
         objects.forEachIndexed { i, rec ->
-            val f = rec.optJSONObject("features") ?: rec
+            val f = normalise(rec.optJSONObject("features") ?: rec)
             val status = f.optString("payee_status", "known"); val kind = f.optString("payee_kind", "person")
             when {
                 !f.has("amount") || f.optDouble("amount", 0.0) <= 0 -> problems += "Row ${i + 1}: amount missing or not above 0"
@@ -162,6 +162,17 @@ object KitParser {
             }
         }
         return out to problems
+    }
+
+    /** Accepts 1/0, "yes"/"no" and "TRUE" for yes/no inputs, and any case for payee status and kind. */
+    private fun normalise(f: JSONObject): JSONObject {
+        val o = JSONObject(f.toString())
+        for (k in BOOLS) if (o.has(k) && !o.isNull(k) && o.get(k) !is Boolean) {
+            if (k == "q1" || k == "q2") continue   // answers keep "not answered" (handled by triState)
+            o.put(k, o.get(k).toString().trim().lowercase() in setOf("true", "1", "1.0", "yes"))
+        }
+        for (k in listOf("payee_status", "payee_kind")) if (o.has(k) && !o.isNull(k)) o.put(k, o.getString(k).trim().lowercase())
+        return o
     }
 
     private fun triState(rec: JSONObject, f: JSONObject, key: String): Boolean? {

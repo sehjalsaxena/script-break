@@ -100,7 +100,7 @@ fun CheckBalanceScreen(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = "Bank balance is retrieved securely through official NPCI UPI network",
+                    text = "Demo balance: no real bank is contacted",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     color = SafeGreen
@@ -119,7 +119,7 @@ fun CheckBalanceScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Account 1: State Bank of India
+        // Account 1: Demo Bank
         Surface(
             color = Color.White,
             shape = RoundedCornerShape(16.dp),
@@ -147,7 +147,7 @@ fun CheckBalanceScreen(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "State Bank of India",
+                            text = "Demo Bank",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkDark
@@ -243,7 +243,7 @@ fun CheckBalanceScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Account 2: HDFC Bank
+        // Account 2: Sample Bank
         Surface(
             color = Color.White,
             shape = RoundedCornerShape(16.dp),
@@ -271,7 +271,7 @@ fun CheckBalanceScreen(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "HDFC Bank",
+                            text = "Sample Bank",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkDark

@@ -59,6 +59,8 @@ import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 @Composable
 fun BankSelfScreen(
     onBack: () -> Unit,
+    onBankAccount: (holderName: String, accountNumber: String, ifsc: String) -> Unit = { _, _, _ -> },
+    onSelfTransfer: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -69,9 +71,6 @@ fun BankSelfScreen(
     var confirmAccountNumber by remember { mutableStateOf("") }
     var ifscCode by remember { mutableStateOf("") }
     var recipientName by remember { mutableStateOf("") }
-
-    // Self transfer fields
-    var selfAmount by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -184,7 +183,7 @@ fun BankSelfScreen(
                             value = ifscCode,
                             onValueChange = { ifscCode = it.uppercase().take(11) },
                             label = { Text("IFSC Code") },
-                            placeholder = { Text("e.g. SBIN0001234") },
+                            placeholder = { Text("e.g. DEMO0001234") },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = InkDark,
@@ -264,7 +263,7 @@ fun BankSelfScreen(
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
-                                    Text("From: State Bank of India", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                                    Text("From: Demo Bank", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
                                     Text("A/c •••• 4821 (Primary)", fontSize = 13.sp, color = MutedText)
                                 }
                             }
@@ -296,30 +295,11 @@ fun BankSelfScreen(
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
-                                    Text("To: HDFC Bank", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                                    Text("To: Sample Bank", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
                                     Text("A/c •••• 7319 (Secondary)", fontSize = 13.sp, color = MutedText)
                                 }
                             }
                         }
-
-                        OutlinedTextField(
-                            value = selfAmount,
-                            onValueChange = { selfAmount = it.filter(Char::isDigit).take(6) },
-                            label = { Text("Transfer Amount (₹)") },
-                            placeholder = { Text("Enter amount") },
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = InkDark,
-                                unfocusedTextColor = InkDark,
-                                cursorColor = AppPurple,
-                                focusedBorderColor = AppPurple,
-                                unfocusedBorderColor = Color(0xFFDDE2EA),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
             }
@@ -334,16 +314,11 @@ fun BankSelfScreen(
                     } else if (accountNumber != confirmAccountNumber) {
                         Toast.makeText(context, "Account numbers do not match", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "Demo app: Bank transfer initiated", Toast.LENGTH_SHORT).show()
-                        onBack()
+                        // same amount screen, ScriptBreak check, ₹1 lakh limit and UPI PIN as a UPI payment
+                        onBankAccount(recipientName, accountNumber, ifscCode)
                     }
                 } else {
-                    if (selfAmount.isBlank() || selfAmount == "0") {
-                        Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Transferred ₹$selfAmount to HDFC Bank (Demo)", Toast.LENGTH_SHORT).show()
-                        onBack()
-                    }
+                    onSelfTransfer()
                 }
             }
         )

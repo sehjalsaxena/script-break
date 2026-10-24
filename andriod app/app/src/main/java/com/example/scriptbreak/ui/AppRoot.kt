@@ -167,9 +167,9 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         userName = flow.profile.displayName,
                         onCall = flow.callNow,
                         people = DemoWorld.homePeople.map { PersonUi(it.id, it.name, it.initials, it.upiId, it.colorHex) },
-                        recent = flow.ledger.reversed().map {
-                            TxnUi("p${it.atMs}", it.payeeName, "Today", rupees(it.amount))
-                        } + DemoWorld.seededRecent(flow.profile.id),
+                        recent = flow.ledger.mapIndexed { i, it ->
+                            TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount))
+                        }.reversed() + DemoWorld.seededRecent(flow.profile.id),
                     ),
                     onSendContact = flow::startContacts,
                     onPayUpiId = flow::startPayToUpi,
@@ -194,14 +194,16 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 )
 
                 Screen.History -> HistoryScreen(
-                    transactions = flow.ledger.reversed().map {
-                        TxnUi("p${it.atMs}", it.payeeName, "Today", rupees(it.amount))
-                    } + DemoWorld.seededRecent(flow.profile.id),
+                    transactions = flow.ledger.mapIndexed { i, it ->
+                        TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount))
+                    }.reversed() + DemoWorld.seededRecent(flow.profile.id),
                     onBack = { flow.back() }
                 )
 
                 Screen.BankSelf -> BankSelfScreen(
-                    onBack = { flow.back() }
+                    onBack = { flow.back() },
+                    onBankAccount = flow::openBankAccount,
+                    onSelfTransfer = flow::openSelfTransfer,
                 )
 
                 Screen.CheckBalance -> CheckBalanceScreen(

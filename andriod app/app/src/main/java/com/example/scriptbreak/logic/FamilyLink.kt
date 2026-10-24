@@ -33,22 +33,28 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     /** True when alerts can reach another phone (Firebase configured). */
     val online: Boolean get() = node != null
 
+    private val retry = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** Signs in (anonymously) first; with no internet yet, tries again every 5 seconds. */
     private fun signedIn(then: () -> Unit) {
         val a = auth ?: return
-        if (a.currentUser != null) then() else a.signInAnonymously().addOnSuccessListener { then() }
+        if (a.currentUser != null) then()
+        else a.signInAnonymously().addOnSuccessListener { then() }
+            .addOnFailureListener { retry.postDelayed({ signedIn(then) }, 5_000) }
     }
 
     override fun send(alert: FamilyAlertUi) {
         val n = node ?: return
+        val now = System.currentTimeMillis()   // the time "Ask family" was tapped, even if sign-in is slow
         signedIn {
             n.setValue(mapOf(
-                "id" to System.currentTimeMillis(),
+                "id" to now,
                 "fromName" to alert.fromName,
                 "amountText" to alert.amountText,
                 "payeeName" to alert.payeeName,
                 "reasons" to alert.reasons.take(3),
                 "status" to "sent",
-                "sentAt" to System.currentTimeMillis(),
+                "sentAt" to now,
             ))
         }
     }
