@@ -29,6 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -148,7 +150,7 @@ fun UserAvatar(
     initials: String,
     modifier: Modifier = Modifier,
     size: Dp = 48.dp,
-    backgroundColor: Color = AppPurple,
+    backgroundColor: Color = AppBlue,
     textColor: Color = Color.White
 ) {
     Box(
@@ -173,7 +175,7 @@ fun DemoPrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    containerColor: Color = AppPurple,
+    containerColor: Color = AppBlue,
     contentColor: Color = Color.White
 ) {
     Button(
@@ -303,6 +305,7 @@ fun NumericKeypad(
         }
 
         // Bottom row: period or empty, 0, backspace
+        val haptic = LocalHapticFeedback.current
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -311,7 +314,12 @@ fun NumericKeypad(
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp)
-                    .clickable(enabled = onPeriod != null) { onPeriod?.invoke() },
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .clickable(enabled = onPeriod != null) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onPeriod?.invoke()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 if (onPeriod != null) {
@@ -330,19 +338,28 @@ fun NumericKeypad(
                 modifier = Modifier.weight(1f)
             )
 
-            Box(
+            Surface(
+                color = Color.White.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(14.dp),
+                shadowElevation = 0.5.dp,
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp)
-                    .clickable { onDelete() },
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onDelete()
+                    }
             ) {
-                Text(
-                    text = "⌫",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = InkDark
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "⌫",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = InkDark
+                    )
+                }
             }
         }
     }
@@ -354,18 +371,27 @@ private fun KeypadButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    val haptic = LocalHapticFeedback.current
+    Surface(
+        color = Color.White,
+        shape = RoundedCornerShape(14.dp),
+        shadowElevation = 0.5.dp,
         modifier = modifier
+            .padding(horizontal = 4.dp, vertical = 2.dp)
             .height(56.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+            .clip(RoundedCornerShape(14.dp))
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            }
     ) {
-        Text(
-            text = text,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = InkDark
-        )
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = InkDark
+            )
+        }
     }
 }

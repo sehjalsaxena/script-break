@@ -39,8 +39,8 @@ import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
@@ -103,7 +103,7 @@ fun PayToUpiScreen(
                         Icon(
                             imageVector = AppIcons.AlternateEmail,
                             contentDescription = null,
-                            tint = AppPurple
+                            tint = AppBlue
                         )
                     },
                     trailingIcon = {
@@ -111,7 +111,7 @@ fun PayToUpiScreen(
                             Icon(
                                 imageVector = AppIcons.ContentPaste,
                                 contentDescription = "Paste",
-                                tint = AppPurple,
+                                tint = AppBlue,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -119,9 +119,9 @@ fun PayToUpiScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = InkDark,
                         unfocusedTextColor = InkDark,
-                        focusedBorderColor = AppPurple,
+                        focusedBorderColor = AppBlue,
                         unfocusedBorderColor = Color(0xFFDDE2EA),
-                        cursorColor = AppPurple,
+                        cursorColor = AppBlue,
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White
                     ),
@@ -165,13 +165,13 @@ fun PayToUpiScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(AppPurpleLight)
+                                .background(AppBlueLight)
                         ) {
                             Text(
                                 text = name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.joinToString(""),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = AppPurple
+                                color = AppBlue
                             )
                         }
                         Spacer(modifier = Modifier.width(14.dp))

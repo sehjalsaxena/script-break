@@ -41,8 +41,10 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.model.TxnUi
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppOrange
+import com.example.scriptbreak.ui.theme.AppOrangeLight
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
@@ -154,12 +156,24 @@ fun HistoryScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(14.dp)
                         ) {
-                            UserAvatar(
-                                initials = txnInitials,
-                                size = 44.dp,
-                                backgroundColor = AppPurpleLight,
-                                textColor = AppPurple
-                            )
+                            Box {
+                                UserAvatar(
+                                    initials = txnInitials,
+                                    size = 44.dp,
+                                    backgroundColor = AppBlueLight,
+                                    textColor = AppBlue
+                                )
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clip(CircleShape)
+                                        .background(AppOrangeLight)
+                                        .align(Alignment.BottomEnd)
+                                ) {
+                                    Text("↑", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = AppOrange)
+                                }
+                            }
 
                             Spacer(modifier = Modifier.width(14.dp))
 

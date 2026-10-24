@@ -50,12 +50,15 @@ import com.example.scriptbreak.ui.model.HomeUi
 import com.example.scriptbreak.ui.model.PersonUi
 import com.example.scriptbreak.ui.model.TxnUi
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppPurple
-import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppBlueLight
+import com.example.scriptbreak.ui.theme.AppOrange
+import com.example.scriptbreak.ui.theme.AppOrangeLight
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
+import com.example.scriptbreak.ui.theme.SafeGreenTint
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
 @Composable
@@ -105,7 +108,7 @@ fun HomeScreen(
                 }
             }
 
-            // Bell icon with notification badge dot
+            // Bell icon with brand orange notification badge dot
             Box {
                 IconButton(onClick = onNotifications) {
                     Icon(
@@ -119,7 +122,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(CritRed)
+                        .background(AppOrange)
                         .align(Alignment.TopEnd)
                         .padding(2.dp)
                 )
@@ -169,62 +172,101 @@ fun HomeScreen(
                 }
             }
 
-            // Search bar
+            // Search bar with QR scan icon button
             item {
                 Surface(
                     color = Color.White,
                     shape = RoundedCornerShape(24.dp),
                     shadowElevation = 1.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onPayUpiId() }
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(
-                            imageVector = AppIcons.Search,
-                            contentDescription = "Search",
-                            tint = MutedText,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(R.string.search_hint),
-                            fontSize = 16.sp,
-                            color = MutedText
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onPayUpiId() }
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.Search,
+                                contentDescription = "Search",
+                                tint = MutedText,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = stringResource(R.string.search_hint),
+                                fontSize = 15.sp,
+                                color = MutedText
+                            )
+                        }
+
+                        // Prominent QR code scanner icon button
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(AppBlueLight)
+                                .clickable { onPayUpiId() }
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.QrCode,
+                                contentDescription = "Scan QR",
+                                tint = AppBlue,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
             }
 
-            // Quick Actions 4x1
+            // Quick Actions 4x1 inside an elevated action dock
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(18.dp),
+                    shadowElevation = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    QuickActionTile(
-                        icon = AppIcons.Person,
-                        label = stringResource(R.string.action_send),
-                        onClick = onSendContact
-                    )
-                    QuickActionTile(
-                        icon = AppIcons.AlternateEmail,
-                        label = stringResource(R.string.action_upi_id),
-                        onClick = onPayUpiId
-                    )
-                    QuickActionTile(
-                        icon = AppIcons.AccountBalance,
-                        label = stringResource(R.string.action_bank),
-                        onClick = onBankSelf
-                    )
-                    QuickActionTile(
-                        icon = AppIcons.Wallet,
-                        label = stringResource(R.string.action_balance),
-                        onClick = onBalance
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp, horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        QuickActionTile(
+                            icon = AppIcons.Person,
+                            label = stringResource(R.string.action_send),
+                            tint = AppBlue,
+                            background = AppBlueLight,
+                            onClick = onSendContact
+                        )
+                        QuickActionTile(
+                            icon = AppIcons.AlternateEmail,
+                            label = stringResource(R.string.action_upi_id),
+                            tint = AppOrange,
+                            background = AppOrangeLight,
+                            onClick = onPayUpiId
+                        )
+                        QuickActionTile(
+                            icon = AppIcons.AccountBalance,
+                            label = stringResource(R.string.action_bank),
+                            tint = AppBlue,
+                            background = AppBlueLight,
+                            onClick = onBankSelf
+                        )
+                        QuickActionTile(
+                            icon = AppIcons.Wallet,
+                            label = stringResource(R.string.action_balance),
+                            tint = SafeGreen,
+                            background = SafeGreenTint,
+                            onClick = onBalance
+                        )
+                    }
                 }
             }
 
@@ -250,9 +292,9 @@ fun HomeScreen(
                             )
                             Text(
                                 text = stringResource(R.string.view_all),
-                                fontSize = 16.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = AppPurple,
+                                color = AppBlue,
                                 modifier = Modifier.clickable { onViewAllPeople() }
                             )
                         }
@@ -274,7 +316,7 @@ fun HomeScreen(
                                     val bg = try {
                                         Color(android.graphics.Color.parseColor(person.colorHex))
                                     } catch (_: Exception) {
-                                        AppPurple
+                                        AppBlue
                                     }
                                     UserAvatar(
                                         initials = person.initials,
@@ -294,25 +336,25 @@ fun HomeScreen(
                                 }
                             }
 
-                            // Trailing chevron circular button (as in Figma image 3)
+                            // Trailing chevron circular button to View All People
                             item {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
                                         .width(54.dp)
-                                        .clickable { onPayUpiId() }
+                                        .clickable { onViewAllPeople() }
                                 ) {
                                     Box(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier
                                             .size(54.dp)
                                             .clip(CircleShape)
-                                            .background(AppPurpleLight)
+                                            .background(AppBlueLight)
                                     ) {
                                         Icon(
                                             imageVector = AppIcons.ChevronRight,
-                                            contentDescription = "More",
-                                            tint = AppPurple,
+                                            contentDescription = "View all",
+                                            tint = AppBlue,
                                             modifier = Modifier.size(24.dp)
                                         )
                                     }
@@ -351,8 +393,9 @@ fun HomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 10.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .clickable { onHistory() }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
                             ) {
                                 val txnInitials = txn.name.split(" ")
                                     .mapNotNull { it.firstOrNull()?.toString() }
@@ -360,12 +403,25 @@ fun HomeScreen(
                                     .joinToString("")
                                     .ifEmpty { "TX" }
 
-                                UserAvatar(
-                                    initials = txnInitials,
-                                    size = 44.dp,
-                                    backgroundColor = AppPurpleLight,
-                                    textColor = AppPurple
-                                )
+                                Box {
+                                    UserAvatar(
+                                        initials = txnInitials,
+                                        size = 44.dp,
+                                        backgroundColor = AppBlueLight,
+                                        textColor = AppBlue
+                                    )
+                                    // Paid outgoing indicator badge
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .clip(CircleShape)
+                                            .background(AppOrangeLight)
+                                            .align(Alignment.BottomEnd)
+                                    ) {
+                                        Text("↑", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = AppOrange)
+                                    }
+                                }
 
                                 Spacer(modifier = Modifier.width(14.dp))
 
@@ -378,18 +434,26 @@ fun HomeScreen(
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = txn.time,
-                                        fontSize = 14.sp,
+                                        text = "${txn.time} · Paid via UPI",
+                                        fontSize = 13.sp,
                                         color = MutedText
                                     )
                                 }
 
-                                Text(
-                                    text = txn.amount,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = InkDark
-                                )
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = txn.amount,
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = InkDark
+                                    )
+                                    Text(
+                                        text = "Completed",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = SafeGreen
+                                    )
+                                }
                             }
                         }
                     }
@@ -412,9 +476,9 @@ fun HomeScreen(
                 icon = { Icon(AppIcons.Home, contentDescription = "Home") },
                 label = { Text(stringResource(R.string.nav_home), fontSize = 14.sp, fontWeight = FontWeight.SemiBold) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = AppPurple,
-                    selectedTextColor = AppPurple,
-                    indicatorColor = AppPurpleLight
+                    selectedIconColor = AppBlue,
+                    selectedTextColor = AppBlue,
+                    indicatorColor = AppBlueLight
                 )
             )
             NavigationBarItem(
@@ -438,36 +502,40 @@ private fun QuickActionTile(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
+    tint: Color = AppBlue,
+    background: Color = AppBlueLight,
     modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .width(80.dp)
+            .width(76.dp)
+            .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(54.dp)
+                .size(52.dp)
                 .clip(CircleShape)
-                .background(AppPurpleLight)
+                .background(background)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = AppPurple,
-                modifier = Modifier.size(26.dp)
+                tint = tint,
+                modifier = Modifier.size(24.dp)
             )
         }
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
             color = InkDark,
             textAlign = TextAlign.Center,
-            lineHeight = 16.sp
+            lineHeight = 15.sp,
+            maxLines = 2
         )
     }
 }
