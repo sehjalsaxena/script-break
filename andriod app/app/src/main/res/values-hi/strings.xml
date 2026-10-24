@@ -6,12 +6,12 @@
     <!-- User Picker -->
     <string name="user_picker_title">यह फ़ोन कौन इस्तेमाल कर रहा है?</string>
     <string name="user_picker_subtitle">डेमो प्रोफ़ाइल चुनें</string>
-    <string name="profile_sharma_title">श्री शर्मा</string>
+    <string name="profile_sharma_title">संभव जैन</string>
     <string name="profile_sharma_sub">मुख्य डेमो उपयोगकर्ता\nसामान्य परिदृश्य</string>
-    <string name="profile_priya_title">प्रिया</string>
+    <string name="profile_priya_title">दीपक रावत</string>
     <string name="profile_priya_sub">नियमित उपयोगकर्ता\nसामान्य भुगतान</string>
-    <string name="profile_rohit_title">रोहित (बेटा)</string>
-    <string name="profile_rohit_sub">पारिवारिक संपर्क\nअलर्ट प्राप्त करता है</string>
+    <string name="profile_rohit_title">सहजल सक्सेना</string>
+    <string name="profile_rohit_sub">भरोसेमंद संपर्क\nअलर्ट यहाँ आते हैं</string>
     <string name="profile_judge_title">जज मोड</string>
     <string name="profile_judge_sub">परीक्षण परिदृश्य\nमॉडल निर्णय देखें</string>
     <string name="profile_analyst_title">एनालिस्ट मोड</string>
@@ -92,7 +92,7 @@
     <!-- Family Alert Screen -->
     <string name="family_alert_title">%1$s शायद किसी फ़्रॉड कॉल पर हैं</string>
     <string name="family_alert_sub">%1$s, %3$s को %2$s भेजने की कोशिश कर रहे हैं।</string>
-    <string name="family_alert_disclaimer">रोहित खाता नहीं देख सकते और न ही भुगतान रोक सकते हैं।</string>
+    <string name="family_alert_disclaimer">सहजल के लिए खाता देखना या भुगतान रोकना संभव नहीं है।</string>
     <string name="family_alert_call_now">%1$s को अभी कॉल करें</string>
     <string name="family_alert_called">मैंने कॉल कर लिया है</string>
 

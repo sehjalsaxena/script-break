@@ -22,7 +22,7 @@ class ExtrasTest {
         override fun isNight(nowMs: Long) = false
     }
 
-    private fun sharma() = PaymentFlow(model, OnCall(), { }, clock = { now }).apply { login("sharma", "1111") }
+    private fun sharma() = PaymentFlow(model, OnCall(), { }, clock = { now }).apply { login("sambhav", "1111") }
 
     @Test
     fun reportPacketHasEverythingFor1930() {
@@ -49,7 +49,7 @@ class ExtrasTest {
     @Test
     fun newTrustedContactNeedsTheCodeAndWaits24Hours() {
         val f = sharma()
-        assertEquals("Rohit", f.contact.name)
+        assertEquals("Sehjal", f.contact.name)
         f.openTrustedContact()
         f.requestContactChange("Anita", "daughter", "12345")           // not a valid mobile number
         assertNull(f.otpFor)
@@ -59,9 +59,9 @@ class ExtrasTest {
         assertEquals("Wrong code", f.message)
         f.verifyContactOtp(code)
         assertNotNull(f.pendingContact)
-        assertEquals("Rohit stays until the 24 hours pass", "Rohit", f.contact.name)
+        assertEquals("Sehjal stays until the 24 hours pass", "Sehjal", f.contact.name)
         now += PaymentFlow.TWENTY_FOUR_HOURS - 1
-        assertEquals("Rohit", f.contact.name)
+        assertEquals("Sehjal", f.contact.name)
         now += 1
         assertEquals("Anita", f.contact.name)
         assertNull(f.pendingContact)
@@ -75,7 +75,7 @@ class ExtrasTest {
         f.verifyContactOtp(f.demoOtp!!)
         f.cancelPendingContact()
         now += PaymentFlow.TWENTY_FOUR_HOURS
-        assertEquals("Rohit", f.contact.name)
+        assertEquals("Sehjal", f.contact.name)
     }
 
     @Test

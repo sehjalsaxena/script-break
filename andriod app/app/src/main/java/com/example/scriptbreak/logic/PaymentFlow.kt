@@ -24,8 +24,8 @@ enum class Screen {
 }
 
 /** A payment made during this demo session (the app's own payment record). */
-/** What the AI saw and decided for the payment being typed (demo view). */
-data class AiView(val level: String, val score: Double?, val facts: List<String>)
+/** What the AI noticed for the payment being typed, in plain words (the "Safety check" card). */
+data class AiView(val level: String, val score: Double?, val facts: List<String>, val reminderOnly: Boolean = false)
 
 data class SessionPayment(
     val payeeId: String,
@@ -110,17 +110,17 @@ class PaymentFlow(
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
     private var lastAlertAt = 0L   // when it was sent (or got here, if unknown), so a very old alert is not shown
-    private val handledAlerts = mutableSetOf<Long>()   // alerts Rohit already answered on this phone
-    /** Called when Rohit logs in: MainActivity reads the latest alert from Firebase right away. */
+    private val handledAlerts = mutableSetOf<Long>()   // alerts Sehjal already answered on this phone
+    /** Called when Sehjal logs in: MainActivity reads the latest alert from Firebase right away. */
     var onFamilyLogin: () -> Unit = {}
-    /** Who last logged in on THIS phone (saved by MainActivity), so only Rohit's phone buzzes on the login screen. */
+    /** Who last logged in on THIS phone (saved by MainActivity), so only Sehjal's phone buzzes on the login screen. */
     var phoneOwner: String? = null
     var onLoggedIn: (String) -> Unit = {}
     var success by mutableStateOf<SuccessUi?>(null); private set
     var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
     var message by mutableStateOf<String?>(null); private set
-    /** Each person's own payment record: Priya never sees, or is scored on, Mr. Sharma's payments. */
+    /** Each person's own payment record: Deepak never sees, or is scored on, Sambhav's payments. */
     private val ledgers = mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>>()
     val ledger: androidx.compose.runtime.snapshots.SnapshotStateList<SessionPayment>
         get() = ledgers.getOrPut(profile.id) { mutableStateListOf() }
@@ -146,10 +146,15 @@ class PaymentFlow(
     var otpFor by mutableStateOf<TrustedContact?>(null); private set
     var demoOtp by mutableStateOf<String?>(null); private set
 
-    /** This phone is being used as the trusted contact's (Rohit's) phone. */
+    /** This phone is being used as the trusted contact's (Sehjal's) phone. */
     var familyMode by mutableStateOf(false); private set
 
     private var pasted = false            // payee UPI ID pasted, not typed or picked
+    private var prefillAmount = ""        // amount written in a scanned QR code (the person can change it)
+    private var prefillNote = ""
+    /** This payment started from a QR image; the name written in the QR (not verified). */
+    var fromQr by mutableStateOf(false); private set
+    var qrName by mutableStateOf<String?>(null); private set
     private var leftApp = false           // left the app and came back during this payment
     private var warnedThisPayment = false // a Pause or Critical screen was shown for this payment
 
@@ -211,7 +216,7 @@ class PaymentFlow(
         val a = DemoWorld.account(username)
         if (a == null || !a.checkLogin(pin)) { message = "Wrong username or PIN"; return false }
         account = a
-        phoneOwner = a.username; onLoggedIn(a.username)
+        phoneOwner = a.mode; onLoggedIn(a.mode)
         pickProfile(a.mode)
         return true
     }
@@ -361,7 +366,48 @@ class PaymentFlow(
         screen = Screen.Payee
     }
 
-    fun toAmount() { amountDigits = ""; note = ""; screen = Screen.Amount }
+    fun toAmount() { amountDigits = prefillAmount; note = prefillNote; screen = Screen.Amount }
+
+    /**
+     * "Pay from a QR image". The QR is only another way to enter the payee: the same payee page,
+     * the same AI check and the same UPI PIN follow. Only @demoupi IDs are paid (demo, no real money).
+     */
+    fun openFromQr(text: String?) {
+        if (text == null) { message = "No QR code found in that image. Try a clearer picture."; return }
+        val qr = UpiQr.parse(text) ?: run { message = "This QR code is not a UPI payment code"; return }
+        if (!qr.upiId.endsWith("@demoupi")) {
+            message = "This QR is for a real UPI ID (${qr.upiId}). DemoPay is a demo: it only pays @demoupi IDs, no real money."
+            return
+        }
+        // the payee comes from the app's own records / the UPI ID, never from the name written in the QR
+        val p = DemoWorld.payees.firstOrNull { it.upiId == qr.upiId } ?: DemoWorld.lookup(qr.upiId)
+            ?: run { message = "This QR has an invalid UPI ID"; return }
+        resetPayment()
+        payee = p
+        fromQr = true
+        qrName = qr.name
+        val rupeesInQr = qr.amount?.let { Math.round(it) }   // whole rupees in this demo
+        prefillAmount = when {
+            rupeesInQr == null || rupeesInQr <= 0 -> ""
+            rupeesInQr > DemoWorld.UPI_LIMIT -> { message = LIMIT_MESSAGE; "" }
+            else -> rupeesInQr.toString()
+        }
+        prefillNote = qr.note.orEmpty()
+        screen = Screen.Payee
+    }
+
+    /** Shown on the payee page for a QR payment. The name inside a QR can say anything, so it is checked here. */
+    val qrNotice: String?
+        get() {
+            val p = payee ?: return null
+            if (!fromQr) return null
+            val n = qrName
+            fun norm(s: String) = s.lowercase().filter(Char::isLetterOrDigit)
+            val matches = n == null || norm(n).let { q -> q.isNotEmpty() && (norm(p.name).contains(q) || q.contains(norm(p.name)) ||
+                norm(p.bankingName).contains(q) || q.contains(norm(p.bankingName))) }
+            return if (matches) "From a QR code. Check the name and the amount before you pay."
+            else "From a QR code. The QR says \"$n\", but the banking name below is different. Check who you are paying."
+        }
 
     // ---- amount ------------------------------------------------------------------------------
     fun amountDigit(d: Int) {
@@ -431,23 +477,23 @@ class PaymentFlow(
         val live = all.filter { it == CALL_NOW || it == SCREEN_SHARE }
         val reasons = (live + (all - live.toSet())).take(3)
         val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock())
-        lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Rohit)
+        lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Sehjal)
         askedFamily = true
         family.send(alert)
         message = "${contact.name} has been alerted"
     }
 
-    // ---- the trusted contact's side (Rohit's phone) -----------------------------------------
+    // ---- the trusted contact's side (Sehjal's phone) -----------------------------------------
     /**
      * An alert arrived from another phone. It is ALWAYS kept, even if nobody is logged in, and opens as
-     * soon as Rohit logs in. Returns true if this phone should buzz.
+     * soon as Sehjal logs in. Returns true if this phone should buzz.
      */
     fun onIncomingAlert(alert: FamilyAlertUi): Boolean {
-        if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // Rohit already answered it
+        if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // Sehjal already answered it
         val same = lastAlert != null && lastAlert?.sentAtMs == alert.sentAtMs && alert.sentAtMs != null
         lastAlert = alert; lastAlertAt = alert.sentAtMs ?: clock()
         return when {
-            familyMode -> {                                      // Rohit is logged in: show it now
+            familyMode -> {                                      // Sehjal is logged in: show it now
                 if (screen == Screen.FamilyWaiting || !same) screen = Screen.FamilyAlert
                 !same                                            // buzz once per alert, not again on login
             }
@@ -462,7 +508,7 @@ class PaymentFlow(
     /** A kept alert, if it is under 24 hours old (the same as Firebase keeps it). */
     private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < KEEP_ALERT }
 
-    /** Rohit's answer reached the sender's phone. */
+    /** Sehjal's answer reached the sender's phone. */
     fun onFamilyStatus(status: String) {
         if (familyMode) return
         when (status) {
@@ -471,7 +517,7 @@ class PaymentFlow(
         }
     }
 
-    /** Rohit handled the alert: back to waiting for the next one. */
+    /** Sehjal handled the alert: back to waiting for the next one. */
     fun familyDone() {
         lastAlert?.sentAtMs?.let { handledAlerts += it }
         lastAlert = null; screen = Screen.FamilyWaiting
@@ -600,43 +646,43 @@ class PaymentFlow(
         )
     }
 
-    /** Score cut-offs (Nudge, Pause, Critical) by model version, read from the model files at start. */
-    var scoreCutoffs: Map<String, List<Double>> = emptyMap()
-    val currentCutoffs: List<Double>? get() = scoreCutoffs[modelVersion]
-
-    /** Demo view on the Amount screen: exactly what the AI was given for this payment, and what it decided. */
+    /**
+     * The "Safety check" card on the Amount screen: what the AI noticed, in plain words a customer understands.
+     * Each line starts with "✓ " (reassuring) or "⚠ " (a warning sign). Warning signs come first.
+     */
     val aiView: AiView?
         get() {
             val p = currentPayment(refreshSignals = false) ?: return null
             if (p.amount <= 0) return null
             val r = assessSafely(null, null, refreshSignals = false)
-            val facts = buildList {
-                add(when {
-                    !p.callNow -> "Not on a call"
-                    judgeInputs == null && simulateCall && !signals.callNow -> "On a call (simulated in Judge mode)"
-                    else -> "On a call now"
-                })
-                if (p.callSeen30m) add("A call ended in the last 30 minutes")
-                if (p.screenShare) add(if (judgeInputs == null && simulateScreenShare && !signals.screenShare)
-                    "Screen is being shared (simulated in Judge mode)" else "Screen is being shared or recorded")
-                add(when (p.payeeStatus) {
-                    "new" -> "New payee: never paid"
-                    "recent" -> "Payee first paid in the last 7 days"
-                    "warned" -> "Payee paid after an earlier warning"
-                    "flagged" -> "Payee is in a fraud report"
-                    else -> "Payee paid before"
-                })
-                add(if (p.payments90d >= 10 && p.median90d > 0)
-                    "Usual payment ${rupees(p.median90d.roundToLong())} (median of ${p.payments90d} payments in 90 days)"
-                    else "Little payment history")
-                if (p.payeePasted) add("UPI ID was pasted")
-                if (p.appSwitch) add("Left the app during this payment")
-                if (p.night) add("Night time (11 pm to 6 am)")
-                if (p.newPayees60m > 0) add("${p.newPayees60m} other new payee(s) in the last hour")
-                if (p.sentNew24h > 0) add("${rupees(p.sentNew24h.roundToLong())} sent to new payees in 24 hours")
-                if (p.samePayee24h > 0) add("Paid this payee ${p.samePayee24h} time(s) today")
+            val warn = mutableListOf<String>(); val ok = mutableListOf<String>()
+            val simulated = judgeInputs == null
+            if (p.callNow) warn += "⚠ You're on a call" + if (simulated && simulateCall && !signals.callNow) " (simulated)" else ""
+            else if (p.callSeen30m) warn += "⚠ You were on a call a few minutes ago"
+            else ok += "✓ Not on a call"
+            if (p.screenShare) warn += "⚠ Your screen is being shared" + if (simulated && simulateScreenShare && !signals.screenShare) " (simulated)" else ""
+            when (p.payeeStatus) {
+                "new" -> warn += "⚠ First payment to this person"
+                "recent" -> warn += "⚠ You only started paying them this week"
+                "warned" -> warn += "⚠ You were warned about them before"
+                "flagged" -> warn += "⚠ Reported for fraud"
+                else -> ok += "✓ You've paid them before"
             }
-            return AiView(r?.level ?: "UNAVAILABLE", r?.score, facts)
+            val hasHistory = p.payments90d >= 10 && p.median90d > 0
+            val ratio = if (hasHistory) p.amount / p.median90d else 0.0
+            val usual = rupees(p.median90d.roundToLong())
+            when {
+                !hasHistory -> warn += "⚠ Not much payment history yet"
+                ratio >= 3 -> warn += "⚠ ${ratio.roundToLong()}× your usual $usual"
+                else -> ok += "✓ A normal amount for you"
+            }
+            if (p.payeePasted) warn += "⚠ The UPI ID was pasted"
+            if (p.appSwitch) warn += "⚠ You left the app while paying"
+            if (p.newPayees60m > 0 || p.sentNew24h > 0) warn += "⚠ You already paid new people today"
+            if (p.samePayee24h > 0) warn += "⚠ Second payment to them today"
+            if (p.night) warn += "⚠ Late at night"
+            return AiView(r?.level ?: "UNAVAILABLE", r?.score, warn + ok,
+                reminderOnly = r?.guardrails?.contains("C1") == true)
         }
 
     /** Clears everything this session did (payments, contact changes, alerts), back to the starting demo. */
@@ -690,6 +736,7 @@ class PaymentFlow(
         q1 = null; q2 = null; askedFamily = false; secondsLeft = 0; pinEntry = ""; pinAttempts = 0
         pauseResult = null; criticalResult = null
         pasted = false; leftApp = false; warnedThisPayment = false
+        prefillAmount = ""; prefillNote = ""; fromQr = false; qrName = null
         judgeInputs = null; judgeAnswers = null to null; returnTo = null; runModel = null
     }
 
@@ -711,8 +758,8 @@ class PaymentFlow(
         const val SCREEN_SHARE = "Your screen is being shared or a remote-access app is active"
 
         private val DEFAULT_CONTACTS = mapOf(
-            "sharma" to TrustedContact("Rohit", "son", "9876543210"),
-            "priya" to TrustedContact("Rohit", "brother", "9876543210"),
+            "sharma" to TrustedContact("Sehjal", "friend", "9876543210"),
+            "priya" to TrustedContact("Sehjal", "friend", "9876543210"),
         )
 
         /** Median, the same way Python's statistics.median does it (mean of the middle two for an even count). */

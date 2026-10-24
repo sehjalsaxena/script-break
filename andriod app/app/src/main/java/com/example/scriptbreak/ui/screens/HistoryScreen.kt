@@ -231,7 +231,7 @@ fun HistoryScreenPreview() {
             transactions = listOf(
                 TxnUi("1", "Sunita Iyer", "Today 10:42 AM", "₹450"),
                 TxnUi("2", "Sharma Kirana Store", "Yesterday, 6:12 PM", "₹1,299"),
-                TxnUi("3", "Rohit (son)", "14 Oct, 2:00 PM", "₹3,000")
+                TxnUi("3", "Sehjal Saxena", "14 Oct, 2:00 PM", "₹3,000")
             ),
             onBack = {}
         )

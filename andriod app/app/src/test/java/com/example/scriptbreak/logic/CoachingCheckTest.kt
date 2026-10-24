@@ -51,7 +51,7 @@ class CoachingCheckTest {
             override fun callSeenWithin30m(nowMs: Long) = false
             override fun isNight(nowMs: Long) = false
         }
-        val f = PaymentFlow(model, signals, { }).apply { login("sharma", "1111") }
+        val f = PaymentFlow(model, signals, { }).apply { login("sambhav", "1111") }
         f.openPerson("gupta"); f.toAmount(); "90000".forEach { f.amountDigit(it.digitToInt()) }
         assertNotNull("amber line while typing", f.nudge)
         f.pay()

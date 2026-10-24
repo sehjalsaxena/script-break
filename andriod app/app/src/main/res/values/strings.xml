@@ -6,12 +6,12 @@
     <!-- User Picker -->
     <string name="user_picker_title">Who\'s using this phone?</string>
     <string name="user_picker_subtitle">Choose a demo profile</string>
-    <string name="profile_sharma_title">Mr. Sharma</string>
+    <string name="profile_sharma_title">Sambhav Jain</string>
     <string name="profile_sharma_sub">Main demo user\nNormal scenario</string>
-    <string name="profile_priya_title">Priya</string>
+    <string name="profile_priya_title">Deepak Rawat</string>
     <string name="profile_priya_sub">Regular user\nNormal payments</string>
-    <string name="profile_rohit_title">Rohit (Son)</string>
-    <string name="profile_rohit_sub">Family contact\nReceives alerts</string>
+    <string name="profile_rohit_title">Sehjal Saxena</string>
+    <string name="profile_rohit_sub">Trusted contact\nReceives alerts</string>
     <string name="profile_judge_title">Judge Mode</string>
     <string name="profile_judge_sub">Test scenarios\nView model decisions</string>
     <string name="profile_analyst_title">Analyst</string>
@@ -92,7 +92,7 @@
     <!-- Family Alert Screen -->
     <string name="family_alert_title">%1$s may be on a scam call</string>
     <string name="family_alert_sub">%1$s is trying to pay %2$s to %3$s.</string>
-    <string name="family_alert_disclaimer">Rohit can\'t see the account or stop the payment.</string>
+    <string name="family_alert_disclaimer">Sehjal can\'t see the account or stop the payment.</string>
     <string name="family_alert_call_now">Call %1$s now</string>
     <string name="family_alert_called">I\'ve called</string>
 

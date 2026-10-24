@@ -30,11 +30,11 @@ import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.NudgeAmber
 import com.example.scriptbreak.ui.theme.SafeGreen
 
-/** Rohit's phone, waiting for an "Ask family" alert. */
+/** Sehjal's phone, waiting for an "Ask family" alert. */
 @Composable
 fun FamilyWaitingScreen(online: Boolean, onBack: () -> Unit) {
     Column(Modifier.fillMaxSize().background(AppBackground).padding(16.dp)) {
-        AppTopBar(title = "Rohit's phone", onBack = onBack, showScriptBreakBadge = true)
+        AppTopBar(title = "Sehjal's phone", onBack = onBack, showScriptBreakBadge = true)
         Column(
             Modifier.fillMaxSize().padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -44,15 +44,15 @@ fun FamilyWaitingScreen(online: Boolean, onBack: () -> Unit) {
                 Icon(AppIcons.Notifications, contentDescription = null, tint = AppPurple, modifier = Modifier.size(48.dp))
             }
             Spacer(Modifier.height(20.dp))
-            Text("Waiting for alerts from Papa", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = InkDark, textAlign = TextAlign.Center)
+            Text("Waiting for alerts from Sambhav", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = InkDark, textAlign = TextAlign.Center)
             Spacer(Modifier.height(10.dp))
-            Text("If Papa taps \"Ask Rohit to call me\" during a risky payment, this phone buzzes and shows who he is paying and why it looks risky.",
+            Text("If Sambhav taps \"Ask Sehjal to call me\" during a risky payment, this phone buzzes and shows who is being paid and why it looks risky.",
                 fontSize = 16.sp, color = MutedText, textAlign = TextAlign.Center, lineHeight = 22.sp)
             Spacer(Modifier.height(16.dp))
-            Text(if (online) "● Connected: alerts arrive from Papa's phone" else "● Not connected: alerts only show on this same phone",
+            Text(if (online) "● Connected: alerts arrive from Sambhav's phone" else "● Not connected: alerts only show on this same phone",
                 fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (online) SafeGreen else NudgeAmber, textAlign = TextAlign.Center)
             Spacer(Modifier.height(10.dp))
-            Text("Rohit can't see the account or stop the payment.", fontSize = 14.sp, color = MutedText, textAlign = TextAlign.Center)
+            Text("Sehjal can't see the account or stop the payment.", fontSize = 14.sp, color = MutedText, textAlign = TextAlign.Center)
         }
     }
 }

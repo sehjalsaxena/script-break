@@ -4,7 +4,7 @@ Work through this on a real Android phone (best) or the emulator. For each row, 
 with **Expected**, and mark ✅ or ❌. For every ❌, write down: the row number, what you did, what you saw,
 a screenshot, and the Logcat error (see section 0). Expected levels come from the real AI model.
 
-Mr. Sharma's profile: usual payment ₹650, 42 payments in 90 days, trusted contact Rohit.
+Sambhav's profile: usual payment ₹650, 42 payments in 90 days, trusted contact Sehjal.
 Demo UPI IDs: `ramesh.k@demoupi` (new), `anil.mehta@demoupi` (new), `manoj.elec@demoupi` (new),
 `guptaelectronics@demoupi` (new shop), `suresh.verma@demoupi` (landlord, paid 14 times).
 
@@ -20,15 +20,15 @@ Demo UPI IDs: `ramesh.k@demoupi` (new), `anil.mehta@demoupi` (new), `manoj.elec@
 
 ## 1a. Login, UPI PIN, limit
 
-Demo accounts (also listed on the login screen): sharma 1111 (UPI PIN 4821), priya 2222 (UPI PIN 7316),
-rohit 3333, judge 0000, analyst 9999.
+Demo accounts (also listed on the login screen): sambhav 1111 (UPI PIN 4821), deepak 2222 (UPI PIN 7316),
+sehjal 3333, judge 0000, analyst 9999.
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
 | 1a.1 | Open the app | Login screen with "Demo accounts (tap to fill)" | |
-| 1a.2 | Username `sharma`, PIN `9999` → Log in | "Wrong username or PIN"; stays on login | |
-| 1a.3 | Tap Mr. Sharma in Demo accounts → Log in | Mr. Sharma's Home | |
-| 1a.4 | Pay Suresh ₹500 → PIN `7316` (Priya's) → Submit | "Incorrect UPI PIN. 2 attempts left" | |
+| 1a.2 | Username `sambhav`, PIN `9999` → Log in | "Wrong username or PIN"; stays on login | |
+| 1a.3 | Tap Sambhav in Demo accounts → Log in | Sambhav's Home | |
+| 1a.4 | Pay Suresh ₹500 → PIN `7316` (Deepak's) → Submit | "Incorrect UPI PIN. 2 attempts left" | |
 | 1a.5 | Two more wrong PINs | "Wrong UPI PIN 3 times. Payment cancelled…" → Home, nothing paid | |
 | 1a.6 | Pay again → PIN `4821` | Success | |
 | 1a.7 | Amount: type 100000, then one more 0 | Stays ₹1,00,000; message "UPI allows up to ₹1,00,000 per payment" | |
@@ -39,16 +39,16 @@ rohit 3333, judge 0000, analyst 9999.
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
 | 1.1 | Open the app | Profile picker with 5 cards; "Demo app – no real money" visible | |
-| 1.2 | Tap **Rohit** before any alert was sent | Message "No alert yet…"; stays on picker | |
+| 1.2 | Tap **Sehjal** before any alert was sent | Message "No alert yet…"; stays on picker | |
 | 1.3 | Tap **Analyst** | Analyst console opens (see section 7b) | |
-| 1.4 | Tap **Mr. Sharma** | Home: "Mr. Sharma", people row (Rohit, Suresh, Sunita, Kirana), recent payments | |
+| 1.4 | Tap **Sambhav** | Home: "Sambhav", people row (Sehjal, Suresh, Sunita, Kirana), recent payments | |
 | 1.5 | Press the phone's Back button on Home | Back to the profile picker (no crash) | |
 
 ## 2. Payments with no warning (no call)
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
-| 2.1 | Sharma → tap **Suresh** in people row | Payee page: SURESH KUMAR VERMA, "Paid 14 times before" | |
+| 2.1 | Sambhav → tap **Suresh** in people row | Payee page: SURESH KUMAR VERMA, "Paid 14 times before" | |
 | 2.2 | Pay → type **18000** | No amber line | |
 | 2.3 | Tap Pay | **Straight to UPI PIN** (no Pause) | |
 | 2.4 | Tap 4 digits → Submit | Success: ₹18,000, UPI ref, **no** "report" line | |
@@ -77,7 +77,7 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 4.3 | Answer Q1 **No**, Q2 **No** → Next | Goes to **PIN** (not Critical): "No" never raises or lowers | |
 | 4.4 | Back to Home, repeat 4.2, answer Q1 **Yes** → Next | **Critical** (red badge): "Stop. This matches a common scam." … last line "If someone is telling you to ignore this screen, that is the scam." | |
 | 4.5 | Look at "Continue anyway (10 s)" | Disabled; counts down 10 → 0, then "Continue anyway" enabled | |
-| 4.6 | Tap **Ask Rohit to call me** | Message "Rohit has been alerted"; button changes to "Rohit has been asked to call you" | |
+| 4.6 | Tap **Ask Sehjal to call me** | Message "Sehjal has been alerted"; button changes to "Sehjal has been asked to call you" | |
 | 4.7 | Tap **EN \| हिंदी** | All Critical text switches to Hindi and back | |
 | 4.8 | Tap the speaker icon | Phone reads the warning aloud (Hindi needs a Hindi voice installed) | |
 | 4.9 | Tap **Wait 30 minutes** | "Payment cancelled. Nothing has left your account." → Back to home | |
@@ -99,31 +99,31 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 5.3 | Android 15+: video call (Meet/WhatsApp) and **share screen**, open DemoPay | Home shows BOTH banners: "Active phone call detected" and "Screen sharing detected" | |
 | 5.4 | Same, pay Ramesh ₹20,000 | Critical; reasons include BOTH "You are on a call right now" and "Your screen is being shared…" | |
 | 5.5 | Any Android: **Cast / Screen mirror** to a TV, open DemoPay | "Screen sharing detected" banner | |
-| 5.6 | Older phone: log in as judge → Inputs → **Simulate screen sharing** on → log out → sharma → pay Ramesh ₹20,000 | Pause, reason "Your screen is being shared…"; "What the AI sees" says "(simulated in Judge mode)". Reset demo turns it off | |
+| 5.6 | Older phone: log in as judge → Inputs → **Simulate screen sharing** on → log out → sambhav → pay Ramesh ₹20,000 | Pause, reason "Your screen is being shared…"; "What the AI sees" says "(simulated in Judge mode)". Reset demo turns it off | |
 
 ## 6a. Family alert on two or three phones (internet on all)
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
-| 6a.1 | Phone B: log in as **rohit** (3333); allow notifications | "Waiting for alerts from Papa", **● Connected** | |
-| 6a.2 | Phone A: log in as **sharma**, on a call, pay Ramesh ₹20,000 → Pause → **Ask Rohit to call me** | Phone A: "Rohit has been alerted" | |
-| 6a.3 | Phone B, within a few seconds | **Vibrates**, shows the alert: Papa, ₹20,000, Ramesh K., reasons | |
-| 6a.4 | Phone B with the app in the background, repeat 6a.2 | Notification "Papa may be on a scam call"; tap opens the alert | |
-| 6a.5 | Phone B: **Call Papa now** | Dialer opens on B; Phone A shows "Rohit is calling you now" | |
-| 6a.6 | Phone B: **I've called** | B back to waiting; A shows "Rohit says they have called you" | |
-| 6a.7 | Turn off internet on A, ask Rohit, turn internet back on | Alert arrives on B once A is back online | |
-| 6a.8 | Phone B **logged out** (login screen). Phone A asks Rohit | B vibrates + notification on the login screen. Log in as rohit → the alert opens straight away | |
-| 6a.9 | Phone B logged in as **judge**. Phone A asks Rohit | B does NOT buzz (someone else is using it). Log out → log in as rohit → the alert opens | |
-| 6a.10 | Phone B: **close the app** (swipe it away). Phone A asks Rohit. Wait 15 minutes, open the app on B, log in as rohit | The alert opens, marked **"Missed alert · Sent at 10:42 PM · 15 min ago"** | |
-| 6a.12 | Phone B: on the alert, tap Back (logs out), log in as rohit again | The same alert is shown again (no second buzz) until **I've called** is tapped | |
-| 6a.11 | Phone C also logged out while B taps **I've called** | C forgets the alert: logging in as rohit on C shows "Waiting" | |
+| 6a.1 | Phone B: log in as **sehjal** (3333); allow notifications | "Waiting for alerts from Sambhav", **● Connected** | |
+| 6a.2 | Phone A: log in as **sambhav**, on a call, pay Ramesh ₹20,000 → Pause → **Ask Sehjal to call me** | Phone A: "Sehjal has been alerted" | |
+| 6a.3 | Phone B, within a few seconds | **Vibrates**, shows the alert: Sambhav, ₹20,000, Ramesh K., reasons | |
+| 6a.4 | Phone B with the app in the background, repeat 6a.2 | Notification "Sambhav may be on a scam call"; tap opens the alert | |
+| 6a.5 | Phone B: **Call Sambhav now** | Dialer opens on B; Phone A shows "Sehjal is calling you now" | |
+| 6a.6 | Phone B: **I've called** | B back to waiting; A shows "Sehjal says they have called you" | |
+| 6a.7 | Turn off internet on A, ask Sehjal, turn internet back on | Alert arrives on B once A is back online | |
+| 6a.8 | Phone B **logged out** (login screen). Phone A asks Sehjal | B vibrates + notification on the login screen. Log in as sehjal → the alert opens straight away | |
+| 6a.9 | Phone B logged in as **judge**. Phone A asks Sehjal | B does NOT buzz (someone else is using it). Log out → log in as sehjal → the alert opens | |
+| 6a.10 | Phone B: **close the app** (swipe it away). Phone A asks Sehjal. Wait 15 minutes, open the app on B, log in as sehjal | The alert opens, marked **"Missed alert · Sent at 10:42 PM · 15 min ago"** | |
+| 6a.12 | Phone B: on the alert, tap Back (logs out), log in as sehjal again | The same alert is shown again (no second buzz) until **I've called** is tapped | |
+| 6a.11 | Phone C also logged out while B taps **I've called** | C forgets the alert: logging in as sehjal on C shows "Waiting" | |
 
 ## 6. Family phone (same phone)
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
-| 6.1 | After 4.6, Back to the profile picker → **Rohit** | Alert screen: "Papa may be on a scam call", amount ₹20,000, Ramesh K., reasons, "Rohit can't see the account or stop the payment" | |
-| 6.2 | Tap **Call Papa now** | Phone dialer opens | |
+| 6.1 | After 4.6, Back to the profile picker → **Sehjal** | Alert screen: "Sambhav may be on a scam call", amount ₹20,000, Ramesh K., reasons, "Sehjal can't see the account or stop the payment" | |
+| 6.2 | Tap **Call Sambhav now** | Phone dialer opens | |
 | 6.3 | Tap **I've called** | Back to the picker | |
 
 ## 7. Judge mode
@@ -142,7 +142,7 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 7.10 | Tab **Test file** → **Our sample file** | 400 scored; scams flagged ~80%; genuine interrupted per 1,000 with 95% range; per type; missed scams list | |
 | 7.11 | Put the CSV below on the phone (e.g. save to Downloads) → **Choose a file** | 3 rows: PAUSE, CRITICAL, NONE | |
 | 7.12 | Choose a non-JSON/CSV file (e.g. a photo) | Error message, no crash | |
-| 7.13 | Switch **Simulate a phone call** ON → Back → Sharma → Home | "On call" banner shows (turn it OFF afterwards) | |
+| 7.13 | Switch **Simulate a phone call** ON → Back → Sambhav → Home | "On call" banner shows (turn it OFF afterwards) | |
 
 CSV for 7.11 (save as `judge_test.csv`):
 ```
@@ -168,12 +168,12 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
-| 7c.1 | Sharma, on a call: pay Ramesh ₹20,000 → Pause → Next → PIN 4821 → Success → **Report payment** | Report packet: amount, Ramesh K., ramesh.k@demoupi, 12-digit UPI ref, date/time, "Warning shown: PAUSE" + reasons | |
+| 7c.1 | Sambhav, on a call: pay Ramesh ₹20,000 → Pause → Next → PIN 4821 → Success → **Report payment** | Report packet: amount, Ramesh K., ramesh.k@demoupi, 12-digit UPI ref, date/time, "Warning shown: PAUSE" + reasons | |
 | 7c.2 | Tap **Call 1930** / **Report online** / **Share** | Dialer with 1930 / browser at cybercrime.gov.in / share sheet with the packet text | |
-| 7c.3 | Home → **Settings** (bottom bar) | Trusted contact: Rohit (son), +91 98••••3210, Active | |
+| 7c.3 | Home → **Settings** (bottom bar) | Trusted contact: Sehjal (friend), +91 98••••3210, Active | |
 | 7c.4 | Change contact: name, relation, mobile `9811122233` → Send code | Code screen with "Demo: no SMS is sent. The code is …" | |
-| 7c.5 | Enter a wrong code, then the right one | "Wrong code"; then "Change requested … Active in 24 hours"; Rohit still active | |
-| 7c.6 | Pay Ramesh on a call → Pause | "Ask **Rohit** to call me" (the new contact is not active yet) | |
+| 7c.5 | Enter a wrong code, then the right one | "Wrong code"; then "Change requested … Active in 24 hours"; Sehjal still active | |
+| 7c.6 | Pay Ramesh on a call → Pause | "Ask **Sehjal** to call me" (the new contact is not active yet) | |
 | 7c.7 | Settings → **Cancel this change** | Pending change removed | |
 | 7c.8 | Log in as judge → **Results** tab | Live check runs: 28 stories (14/16, 2/10), 400 payments scored with ms per payment, error ranges; full test table AI vs rules vs bank rule; per-type bars; fairness; where it fails | |
 
@@ -193,6 +193,16 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 - [ ] Same payment while on a call → Pause/Critical as before.
 - [ ] Same payment with a **pasted** UPI ID, or after leaving the app and coming back → Pause.
 
+## 7f. Pay from a QR image
+
+Put the three images from `docs/demo_qr/` on the phone first (see `docs/demo_qr/README.md`).
+
+- [ ] Home → QR icon in the search bar → the photo picker opens (no permission asked).
+- [ ] Pick **3_rent_suresh_qr** → payee Suresh Verma, "Paid 14 times before", amber "From a QR code. Check the name and the amount…" → Pay → amount ₹18,000 and note "Rent" filled in → Continue → straight to the PIN.
+- [ ] Pick **2_tv_gupta_electronics_qr**, no call → ₹90,000 filled in, amber line only → Continue → straight to the PIN.
+- [ ] On a call, pick **1_scam_refund_qr** → payee **Ramesh K.**, banking name RAMESH KUMAR, amber "The QR says "Bank Refund Desk", but the banking name below is different…" → Pay → ₹20,000 → Continue → **Pause** ("This sends ₹20,000 out of your account…").
+- [ ] Pick a photo with no QR → "No QR code found in that image". A real shop QR (not @demoupi) → "This QR is for a real UPI ID… DemoPay only pays @demoupi IDs".
+
 ## 8. Not built yet (don't report as bugs)
 
-- Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).
+- Hindi on screens other than Critical; Deepak has the same trusted contact (Sehjal).

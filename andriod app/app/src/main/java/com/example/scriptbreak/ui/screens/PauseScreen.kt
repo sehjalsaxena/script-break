@@ -397,7 +397,7 @@ fun PauseScreenPreview() {
                 ),
                 q1 = null,
                 q2 = null,
-                contactName = "Rohit",
+                contactName = "Sehjal",
                 askedFamily = false
             ),
             onQ1 = {},

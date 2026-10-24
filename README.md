@@ -23,7 +23,12 @@ Just before the PIN, ScriptBreak checks the payment on the phone and shows one o
 | Pause | "Before you pay": the facts, two questions, "Ask family", Next |
 | Critical | Full red screen, a 10-second wait before "Continue anyway", "Ask family", call 1930 |
 
-It **never blocks**: the person always decides. "Ask family" alerts a trusted relative's phone through Firebase.
+It **never blocks**: the person always decides. "Ask family" alerts a trusted contact's phone through Firebase.
+
+A payment can start from a typed or pasted UPI ID, a contact, a bank account or **a QR image** (the QR icon on Home).
+A QR is only another way to enter the payee: the same payee page, AI check and PIN follow. The name written inside
+a QR is never trusted. If it differs from the banking name, the payee page says so. QR decoding happens on the
+phone (ZXing, no AI model), and the Android photo picker shares only the one image chosen.
 
 ## How it works
 
@@ -91,7 +96,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 | `andriod app/app/src/main/java/com/example/scriptbreak/ml/` | `ScamModel.kt`: the on-phone scorer and safety layer |
 | `andriod app/app/src/main/java/com/example/scriptbreak/logic/` | Payment flow, phone signals, Judge mode, Analyst mode, family alert |
 | `andriod app/app/src/main/java/com/example/scriptbreak/ui/` | All screens |
-| `andriod app/app/src/test/` | 66 unit tests |
+| `andriod app/app/src/test/` | 72 unit tests |
 | [`ml/`](ml/) | Data generator, training, export, evaluation, analyst discovery, one-command test runner |
 | [`reference/`](reference/) | Round 1 Python code (rules engine, generator), reused as declared |
 | [`tests/cases.json`](tests/cases.json) | The 28 Round 1 behaviour stories (never used for training) |
@@ -107,20 +112,20 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 
 | Username | PIN | Opens | UPI PIN |
 |---|---|---|---|
-| `sharma` | 1111 | Mr. Sharma, 64: the person paying | 4821 |
-| `priya` | 2222 | Priya: a second payer | 7316 |
-| `rohit` | 3333 | Rohit: the family phone that gets "Ask family" alerts | |
+| `sambhav` | 1111 | Sambhav Jain: the person paying | 4821 |
+| `deepak` | 2222 | Deepak: a second payer | 7316 |
+| `sehjal` | 3333 | Sehjal: the family phone that gets "Ask family" alerts | |
 | `judge` | 0000 | Judge mode: change any of the 16 inputs, the 28 stories, load a test file, results | |
 | `analyst` | 9999 | Analyst console: approve rules the AI proposes | |
 
-A demo to try on one phone: log in as judge, switch on "Simulate a phone call", log out, and log in as sharma.
-Then Pay to UPI ID `ramesh.k@demoupi` ₹20,000 → Pause → answer Yes → Critical → Ask Rohit.
-Then log out and log in as rohit: the alert is there. For two or three phones, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+A demo to try on one phone: log in as judge, switch on "Simulate a phone call", log out, and log in as sambhav.
+Then Pay to UPI ID `ramesh.k@demoupi` ₹20,000 → Pause → answer Yes → Critical → Ask Sehjal.
+Then log out and log in as sehjal: the alert is there. For two or three phones, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
 ## Run the tests
 
 ```bash
-# Android: 66 unit tests (needs a JDK, e.g. Android Studio's)
+# Android: 72 unit tests (needs a JDK, e.g. Android Studio's)
 cd "andriod app"
 gradlew.bat testDebugUnitTest
 

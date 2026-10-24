@@ -61,9 +61,9 @@ object DemoWorld {
     const val UPI_LIMIT = 100_000L
 
     val accounts: List<Account> = listOf(
-        Account("sharma", "Mr. Sharma", mode = "sharma", loginPinHash = "6500a6be6e406c1d4eccd746abb05e909b07debe4f5e1470ec5775c15bae45dd", upiPinHash = "4a0a54fdcb49a5571952304eac16d4968b34b150c733c528a1c8247a9c1f4fc3", demoLoginPin = "1111", demoUpiPin = "4821"),
-        Account("priya", "Priya", mode = "priya", loginPinHash = "082b8fa8512c9854e21e7a009cc24648bcca3402c1a4ed66e0aaf2f69a058651", upiPinHash = "eefc5d580978d29279dc9756eb56750e65dc468be5657d70db72c3ee44159507", demoLoginPin = "2222", demoUpiPin = "7316"),
-        Account("rohit", "Rohit (son)", mode = "rohit", loginPinHash = "57e9ba44af7e1c3711f7c66ed8fdf9a569534fd0192b06f87abb13640b350ab3", upiPinHash = null, demoLoginPin = "3333", demoUpiPin = null),
+        Account("sambhav", "Sambhav Jain", mode = "sharma", loginPinHash = "ba9daeba79544e90605d91663f69a50ee8655080c1505c869f2bebcb7a2de7eb", upiPinHash = "3833b52b6eea3d8af29f5963cfba0d4d13c01165ce25fae17e75f968c491e9d8", demoLoginPin = "1111", demoUpiPin = "4821"),
+        Account("deepak", "Deepak Rawat", mode = "priya", loginPinHash = "2fda858c3af4887cfb817e4937a32673b0746e4a9bd22dc123dc5c51efd00fc9", upiPinHash = "486eb1896cba6cdd1dd5beae845bca5a27fc1c810bafe162bc40b11beffa42d3", demoLoginPin = "2222", demoUpiPin = "7316"),
+        Account("sehjal", "Sehjal Saxena", mode = "rohit", loginPinHash = "241d05bd50b7bbb45b47bc989f746535fb7caa56109678ca7a82fe9167321cfa", upiPinHash = null, demoLoginPin = "3333", demoUpiPin = null),
         Account("judge", "Judge", mode = "judge", loginPinHash = "72cdfeadb538864524a9e9a8641acf4a305c9b21d757a2c144de8c6744bb08c6", upiPinHash = null, demoLoginPin = "0000", demoUpiPin = null),
         Account("analyst", "Analyst", mode = "analyst", loginPinHash = "f1806240e1e119d841fdb68070019777d55c9e57d56d02f1bc2dbe28da141c9e", upiPinHash = null, demoLoginPin = "9999", demoUpiPin = null),
     )
@@ -74,13 +74,13 @@ object DemoWorld {
         MessageDigest.getInstance("SHA-256").digest("scriptbreak:$s".toByteArray()).joinToString("") { "%02x".format(it) }
 
     val profiles: Map<String, Profile> = listOf(
-        Profile("sharma", "Mr. Sharma", median90d = 650.0, payments90d = 42, contactName = "Rohit", shownToFamilyAs = "Papa"),
-        Profile("priya", "Priya", median90d = 1200.0, payments90d = 60, contactName = "Rohit", shownToFamilyAs = "Priya"),
+        Profile("sharma", "Sambhav Jain", median90d = 650.0, payments90d = 42, contactName = "Sehjal", shownToFamilyAs = "Sambhav"),
+        Profile("priya", "Deepak Rawat", median90d = 1200.0, payments90d = 60, contactName = "Sehjal", shownToFamilyAs = "Deepak"),
     ).associateBy { it.id }
 
     val payees: List<PayeeRecord> = listOf(
         // paid before (the people row on Home)
-        PayeeRecord("rohit", "Rohit (son)", "rohit.sharma@demoupi", "ROHIT SHARMA", status = "known", paidTimes = 31, initials = "RS", colorHex = "#3D8FD1"),
+        PayeeRecord("rohit", "Sehjal Saxena", "sehjal.saxena@demoupi", "SEHJAL SAXENA", status = "known", paidTimes = 31, initials = "SS", colorHex = "#3D8FD1"),
         PayeeRecord("suresh", "Suresh Verma", "suresh.verma@demoupi", "SURESH KUMAR VERMA", status = "known", paidTimes = 14, initials = "SV", colorHex = "#4F7FB0"),
         PayeeRecord("sunita", "Sunita Iyer", "sunita.iyer@demoupi", "SUNITA IYER", status = "known", paidTimes = 9, initials = "SI", colorHex = "#D0679A"),
         PayeeRecord("kirana", "Sharma Kirana Store", "sharmakirana@demoupi", "SHARMA GENERAL STORE", kind = "merchant", status = "known", paidTimes = 23, initials = "SK", colorHex = "#4F9B7A"),
@@ -94,7 +94,7 @@ object DemoWorld {
     val homePeople: List<PayeeRecord> get() = payees.filter { it.status == "known" }
 
     val contacts: List<ContactItem> = listOf(
-        ContactItem("c1", "Rohit (son)", "+91 98765 43210", "rohit.sharma@demoupi", "RS", "#3D8FD1", "rohit"),
+        ContactItem("c1", "Sehjal Saxena", "+91 98765 43210", "sehjal.saxena@demoupi", "SS", "#3D8FD1", "rohit"),
         ContactItem("c2", "Suresh Verma", "+91 98111 22334", "suresh.verma@demoupi", "SV", "#4F7FB0", "suresh"),
         ContactItem("c3", "Sunita Iyer", "+91 98222 33445", "sunita.iyer@demoupi", "SI", "#D0679A", "sunita"),
         ContactItem("c4", "Sharma Kirana Store", "+91 98333 44556", "sharmakirana@demoupi", "SK", "#4F9B7A", "kirana"),
@@ -129,7 +129,7 @@ object DemoWorld {
     fun history90d(profileId: String): List<Long> {
         val p = profiles[profileId] ?: return emptyList()
         val m = p.median90d
-        // Mr. Sharma's regular payments: rent to Suresh and money to Rohit, every month
+        // Sambhav's regular payments: rent to Suresh and money to Sehjal, every month
         val recurring = if (profileId == "sharma") listOf(18_000L, 18_000L, 18_000L, 3_000L, 3_000L, 3_000L) else emptyList()
         val below = p.payments90d / 2 - 1
         val above = p.payments90d - below - 2 - recurring.size
@@ -147,7 +147,7 @@ object DemoWorld {
         )
         else -> listOf(
             TxnUi("s1", "Sharma Kirana Store", "Yesterday, 6:12 PM", "₹420"),
-            TxnUi("s2", "Rohit (son)", "14 Oct, 2:00 PM", "₹3,000"),
+            TxnUi("s2", "Sehjal Saxena", "14 Oct, 2:00 PM", "₹3,000"),
             TxnUi("s3", "Suresh Verma", "1 Oct, 9:30 AM", "₹18,000"),
         )
     }

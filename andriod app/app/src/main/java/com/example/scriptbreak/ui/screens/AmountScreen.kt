@@ -55,6 +55,7 @@ import com.example.scriptbreak.ui.components.NumericKeypad
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.model.AmountUi
 import com.example.scriptbreak.ui.theme.AppBackground
+import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppSurface
@@ -219,7 +220,7 @@ fun AmountScreen(
         }
 
         if (state.aiLevel != null) {
-            AiSeesCard(state.aiLevel, state.aiScore, state.aiFacts, state.aiCutoffs)
+            SafetyCheckCard(state.aiLevel, state.aiScore, state.aiFacts, state.aiReminderOnly)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
@@ -269,44 +270,42 @@ fun AmountScreen(
     }
 }
 
-/** Demo view: the facts the AI was given and its decision, updated on every key press. Tap to open. */
+/** "Safety check": what the AI noticed, in plain words, updated on every key press. Tap to see why. */
 @Composable
-private fun AiSeesCard(level: String, score: Double?, facts: List<String>, cutoffs: List<Double>?) {
+private fun SafetyCheckCard(level: String, score: Double?, facts: List<String>, reminderOnly: Boolean) {
     var open by remember { mutableStateOf(false) }
-    val color = when (level) {
-        "CRITICAL" -> CritRed
-        "PAUSE" -> PauseOrange
-        "NUDGE" -> NudgeAmber
-        "NONE" -> SafeGreen
-        else -> MutedText
+    val (color, label) = when (level) {
+        "CRITICAL" -> CritRed to "Looks like a scam"
+        "PAUSE" -> PauseOrange to "Needs a quick check"
+        "NUDGE" -> NudgeAmber to "Check before you pay"
+        "NONE" -> SafeGreen to "Looks normal"
+        else -> MutedText to "Check not available"
     }
-    val label = when (level) {
-        "NONE" -> "No warning"
-        "UNAVAILABLE" -> "Unavailable"
-        else -> level.lowercase().replaceFirstChar(Char::uppercaseChar)
-    }
-    fun both(x: Double) = String.format(java.util.Locale.ENGLISH, "%.2f (%d%%)", x, Math.round(x * 100))
     Surface(
         color = Color.White,
         shape = RoundedCornerShape(12.dp),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDDE2EA)),
         modifier = Modifier.fillMaxWidth().clickable { open = !open }
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("What the AI sees", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark,
+                Text("Safety check", fontSize = 15.sp, color = MutedText, maxLines = 1)
+                Text("  $label", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = color,
                     maxLines = 1, modifier = Modifier.weight(1f))
-                Text(label + (score?.let { " · " + both(it) } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
-                    color = color, maxLines = 1, softWrap = false)
-                Text(if (open) "  ▲" else "  ▼", fontSize = 12.sp, color = MutedText)
+                Text(if (open) "Hide ▲" else "Why? ▼", fontSize = 13.sp, color = AppPurple)
             }
             if (open) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(facts.joinToString("  ·  "), fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
-                Text("AI scam score: how closely this payment matches the scams the AI learned (0 = 0%, not at all; 1 = 100%, exactly). " +
-                    (cutoffs?.let { (n, p, c) -> "Nudge above ${both(n)}, Pause above ${both(p)}, Critical above ${both(c)}. " } ?: "") +
-                    "It weighs all the facts together: there is no fixed amount limit.",
-                    fontSize = 12.sp, color = MutedText, lineHeight = 16.sp, modifier = Modifier.padding(top = 4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
+                facts.forEach { line ->
+                    Text(line, fontSize = 15.sp, lineHeight = 21.sp,
+                        color = if (line.startsWith("✓")) SafeGreen else InkDark)
+                }
+                score?.let {
+                    Text("AI risk score: ${Math.round(it * 100)}%", fontSize = 13.sp, color = MutedText,
+                        modifier = Modifier.padding(top = 6.dp))
+                }
+                if (reminderOnly) Text("No sign that anyone is guiding you, so this is only a reminder.",
+                    fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
             }
         }
     }

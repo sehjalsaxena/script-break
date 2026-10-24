@@ -96,12 +96,12 @@ vs 60% for our rules, with fewer false alarms (7.3 vs 7.7 per 1,000). Rules have
 (5× the usual amount); the model weighs all the signals together. We keep a few fixed rules as
 safety guardrails, because some things should never depend on a model.
 
-**Mr. Sharma buys a ₹90,000 TV in a shop. Does he get a scary popup?**
-No. The model alone scores it 0.54 (54%), a Pause: 138× his usual payment to a new payee. But our
+**Sambhav buys a ₹90,000 TV in a shop. Is there a scary popup?**
+No. The model alone scores it 0.54 (54%), a Pause: 138× the usual payment, to a new payee. But our
 safety layer has a coaching check (C1): a full-screen Pause needs at least one sign that someone is
 steering the payment (a call, a recent call, screen sharing, a pasted UPI ID, leaving the app, new
-payees today, money from a stranger). In a shop there is none, so he only sees the amber line and goes
-straight to his PIN. On the test set this check lost 0 scams and kept the 28 stories the same.
+payees today, money from a stranger). In a shop there is none, so only the amber line shows and the payment goes
+straight to the PIN. On the test set this check lost 0 scams and kept the 28 stories the same.
 The risk we accept: a scam with no sign the phone can see gets only the amber line. If such a wave
 appears, the analyst console can approve a rule for it (guardrail G3 still raises to Pause).
 

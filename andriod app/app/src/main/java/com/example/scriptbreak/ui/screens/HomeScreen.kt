@@ -78,6 +78,8 @@ fun HomeScreen(
     onBalance: () -> Unit,
     onNotifications: () -> Unit = {},
     onAccount: () -> Unit = {},
+    // "Pay from a QR image" (the QR icon in the search bar). Optional so older callers still compile.
+    onScanQr: (() -> Unit)? = null,
     // Settings (trusted contact). Optional so older callers still compile.
     onSettings: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -217,11 +219,11 @@ fun HomeScreen(
                                 .size(38.dp)
                                 .clip(CircleShape)
                                 .background(AppBlueLight)
-                                .clickable { onPayUpiId() }
+                                .clickable { (onScanQr ?: onPayUpiId)() }
                         ) {
                             Icon(
                                 imageVector = AppIcons.QrCode,
-                                contentDescription = "Scan QR",
+                                contentDescription = "Pay from a QR image",
                                 tint = AppBlue,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -568,7 +570,7 @@ fun HomeScreenPreview() {
     ScriptBreakTheme {
         HomeScreen(
             state = HomeUi(
-                userName = "Mr. Sharma",
+                userName = "Sambhav Jain",
                 onCall = true,
                 people = listOf(
                     PersonUi("ramesh", "Ramesh K.", "RK", "ramesh.k@demoupi", "#6B74D6"),

@@ -64,28 +64,20 @@ class MainActivity : ComponentActivity() {
         // If the model file can't be loaded, the app still works: every payment goes straight
         // to the PIN (fail-open), as promised. It never blocks a payment because of our own error.
         val model = try { ScamModel.fromAssets(this) } catch (e: Exception) { null }
-        // The score cut-offs, from the model files, for the "What the AI sees" card
-        fun cutoffs(file: String) = try {
-            org.json.JSONObject(assets.open(file).bufferedReader().use { it.readText() }).let { o ->
-                val t = o.getJSONObject("thresholds")
-                o.getString("model_version") to listOf(t.getDouble("nudge"), t.getDouble("pause"), t.getDouble("critical"))
-            }
-        } catch (e: Exception) { null }
         // "Ask family" goes to the trusted contact's phone through Firebase (and is kept on this phone too)
         family = FamilyLink(applicationContext)
         flow = PaymentFlow(model, signals, family)
-        flow.scoreCutoffs = listOfNotNull(cutoffs("scam_model.json"), cutoffs("scam_model_unseen_sent_by_mistake.json")).toMap()
         family.listen(
             onAlert = { _, alert -> if (flow.onIncomingAlert(alert)) FamilyBuzz.buzz(applicationContext, alert) },
             onStatus = { _, status ->
                 flow.onFamilyStatus(status)
-                // Rohit has called: the alert has done its job, so the sender's phone deletes it from Firebase
+                // Sehjal has called: the alert has done its job, so the sender's phone deletes it from Firebase
                 if (status == "called") family.clear()
             },
             onCleared = { flow.onAlertCleared() },
         )
         flow.onFamilyLogin = { family.fetchLatest() }
-        // remember who uses this phone, so only Rohit's phone buzzes while it is on the login screen
+        // remember who uses this phone, so only Sehjal's phone buzzes while it is on the login screen
         val prefs = getSharedPreferences("scriptbreak", MODE_PRIVATE)
         flow.phoneOwner = prefs.getString("last_user", null)
         flow.onLoggedIn = { user -> prefs.edit().putString("last_user", user).apply() }

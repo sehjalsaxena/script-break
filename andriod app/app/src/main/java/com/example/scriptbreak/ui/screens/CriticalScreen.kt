@@ -379,7 +379,7 @@ fun CriticalScreenPreview() {
                     "New payee – never paid before",
                     "Amount is 10× higher than usual"
                 ),
-                contactName = "Rohit",
+                contactName = "Sehjal",
                 askedFamily = false,
                 continueSecondsLeft = 10,
                 hindi = false

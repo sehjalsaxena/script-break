@@ -28,7 +28,7 @@ class ReviewFixesTest {
 
     @Test
     fun judgeTestPaymentsDoNotChangeAnyonesHistory() {
-        val f = flow("sharma", "1111")
+        val f = flow("sambhav", "1111")
         f.runJudge(Payment(amount = 500.0, median90d = 650.0, payments90d = 42, payeeStatus = "known"), null, null)
         f.pay()
         assertEquals(Screen.Pin, f.screen)
@@ -39,20 +39,20 @@ class ReviewFixesTest {
 
     @Test
     fun eachPersonHasTheirOwnPaymentRecord() {
-        val f = flow("sharma", "1111")
+        val f = flow("sambhav", "1111")
         f.openPerson("suresh"); f.toAmount(); "500".forEach { f.amountDigit(it.digitToInt()) }; f.pay()
         f.finishPin("4821")
         assertEquals(1, f.ledger.size)
         f.logout()
-        assertTrue(f.login("priya", "2222"))
-        assertTrue("Priya does not see Mr. Sharma's payment", f.ledger.isEmpty())
-        f.logout(); f.login("sharma", "1111")
+        assertTrue(f.login("deepak", "2222"))
+        assertTrue("Deepak does not see Sambhav's payment", f.ledger.isEmpty())
+        f.logout(); f.login("sambhav", "1111")
         assertEquals(1, f.ledger.size)
     }
 
     @Test
     fun nudgeLineUsesTheJudgesUsualPaymentNotTheProfiles() {
-        val f = flow("sharma", "1111")
+        val f = flow("sambhav", "1111")
         // usual payment ₹10,000 in the judge's inputs: ₹2,000 is NOT "3× your usual payment"
         val p = Payment(amount = 2000.0, median90d = 10_000.0, payments90d = 40, payeeStatus = "new")
         f.runJudge(p, null, null)
@@ -62,7 +62,7 @@ class ReviewFixesTest {
 
     @Test
     fun readingTheContactChangesNothingAndAFinishedChangeIsKept() {
-        val f = flow("sharma", "1111")
+        val f = flow("sambhav", "1111")
         f.openTrustedContact()
         f.requestContactChange("Anita", "daughter", "9811122233")
         f.verifyContactOtp(f.demoOtp!!)
@@ -77,7 +77,7 @@ class ReviewFixesTest {
 
     @Test
     fun bankAccountTransfersGetTheSameCheckAndLimit() {
-        val f = flow("sharma", "1111", call = true)
+        val f = flow("sambhav", "1111", call = true)
         f.startBankSelf()
         f.openBankAccount("Ramesh Kumar", "10023456789", "demo0001234")
         assertEquals(Screen.Payee, f.screen)

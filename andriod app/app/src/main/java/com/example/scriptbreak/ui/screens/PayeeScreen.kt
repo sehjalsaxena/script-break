@@ -16,6 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import com.example.scriptbreak.ui.theme.NudgeAmberTint
+import com.example.scriptbreak.ui.theme.NudgeAmberBar
+import com.example.scriptbreak.ui.theme.NudgeAmberInk
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -119,6 +122,26 @@ fun PayeeScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = SafeGreen
+                    )
+                }
+            }
+
+            // Payment started from a QR image: the name written in the QR is not verified
+            if (state.qrNotice != null) {
+                Spacer(modifier = Modifier.height(14.dp))
+                Surface(
+                    color = NudgeAmberTint,
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, NudgeAmberBar),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = state.qrNotice,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = NudgeAmberInk,
+                        lineHeight = 21.sp,
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
             }

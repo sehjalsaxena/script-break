@@ -249,7 +249,7 @@ fun FamilyAlertScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Call Papa now button (Orange, >= 48dp, with phone icon)
+        // "Call Sambhav now" button (Orange, >= 48dp, with phone icon)
         Button(
             onClick = onCallNow,
             colors = ButtonDefaults.buttonColors(
@@ -300,7 +300,7 @@ fun FamilyAlertScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Disclaimer footnote: "Rohit can't see the account or stop the payment."
+        // Disclaimer footnote: "Sehjal can't see the account or stop the payment."
         Text(
             text = stringResource(R.string.family_alert_disclaimer),
             fontSize = 14.sp,
@@ -320,7 +320,7 @@ fun FamilyAlertScreenPreview() {
     ScriptBreakTheme {
         FamilyAlertScreen(
             state = FamilyAlertUi(
-                fromName = "Papa",
+                fromName = "Sambhav",
                 amountText = "₹48,000",
                 payeeName = "Ramesh K.",
                 reasons = listOf(

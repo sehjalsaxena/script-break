@@ -447,6 +447,6 @@ fun CheckBalanceScreen(
 @Composable
 fun CheckBalanceScreenPreview() {
     ScriptBreakTheme {
-        CheckBalanceScreen(userProfileName = "Mr. Sharma", onBack = {})
+        CheckBalanceScreen(userProfileName = "Sambhav Jain", onBack = {})
     }
 }

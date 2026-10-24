@@ -49,6 +49,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-auth")
+    // "Pay from a QR image": reads the UPI QR code in a picked image (classic decoder, no AI model)
+    implementation("com.google.zxing:core:3.5.3")
     testImplementation(libs.junit)
     testImplementation("org.json:json:20240303")
     androidTestImplementation(platform(libs.androidx.compose.bom))

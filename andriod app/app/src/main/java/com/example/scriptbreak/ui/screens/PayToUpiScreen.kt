@@ -58,7 +58,7 @@ fun PayToUpiScreen(
     recentPayees: List<Pair<String, String>> = listOf(
         "suresh.verma@demoupi" to "Suresh Verma",
         "sunita.iyer@demoupi" to "Sunita Iyer",
-        "rohit.sharma@demoupi" to "Rohit (son)"
+        "sehjal.saxena@demoupi" to "Sehjal Saxena"
     ),
     modifier: Modifier = Modifier
 ) {

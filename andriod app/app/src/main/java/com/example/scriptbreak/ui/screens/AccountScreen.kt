@@ -57,7 +57,7 @@ fun AccountScreen(
     userName: String,
     upiId: String,
     phoneNumber: String = "+91 98765 43210",
-    trustedContactName: String = "Rohit Sharma",
+    trustedContactName: String = "Sehjal Saxena",
     onCheckBalance: () -> Unit,
     onTrustedContact: () -> Unit,
     onSwitchProfile: () -> Unit,

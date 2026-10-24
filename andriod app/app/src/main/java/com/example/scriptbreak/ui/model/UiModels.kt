@@ -33,7 +33,8 @@ data class PayeeUi(
     val name: String,
     val upiId: String,
     val bankingName: String,
-    val historyLine: String // "Paid 14 times" or "New payee"
+    val historyLine: String, // "Paid 14 times" or "New payee"
+    val qrNotice: String? = null, // only for a payment started from a QR image
 )
 
 data class AmountUi(
@@ -46,7 +47,7 @@ data class AmountUi(
     val aiScore: Double? = null,
     val aiFacts: List<String> = emptyList(),
     val payeeUpiId: String = "",
-    val aiCutoffs: List<Double>? = null,  // the model's score cut-offs: Nudge, Pause, Critical
+    val aiReminderOnly: Boolean = false,  // a high score, but no sign anyone is guiding the person (C1)
 )
 
 data class PauseUi(

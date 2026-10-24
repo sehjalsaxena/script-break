@@ -24,7 +24,7 @@ class PaymentFlowTest {
     private val sent = mutableListOf<FamilyAlertUi>()
 
     private fun newFlow(signals: SignalSource, m: ScamModel? = model) =
-        PaymentFlow(m, signals, { sent += it }, clock = { now }).apply { assertTrue(login("sharma", "1111")) }
+        PaymentFlow(m, signals, { sent += it }, clock = { now }).apply { assertTrue(login("sambhav", "1111")) }
 
     private fun PaymentFlow.typeAmount(amount: Long) = amount.toString().forEach { amountDigit(it.digitToInt()) }
 
@@ -38,7 +38,7 @@ class PaymentFlowTest {
         pay()
     }
 
-    /** Mr. Sharma's own UPI PIN (demo). */
+    /** Sambhav's own UPI PIN (demo). */
     private fun PaymentFlow.finishPin(pin: String = "4821") { pin.forEach { pinDigit(it.digitToInt()) }; pinSubmit() }
 
     @Test
@@ -56,7 +56,7 @@ class PaymentFlowTest {
 
         f.askFamily()
         assertEquals(1, sent.size)
-        assertEquals("Papa", sent[0].fromName)
+        assertEquals("Sambhav", sent[0].fromName)
         assertEquals("₹20,000", sent[0].amountText)
         assertEquals("Ramesh K.", sent[0].payeeName)
 
@@ -187,19 +187,19 @@ class PaymentFlowTest {
     fun loginOpensTheRightModeAndRejectsWrongPins() {
         val f = PaymentFlow(model, FakeSignals(), { })
         assertEquals(Screen.Login, f.screen)
-        assertFalse(f.login("sharma", "9999"))
+        assertFalse(f.login("sambhav", "9999"))
         assertFalse(f.login("nobody", "1111"))
         assertEquals(Screen.Login, f.screen)
-        assertTrue(f.login("  Sharma ", "1111"))                   // username is not case-sensitive
+        assertTrue(f.login("  Sambhav ", "1111"))                   // username is not case-sensitive
         assertEquals(Screen.Home, f.screen)
-        assertEquals("Mr. Sharma", f.profile.displayName)
+        assertEquals("Sambhav Jain", f.profile.displayName)
         assertTrue(f.back())                                        // Back on Home logs out
         assertEquals(Screen.Login, f.screen)
         assertNull(f.account)
         assertTrue(f.login("judge", "0000")); assertEquals(Screen.Judge, f.screen); f.logout()
         assertTrue(f.login("analyst", "9999")); assertEquals(Screen.Analyst, f.screen); f.logout()
-        assertTrue(f.login("rohit", "3333")); assertEquals(Screen.FamilyWaiting, f.screen)
-        assertTrue(f.back())                                        // Back on Rohit's screen logs out
+        assertTrue(f.login("sehjal", "3333")); assertEquals(Screen.FamilyWaiting, f.screen)
+        assertTrue(f.back())                                        // Back on Sehjal's screen logs out
         assertEquals(Screen.Login, f.screen)
         assertFalse(f.back())                                       // on Login there is nothing to go back to
     }
@@ -209,7 +209,7 @@ class PaymentFlowTest {
         val f = newFlow(FakeSignals())
         f.openPerson("suresh"); f.toAmount(); f.typeAmount(500); f.pay()
         assertEquals(Screen.Pin, f.screen)
-        f.finishPin("7316")                                         // Priya's UPI PIN: wrong for Mr. Sharma
+        f.finishPin("7316")                                         // Deepak's UPI PIN: wrong for Sambhav
         assertEquals(Screen.Pin, f.screen)
         assertEquals("Incorrect UPI PIN. 2 attempts left", f.message)
         f.finishPin("0000")
@@ -218,7 +218,7 @@ class PaymentFlowTest {
         assertEquals(Screen.Home, f.screen)                         // cancelled, nothing paid
         assertTrue(f.ledger.isEmpty())
 
-        val priya = PaymentFlow(model, FakeSignals(), { }).apply { login("priya", "2222") }
+        val priya = PaymentFlow(model, FakeSignals(), { }).apply { login("deepak", "2222") }
         priya.openPerson("suresh"); priya.toAmount(); priya.typeAmount(500); priya.pay()
         priya.finishPin("7316")
         assertEquals(Screen.Success, priya.screen)
@@ -248,18 +248,18 @@ class PaymentFlowTest {
 
     @Test
     fun familyAlertReachesRohitsPhoneAndHisAnswerComesBack() {
-        val rohitPhone = PaymentFlow(model, FakeSignals(), { }).apply { login("rohit", "3333") }
+        val rohitPhone = PaymentFlow(model, FakeSignals(), { }).apply { login("sehjal", "3333") }
         assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
         val sharmaPhone = newFlow(FakeSignals(call = true))
         sharmaPhone.payTyped("ramesh.k@demoupi", 20_000)
         sharmaPhone.askFamily()
-        assertTrue("Rohit's phone buzzes", rohitPhone.onIncomingAlert(sent.single()))
+        assertTrue("Sehjal's phone buzzes", rohitPhone.onIncomingAlert(sent.single()))
         assertEquals(Screen.FamilyAlert, rohitPhone.screen)
-        assertEquals("Papa", rohitPhone.lastAlert!!.fromName)
+        assertEquals("Sambhav", rohitPhone.lastAlert!!.fromName)
         assertFalse("the sender's own echo doesn't buzz", sharmaPhone.onIncomingAlert(sent.single()))
         sharmaPhone.consumeMessage()
         sharmaPhone.onFamilyStatus("calling")
-        assertEquals("Rohit is calling you now", sharmaPhone.message)
+        assertEquals("Sehjal is calling you now", sharmaPhone.message)
         rohitPhone.familyDone()
         assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
     }

@@ -104,7 +104,7 @@ fun NotificationsScreen(
             NotificationItem(
                 id = "3",
                 title = "Trusted Contact Protection",
-                description = "Rohit Sharma is active as your trusted family contact. High-risk payments trigger an alert.",
+                description = "Sehjal Saxena is active as your trusted contact. High-risk payments trigger an alert.",
                 time = "2 hours ago",
                 category = "Security",
                 icon = AppIcons.Person,

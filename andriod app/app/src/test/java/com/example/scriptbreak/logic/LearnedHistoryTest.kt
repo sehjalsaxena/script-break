@@ -21,7 +21,7 @@ class LearnedHistoryTest {
     }
 
     private fun sharma(s: SignalSource = Signals()) =
-        PaymentFlow(model, s, { }, clock = { now }).apply { assertTrue(login("sharma", "1111")) }
+        PaymentFlow(model, s, { }, clock = { now }).apply { assertTrue(login("sambhav", "1111")) }
 
     private fun PaymentFlow.payKnown(id: String, amount: Long) {
         openPerson(id); toAmount(); amount.toString().forEach { amountDigit(it.digitToInt()) }; pay()
@@ -65,9 +65,9 @@ class LearnedHistoryTest {
         val ai = f.aiView!!
         assertEquals("PAUSE", ai.level)
         assertNotNull("the line does not vanish at Pause level", f.nudge)
-        assertTrue(ai.facts.toString(), ai.facts.contains("On a call now"))
-        assertTrue(ai.facts.toString(), ai.facts.contains("New payee: never paid"))
-        assertTrue(ai.facts.toString(), ai.facts.contains("Usual payment ₹650 (median of 42 payments in 90 days)"))
+        assertEquals("plain-language reasons for the Safety check card",
+            listOf("⚠ You're on a call", "⚠ First payment to this person", "⚠ 31× your usual ₹650"), ai.facts)
+        assertTrue("not a C1 reminder: someone may be guiding the payment", !ai.reminderOnly)
     }
 
     @Test
@@ -93,7 +93,7 @@ class LearnedHistoryTest {
         assertTrue(f.ledger.isEmpty())
         assertFalse(f.simulateCall)
         assertEquals(650.0, f.usualPayment, 0.0)
-        assertEquals("Rohit", f.contact.name)
+        assertEquals("Sehjal", f.contact.name)
         assertEquals("9876543210", f.contact.phone)
     }
 }

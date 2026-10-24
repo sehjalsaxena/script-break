@@ -14,12 +14,12 @@ import com.google.firebase.database.ValueEventListener
 
 /**
  * "Ask family" between two phones, through Firebase Realtime Database (free plan).
- * Mr. Sharma's phone writes one short alert; Rohit's phone (Rohit profile) listens and shows it.
- * Rohit's answer ("calling", "called") goes back the same way.
+ * Sambhav's phone writes one short alert; Sehjal's phone (Sehjal profile) listens and shows it.
+ * Sehjal's answer ("calling", "called") goes back the same way.
  *
  * Only what the person chose to send leaves the phone: who, amount, payee name and up to 3 reasons.
  * No account number, no UPI PIN, nothing about the call. If Firebase is not set up or there is no
- * internet, the alert still shows on this phone (Rohit profile) and Firebase sends it once online.
+ * internet, the alert still shows on this phone (Sehjal profile) and Firebase sends it once online.
  */
 class FamilyLink(context: Context) : FamilyAlertSender {
     private val node: DatabaseReference? = try {
@@ -70,7 +70,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
         }
     }
 
-    /** Rohit's answer: "calling" or "called". */
+    /** Sehjal's answer: "calling" or "called". */
     fun setStatus(status: String) {
         val n = node ?: return
         signedIn { n.child("status").setValue(status) }
@@ -89,8 +89,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
 
     /**
      * Listen for alerts and status changes, from app start, whoever is logged in.
-     * [onAlert]: an alert from ANOTHER phone that Rohit has not handled yet (kept up to 24 hours).
-     * [onStatus]: Rohit's answer to an alert THIS phone sent.
+     * [onAlert]: an alert from ANOTHER phone that Sehjal has not handled yet (kept up to 24 hours).
+     * [onStatus]: Sehjal's answer to an alert THIS phone sent.
      * [onCleared]: the alert is gone (handled, deleted or too old). Call [stop] to remove the listener.
      */
     fun listen(onAlert: (Long, FamilyAlertUi) -> Unit, onStatus: (Long, String) -> Unit, onCleared: () -> Unit = {}) {
@@ -108,7 +108,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     }
 
     /**
-     * Rohit just logged in: read the alert from Firebase NOW, so one sent while he was logged out, or
+     * Sehjal just logged in: read the alert from Firebase NOW, so one sent while he was logged out, or
      * while this app was closed, is shown straight away (with the time it was sent).
      */
     fun fetchLatest() {
@@ -125,7 +125,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
             s.ref.removeValue(); onCleared(); return
         }
         val mine = s.child("fromDevice").value == deviceId
-        // still open until Rohit taps "I've called"; a live change to "calling" is Rohit's own tap, not a new alert
+        // still open until Sehjal taps "I've called"; a live change to "calling" is Sehjal's own tap, not a new alert
         val open = if (onLogin) status != "called" else status == "sent"
         when {
             open && !mine -> onAlert(id, FamilyAlertUi(
@@ -135,8 +135,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                 reasons = s.child("reasons").children.mapNotNull { it.value as? String },
                 sentAtMs = sentAt,
             ))
-            mine && status != "sent" && !onLogin -> onStatus(id, status)       // Rohit answered OUR alert
-            !mine && status == "called" -> onCleared()                        // handled on Rohit's phone
+            mine && status != "sent" && !onLogin -> onStatus(id, status)       // Sehjal answered OUR alert
+            !mine && status == "called" -> onCleared()                        // handled on Sehjal's phone
         }
     }
 
@@ -146,9 +146,9 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     }
 
     companion object {
-        /** Demo pairing: Mr. Sharma's family. A real app pairs phones with the trusted-contact OTP. */
+        /** Demo pairing: Sambhav's family. A real app pairs phones with the trusted-contact OTP. */
         const val FAMILY_ID = "sharma-family"
-        /** An alert Rohit has not handled is kept this long, then deleted. */
+        /** An alert Sehjal has not handled is kept this long, then deleted. */
         private const val KEEP_FOR = 24 * 60 * 60 * 1000L
     }
 }

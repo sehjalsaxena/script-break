@@ -12,6 +12,7 @@ import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.CubicBezierEasing
@@ -42,6 +43,7 @@ import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.FamilyLink
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.KitResult
+import com.example.scriptbreak.logic.QrDecoder
 import com.example.scriptbreak.logic.PaymentFlow
 import com.example.scriptbreak.logic.ResultsData
 import com.example.scriptbreak.logic.Story
@@ -135,10 +137,17 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             judge.kitLoading = false
         }
     }
-    // Rohit's phone needs permission to show the alert as a notification (Android 13+)
+    // Sehjal's phone needs permission to show the alert as a notification (Android 13+)
     val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(flow.familyMode) {
         if (flow.familyMode && Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+    // "Pay from a QR image": the Android photo picker shares only the one image chosen (no storage permission)
+    val pickQr = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) scope.launch {
+            val text = withContext(Dispatchers.Default) { QrDecoder.decode(context, uri) }
+            flow.openFromQr(text)
+        }
     }
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) scoreKit({ context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() } }, displayName(context, uri))
@@ -158,7 +167,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             flow.tick()
         }
     }
-    // One-off notices ("Rohit has been alerted", fail-open note)
+    // One-off notices ("Sehjal has been alerted", fail-open note)
     LaunchedEffect(flow.message) {
         flow.message?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -217,6 +226,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onNotifications = flow::startNotifications,
                     onAccount = flow::startAccount,
                     onSettings = flow::startSettings,
+                    onScanQr = { pickQr.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 )
 
                 Screen.Contacts -> ContactsScreen(
@@ -270,7 +280,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
                 Screen.Payee -> flow.payee?.let { p ->
                     PayeeScreen(
-                        state = PayeeUi(p.name, p.upiId, p.bankingName, flow.historyLine(p)),
+                        state = PayeeUi(p.name, p.upiId, p.bankingName, flow.historyLine(p), qrNotice = flow.qrNotice),
                         onPay = flow::toAmount,
                         onBack = { flow.back() },
                     )
@@ -289,7 +299,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             aiScore = ai?.score,
                             aiFacts = ai?.facts.orEmpty(),
                             payeeUpiId = p.upiId,
-                            aiCutoffs = flow.currentCutoffs,
+                            aiReminderOnly = ai?.reminderOnly == true,
                         ),
                         onDigit = flow::amountDigit,
                         onDelete = flow::amountDelete,

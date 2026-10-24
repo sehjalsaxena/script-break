@@ -108,7 +108,7 @@ class JudgeMode(private val model: ScamModel?, val stories: List<Story>) {
     }
 
     companion object {
-        /** Mr. Sharma on a call, paying ₹20,000 to a new payee: the demo starting point. */
+        /** Sambhav on a call, paying ₹20,000 to a new payee: the demo starting point. */
         val DEFAULT = Payment(amount = 20000.0, median90d = 650.0, payments90d = 42, callNow = true, payeeStatus = "new")
 
         fun parseStories(json: String): List<Story> {
