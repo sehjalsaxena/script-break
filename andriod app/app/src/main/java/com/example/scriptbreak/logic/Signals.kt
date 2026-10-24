@@ -30,7 +30,11 @@ class AndroidSignals(context: Context) : SignalSource {
     /** This app's screen is being recorded or shared (Android 15+ callback, set by MainActivity). */
     override var screenShare by mutableStateOf(false)
 
+    /** Set by MainActivity: true only while the app is on screen. Nothing is read in the background. */
+    var appVisible = false
+
     override fun refresh(nowMs: Long) {
+        if (!appVisible) return
         val mode = audio?.mode
         val inCall = mode == AudioManager.MODE_IN_CALL || mode == AudioManager.MODE_IN_COMMUNICATION
         callNow = inCall

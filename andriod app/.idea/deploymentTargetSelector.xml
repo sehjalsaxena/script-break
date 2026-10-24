@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Sciptbreak">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-10-24T14:05:52.407655500Z">
+        <DropdownSelection timestamp="2026-10-24T14:36:47.569919900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Sambh\.android\avd\Medium_Phone.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=AMAQHYZXGIUK8DI7" />
             </handle>
           </Target>
         </DropdownSelection>

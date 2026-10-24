@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        signals.appVisible = true   // phone signals are read only while the app is on screen
         if (Build.VERSION.SDK_INT >= 35) {
             screenRecording.accept(windowManager.addScreenRecordingCallback(mainExecutor, screenRecording))
         }
@@ -58,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         flow.onAppStopped()   // leaving the app mid-payment is one of the model's signals
+        signals.appVisible = false
         if (Build.VERSION.SDK_INT >= 35) windowManager.removeScreenRecordingCallback(screenRecording)
         super.onStop()
     }
