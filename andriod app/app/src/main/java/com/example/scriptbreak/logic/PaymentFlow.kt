@@ -108,7 +108,10 @@ class PaymentFlow(
     var pauseResult by mutableStateOf<Result?>(null); private set
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
-    private var lastAlertAt = 0L   // when this phone got it (its own clock), so an old alert is not shown
+    private var lastAlertAt = 0L   // when it was sent (or got here, if unknown), so a very old alert is not shown
+    private val handledAlerts = mutableSetOf<Long>()   // alerts Rohit already answered on this phone
+    /** Called when Rohit logs in: MainActivity reads the latest alert from Firebase right away. */
+    var onFamilyLogin: () -> Unit = {}
     var success by mutableStateOf<SuccessUi?>(null); private set
     var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
@@ -226,6 +229,7 @@ class PaymentFlow(
                 familyMode = true
                 if (freshAlert == null) lastAlert = null
                 screen = if (lastAlert != null) Screen.FamilyAlert else Screen.FamilyWaiting
+                onFamilyLogin()   // also ask Firebase, in case the alert came while this app was closed
             }
             "judge" -> screen = Screen.Judge
             "analyst" -> screen = Screen.Analyst
@@ -420,7 +424,7 @@ class PaymentFlow(
         val all = (criticalResult ?: pauseResult)?.reasons.orEmpty()
         val live = all.filter { it == CALL_NOW || it == SCREEN_SHARE }
         val reasons = (live + (all - live.toSet())).take(3)
-        val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons)
+        val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock())
         lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Rohit)
         askedFamily = true
         family.send(alert)
@@ -433,10 +437,15 @@ class PaymentFlow(
      * soon as Rohit logs in. Returns true if this phone should buzz.
      */
     fun onIncomingAlert(alert: FamilyAlertUi): Boolean {
-        lastAlert = alert; lastAlertAt = clock()
+        if (alert.sentAtMs != null && alert.sentAtMs in handledAlerts) return false   // Rohit already answered it
+        val same = lastAlert != null && lastAlert?.sentAtMs == alert.sentAtMs && alert.sentAtMs != null
+        lastAlert = alert; lastAlertAt = alert.sentAtMs ?: clock()
         return when {
-            familyMode -> { screen = Screen.FamilyAlert; true }  // Rohit is logged in: show it now
-            account == null -> true                              // login screen: buzz, it opens when Rohit logs in
+            familyMode -> {                                      // Rohit is logged in: show it now
+                if (screen == Screen.FamilyWaiting || !same) screen = Screen.FamilyAlert
+                !same                                            // buzz once per alert, not again on login
+            }
+            account == null -> !same                             // login screen: buzz, it opens when Rohit logs in
             else -> false                                        // someone else is using this phone: keep it quietly
         }
     }
@@ -444,8 +453,8 @@ class PaymentFlow(
     /** The alert was handled, deleted or became too old: stop keeping it (unless it is on screen now). */
     fun onAlertCleared() { if (screen != Screen.FamilyAlert) lastAlert = null }
 
-    /** A kept alert, if it is still fresh (10 minutes, the same as Firebase keeps it). */
-    private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < TEN_MINUTES }
+    /** A kept alert, if it is under 24 hours old (the same as Firebase keeps it). */
+    private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < KEEP_ALERT }
 
     /** Rohit's answer reached the sender's phone. */
     fun onFamilyStatus(status: String) {
@@ -457,7 +466,10 @@ class PaymentFlow(
     }
 
     /** Rohit handled the alert: back to waiting for the next one. */
-    fun familyDone() { lastAlert = null; screen = Screen.FamilyWaiting }
+    fun familyDone() {
+        lastAlert?.sentAtMs?.let { handledAlerts += it }
+        lastAlert = null; screen = Screen.FamilyWaiting
+    }
 
     // ---- PIN and result ----------------------------------------------------------------------
     private fun goPin() {
@@ -688,7 +700,7 @@ class PaymentFlow(
         private const val DAY = 24 * HOUR
         private const val SEVEN_DAYS = 7 * DAY
         private const val NINETY_DAYS = 90 * DAY
-        private const val TEN_MINUTES = 10 * 60 * 1000L
+        private const val KEEP_ALERT = 24 * 60 * 60 * 1000L
         const val CALL_NOW = "You are on a call right now"
         const val SCREEN_SHARE = "Your screen is being shared or a remote-access app is active"
 

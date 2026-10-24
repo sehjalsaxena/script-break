@@ -52,10 +52,40 @@ class FamilyAndScreenShareTest {
     }
 
     @Test
+    fun aMissedAlertIsStillShownWithItsTimeWhenRohitLogsIn() {
+        val p = phone()
+        var fetched = 0
+        p.onFamilyLogin = { fetched++ }
+        val sent = alert.copy(sentAtMs = now)
+        p.onIncomingAlert(sent)
+        now += 45 * 60_000                                               // Rohit logs in 45 minutes later
+        p.login("rohit", "3333")
+        assertEquals(Screen.FamilyAlert, p.screen)
+        assertEquals("the screen shows when it was sent", sent.sentAtMs, p.lastAlert!!.sentAtMs)
+        assertEquals("Rohit's login also asks Firebase", 1, fetched)
+        // Firebase answers with the same alert: shown, but no second buzz
+        assertFalse(p.onIncomingAlert(sent))
+        assertEquals(Screen.FamilyAlert, p.screen)
+        // once Rohit has answered, the same alert never comes back
+        p.familyDone()
+        assertFalse(p.onIncomingAlert(sent))
+        assertEquals(Screen.FamilyWaiting, p.screen)
+    }
+
+    @Test
+    fun alertFetchedOnlyAfterLoginOpensTheAlert() {
+        val p = phone()
+        p.login("rohit", "3333")                                         // app was closed when it was sent
+        assertEquals(Screen.FamilyWaiting, p.screen)
+        assertTrue(p.onIncomingAlert(alert.copy(sentAtMs = now - 20 * 60_000)))
+        assertEquals(Screen.FamilyAlert, p.screen)
+    }
+
+    @Test
     fun oldOrHandledAlertsAreNotShown() {
         val p = phone()
         p.onIncomingAlert(alert)
-        now += 11 * 60_000                                               // more than 10 minutes later
+        now += 25L * 60 * 60_000                                         // more than 24 hours later
         p.login("rohit", "3333")
         assertEquals(Screen.FamilyWaiting, p.screen)
 

@@ -114,7 +114,8 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 6a.7 | Turn off internet on A, ask Rohit, turn internet back on | Alert arrives on B once A is back online | |
 | 6a.8 | Phone B **logged out** (login screen). Phone A asks Rohit | B vibrates + notification on the login screen. Log in as rohit → the alert opens straight away | |
 | 6a.9 | Phone B logged in as **judge**. Phone A asks Rohit | B does NOT buzz (someone else is using it). Log out → log in as rohit → the alert opens | |
-| 6a.10 | Phone B: wait more than 10 minutes after the alert, then log in as rohit | No old alert: "Waiting for alerts" | |
+| 6a.10 | Phone B: **close the app** (swipe it away). Phone A asks Rohit. Wait 15 minutes, open the app on B, log in as rohit | The alert opens, marked **"Missed alert · Sent at 10:42 PM · 15 min ago"** | |
+| 6a.12 | Phone B: on the alert, tap Back (logs out), log in as rohit again | The same alert is shown again (no second buzz) until **I've called** is tapped | |
 | 6a.11 | Phone C also logged out while B taps **I've called** | C forgets the alert: logging in as rohit on C shows "Waiting" | |
 
 ## 6. Family phone (same phone)

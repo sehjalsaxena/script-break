@@ -83,5 +83,6 @@ data class FamilyAlertUi(
     val fromName: String,
     val amountText: String,
     val payeeName: String,
-    val reasons: List<String>
+    val reasons: List<String>,
+    val sentAtMs: Long? = null,   // when "Ask family" was tapped (shown as "Sent at 10:42 PM · 12 min ago")
 )

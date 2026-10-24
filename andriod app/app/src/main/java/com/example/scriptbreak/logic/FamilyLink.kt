@@ -54,7 +54,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
 
     override fun send(alert: FamilyAlertUi) {
         val n = node ?: return
-        val now = System.currentTimeMillis()   // the time "Ask family" was tapped, even if sign-in is slow
+        val now = alert.sentAtMs ?: System.currentTimeMillis()   // the time "Ask family" was tapped, even if sign-in is slow
         signedIn {
             n.setValue(mapOf(
                 "id" to now,
@@ -76,52 +76,67 @@ class FamilyLink(context: Context) : FamilyAlertSender {
         signedIn { n.child("status").setValue(status) }
     }
 
-    /** Delete the alert from Firebase: nothing is kept once it has been handled. */
+    /** Delete the alert from Firebase: nothing is kept once it has been handled (or after 24 hours). */
     fun clear() {
         val n = node ?: return
         signedIn { n.removeValue() }
     }
 
     private var listener: ValueEventListener? = null
+    private var onAlert: (Long, FamilyAlertUi) -> Unit = { _, _ -> }
+    private var onStatus: (Long, String) -> Unit = { _, _ -> }
+    private var onCleared: () -> Unit = {}
 
     /**
      * Listen for alerts and status changes, from app start, whoever is logged in.
-     * [onAlert]: a new alert from ANOTHER phone (sent in the last 10 minutes).
+     * [onAlert]: an alert from ANOTHER phone that Rohit has not handled yet (kept up to 24 hours).
      * [onStatus]: Rohit's answer to an alert THIS phone sent.
      * [onCleared]: the alert is gone (handled, deleted or too old). Call [stop] to remove the listener.
      */
     fun listen(onAlert: (Long, FamilyAlertUi) -> Unit, onStatus: (Long, String) -> Unit, onCleared: () -> Unit = {}) {
+        this.onAlert = onAlert; this.onStatus = onStatus; this.onCleared = onCleared
         val n = node ?: return
         stop()
         signedIn {
             val l = object : ValueEventListener {
-                override fun onDataChange(s: DataSnapshot) {
-                    val id = (s.child("id").value as? Number)?.toLong()
-                    if (id == null) { onCleared(); return }                     // no alert: deleted or never sent
-                    val sentAt = (s.child("sentAt").value as? Number)?.toLong() ?: 0L
-                    val status = s.child("status").value as? String ?: "sent"
-                    if (System.currentTimeMillis() - sentAt >= TEN_MINUTES) {   // stale: delete, keep nothing
-                        s.ref.removeValue(); onCleared(); return
-                    }
-                    val mine = s.child("fromDevice").value == deviceId
-                    if (status == "sent") {
-                        if (mine) return                                         // our own alert echoing back
-                        onAlert(id, FamilyAlertUi(
-                            fromName = s.child("fromName").value as? String ?: "",
-                            amountText = s.child("amountText").value as? String ?: "",
-                            payeeName = s.child("payeeName").value as? String ?: "",
-                            reasons = s.child("reasons").children.mapNotNull { it.value as? String },
-                        ))
-                    } else if (mine) {
-                        onStatus(id, status)                                     // Rohit answered OUR alert
-                    } else if (status == "called") {
-                        onCleared()                                              // handled on Rohit's phone
-                    }
-                }
+                override fun onDataChange(s: DataSnapshot) = handle(s, onLogin = false)
                 override fun onCancelled(e: DatabaseError) {}
             }
             listener = l
             n.addValueEventListener(l)
+        }
+    }
+
+    /**
+     * Rohit just logged in: read the alert from Firebase NOW, so one sent while he was logged out, or
+     * while this app was closed, is shown straight away (with the time it was sent).
+     */
+    fun fetchLatest() {
+        val n = node ?: return
+        signedIn { n.get().addOnSuccessListener { handle(it, onLogin = true) } }
+    }
+
+    private fun handle(s: DataSnapshot, onLogin: Boolean) {
+        val id = (s.child("id").value as? Number)?.toLong()
+        if (id == null) { onCleared(); return }                              // no alert: deleted or never sent
+        val sentAt = (s.child("sentAt").value as? Number)?.toLong() ?: id
+        val status = s.child("status").value as? String ?: "sent"
+        if (System.currentTimeMillis() - sentAt >= KEEP_FOR) {               // over 24 hours: delete, keep nothing
+            s.ref.removeValue(); onCleared(); return
+        }
+        val mine = s.child("fromDevice").value == deviceId
+        // still open until Rohit taps "I've called"; a live change to "calling" is Rohit's own tap, not a new alert
+        val open = if (onLogin) status != "called" else status == "sent"
+        when {
+            open && !mine -> onAlert(id, FamilyAlertUi(
+                fromName = s.child("fromName").value as? String ?: "",
+                amountText = s.child("amountText").value as? String ?: "",
+                payeeName = s.child("payeeName").value as? String ?: "",
+                reasons = s.child("reasons").children.mapNotNull { it.value as? String },
+                sentAtMs = sentAt,
+            ))
+            mine && status != "sent" && !onLogin -> onStatus(id, status)       // Rohit answered OUR alert
+            !mine && status == "called" -> onCleared()                        // handled on Rohit's phone
         }
     }
 
@@ -133,6 +148,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     companion object {
         /** Demo pairing: Mr. Sharma's family. A real app pairs phones with the trusted-contact OTP. */
         const val FAMILY_ID = "sharma-family"
-        private const val TEN_MINUTES = 10 * 60 * 1000L
+        /** An alert Rohit has not handled is kept this long, then deleted. */
+        private const val KEEP_FOR = 24 * 60 * 60 * 1000L
     }
 }

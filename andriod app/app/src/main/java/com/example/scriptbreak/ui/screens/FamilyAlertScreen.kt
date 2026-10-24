@@ -27,6 +27,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -171,11 +180,24 @@ fun FamilyAlertScreen(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
-                    Text(
-                        text = "2 mins ago",
-                        fontSize = 14.sp,
-                        color = MutedText
-                    )
+                    // the real time the alert was sent; refreshed every 30 seconds
+                    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+                    LaunchedEffect(Unit) { while (true) { delay(30_000); now = System.currentTimeMillis() } }
+                    state.sentAtMs?.let { sent ->
+                        val mins = ((now - sent) / 60_000).coerceAtLeast(0)
+                        val ago = when {
+                            mins < 1 -> "just now"
+                            mins < 60 -> "$mins min ago"
+                            else -> "${mins / 60} h ${mins % 60} min ago"
+                        }
+                        Text(
+                            text = (if (mins >= 10) "Missed alert · " else "") + "Sent at " +
+                                SimpleDateFormat("h:mm a", Locale.ENGLISH).format(Date(sent)) + " · " + ago,
+                            fontSize = 14.sp,
+                            fontWeight = if (mins >= 10) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (mins >= 10) CritRed else MutedText
+                        )
+                    }
                 }
             }
 

@@ -15,7 +15,7 @@ Other logins: `priya` / 2222 (UPI PIN 7316).
 ## Before the judges arrive (5 minutes)
 
 1. Install the **same build** on all three phones. Turn on internet (Wi-Fi or data) on all three. Set the clock to automatic.
-2. Phone B: log in as rohit and allow notifications. It should say "Waiting for alerts from Papa" and **● Connected**. Keep the app open, or at least don't swipe it away. A closed app gets the alert only when it is opened again (within 10 minutes).
+2. Phone B: log in as rohit and allow notifications. It should say "Waiting for alerts from Papa" and **● Connected**. Keep the app open if you can. If it was closed or logged out, the alert is still there when Rohit logs in (up to 24 hours), marked with the time it was sent.
 3. Phone A: log in as sharma. Open Settings (Home → Settings) → **Reset demo**. The usual payment should read ₹650.
 4. Phone C: save Phone A's number so Deepak can call it. Phone B: save Phone A's number as "Papa".
 5. Screen share: check Phone A's Android version (Settings → About phone).
@@ -65,14 +65,14 @@ Tap Continue → **Pause** ("Before you pay", the reasons, Q1 and Q2).
 
 | Problem | Fix |
 |---|---|
-| Phone B didn't buzz | Is B online and showing **● Connected**? If B was logged out, log in as rohit: the alert opens (if under 10 minutes old). |
+| Phone B didn't buzz | Is B online and showing **● Connected**? If B was logged out or the app was closed, log in as rohit: the alert opens with "Sent at …". |
 | No "on call" banner | The call must be active while DemoPay is open. Plan B: Judge mode → Simulate a phone call. |
 | Levels differ from the rehearsal | Tap **What the AI sees** on the Amount screen: one of the facts differs (call, pasted ID, left the app, payments made earlier). Reset demo. |
 | No internet at the venue | Same-phone fallback: Phone A asks Rohit, log out, log in as rohit on Phone A: the alert is there. |
 
 ## Honest limits (say them if asked)
 
-- The family alert travels through Firebase only while DemoPay is running on Rohit's phone. Push to a fully closed app needs Firebase Cloud Messaging and a server, which we did not build.
+- Rohit's phone buzzes only while DemoPay is running on it. If the app is closed, the alert waits in Firebase (up to 24 hours, deleted once Rohit taps "I've called") and opens when he logs in. A buzz on a fully closed app needs Firebase Cloud Messaging and a server, which we did not build.
 - Screen-share detection is real on Android 15+ (this app being recorded or shared) and for casting/mirroring on any Android. On older phones we use the Judge-mode switch.
 - Analyst-approved rules apply on the phone where they were approved. In production they would ship as a signed rules update.
 - The trusted-contact change (OTP + 24 hours) is shown on the phone, but alerts in this demo always go to Rohit's demo account.

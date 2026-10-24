@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
             },
             onCleared = { flow.onAlertCleared() },
         )
+        flow.onFamilyLogin = { family.fetchLatest() }
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }
         judge = JudgeMode(model, stories)
