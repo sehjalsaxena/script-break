@@ -145,7 +145,7 @@ private fun ClusterCard(c: Cluster, analyst: AnalystMode) {
                 Decision("Reject", "reject", decision, CritRed) { analyst.decide(c.id, it) }
             }
             when (decision) {
-                "approve" -> Text("✓ Approved: phones now Pause payments that match this rule (guardrail G3).", fontSize = 14.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
+                "approve" -> Text("Approved: phones now Pause payments that match this rule (guardrail G3).", fontSize = 14.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
                 "shadow" -> Text("Shadow mode: runs silently and only counts how often it would fire. Nothing is shown to people.", fontSize = 14.sp, color = NudgeAmber)
                 "reject" -> Text("Rejected: not sent to phones.", fontSize = 14.sp, color = MutedText)
             }

@@ -1,19 +1,23 @@
 package com.example.scriptbreak.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,23 +26,25 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -47,15 +53,18 @@ import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.KitResult
 import com.example.scriptbreak.logic.KitRow
 import com.example.scriptbreak.logic.Rate
+import com.example.scriptbreak.logic.Story
 import com.example.scriptbreak.ml.Payment
 import com.example.scriptbreak.ml.Result
+import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
-import com.example.scriptbreak.ui.theme.AppSurface
+import com.example.scriptbreak.ui.theme.AppBlue
 import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.AppPurpleLight
+import com.example.scriptbreak.ui.theme.AppSurface
 import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import com.example.scriptbreak.ui.theme.FaintText
@@ -72,8 +81,118 @@ import com.example.scriptbreak.ui.theme.SafeGreenTint
 import java.util.Locale
 
 /**
- * Judge mode: vary any of the 16 inputs and see the AI model + safety layer decide live; load one of
- * the 28 Round 1 stories; or load a test file and get error rates. All data synthetic.
+ * 1-Tap preset scenarios specifically designed for hackathon judges to evaluate
+ * the on-device AI fraud detection model instantly with vector icons and zero emojis.
+ */
+private data class QuickScenario(
+    val id: String,
+    val icon: ImageVector,
+    val title: String,
+    val subtitle: String,
+    val expectedBadge: String,
+    val badgeColorType: String,
+    val payment: Payment,
+    val q1: Boolean? = null,
+    val q2: Boolean? = null,
+)
+
+private val PRESET_SCENARIOS = listOf(
+    QuickScenario(
+        id = "digital_arrest",
+        icon = AppIcons.Warning,
+        title = "Digital Arrest",
+        subtitle = "Fake police call demanding secret fine (₹50k)",
+        expectedBadge = "CRITICAL",
+        badgeColorType = "CRITICAL",
+        payment = Payment(
+            amount = 50000.0,
+            median90d = 500.0,
+            payments90d = 35,
+            callNow = true,
+            payeeStatus = "new",
+            payeePasted = true
+        ),
+        q1 = true,
+        q2 = true,
+    ),
+    QuickScenario(
+        id = "screen_share",
+        icon = AppIcons.ScreenShare,
+        title = "Remote Takeover",
+        subtitle = "AnyDesk screen sharing to new payee (₹28k)",
+        expectedBadge = "CRITICAL",
+        badgeColorType = "CRITICAL",
+        payment = Payment(
+            amount = 28000.0,
+            median90d = 700.0,
+            payments90d = 20,
+            screenShare = true,
+            appSwitch = true,
+            payeeStatus = "new",
+            payeePasted = true
+        ),
+    ),
+    QuickScenario(
+        id = "reverse_refund",
+        icon = AppIcons.History,
+        title = "Wrong Credit",
+        subtitle = "Refund trap for stranger deposit (₹10k)",
+        expectedBadge = "PAUSE",
+        badgeColorType = "PAUSE",
+        payment = Payment(
+            amount = 10000.0,
+            median90d = 1200.0,
+            payments90d = 40,
+            creditUnknown48h = 10000.0,
+            payeeIsSender = true,
+            payeeStatus = "new"
+        ),
+    ),
+    QuickScenario(
+        id = "late_night",
+        icon = AppIcons.DarkMode,
+        title = "Late-Night Transfer",
+        subtitle = "Unusual 2:00 AM transfer to new payee (₹8.5k)",
+        expectedBadge = "NUDGE",
+        badgeColorType = "NUDGE",
+        payment = Payment(
+            amount = 8500.0,
+            median90d = 400.0,
+            payments90d = 25,
+            night = true,
+            payeeStatus = "new"
+        ),
+    ),
+    QuickScenario(
+        id = "normal_grocery",
+        icon = AppIcons.VerifiedUser,
+        title = "Daily Grocery",
+        subtitle = "Routine shopping to known merchant (₹350)",
+        expectedBadge = "SAFE",
+        badgeColorType = "SAFE",
+        payment = Payment(
+            amount = 350.0,
+            median90d = 450.0,
+            payments90d = 60,
+            payeeStatus = "known",
+            payeeKind = "merchant"
+        ),
+    ),
+    QuickScenario(
+        id = "sharma_demo",
+        icon = AppIcons.Refresh,
+        title = "Mr. Sharma Demo",
+        subtitle = "Benchmark ₹20k on phone call to new payee",
+        expectedBadge = "BENCHMARK",
+        badgeColorType = "PAUSE",
+        payment = JudgeMode.DEFAULT,
+    ),
+)
+
+/**
+ * Judge Mode: Interactive AI Defense Sandbox & Showcase for Hackathon Judges.
+ * Test scenarios live, inspect neural model scores and safety guardrails,
+ * evaluate curated fraud stories, and run batch offline datasets.
  */
 @Composable
 fun JudgeScreen(
@@ -88,247 +207,1349 @@ fun JudgeScreen(
     onBack: () -> Unit,
     resultsContent: @Composable () -> Unit = {},
 ) {
-    Column(Modifier.fillMaxSize().background(AppBackground)) {
-        AppTopBar(title = "Judge mode", onBack = onBack, showScriptBreakBadge = true, modifier = Modifier.padding(horizontal = 8.dp))
-        TabRow(selectedTabIndex = judge.tab, containerColor = AppBackground, contentColor = AppPurple) {
-            listOf("Inputs", "Stories", "Test file", "Results").forEachIndexed { i, t ->
-                Tab(selected = judge.tab == i, onClick = { judge.tab = i },
-                    text = { Text(t, fontSize = 15.sp, fontWeight = if (judge.tab == i) FontWeight.Bold else FontWeight.Normal) })
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground)
+    ) {
+        AppTopBar(
+            title = "Judge Mode",
+            onBack = onBack,
+            showScriptBreakBadge = true,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+
+        // Segmented Navigation Pill Control with Vector Icons
+        Surface(
+            color = PanelBg,
+            shape = RoundedCornerShape(14.dp),
+            border = BorderStroke(1.dp, LineBorder),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                val tabs = listOf(
+                    Triple("Sandbox", AppIcons.Tune, 0),
+                    Triple("Stories", AppIcons.MenuBook, 1),
+                    Triple("Batch", AppIcons.Folder, 2),
+                    Triple("Score", AppIcons.Assessment, 3)
+                )
+                tabs.forEach { (title, icon, index) ->
+                    val isSelected = judge.tab == index
+                    Surface(
+                        color = if (isSelected) AppSurface else Color.Transparent,
+                        shape = RoundedCornerShape(10.dp),
+                        border = if (isSelected) BorderStroke(1.dp, LineBorder) else null,
+                        shadowElevation = if (isSelected) 1.dp else 0.dp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { judge.tab = index }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                tint = if (isSelected) AppPurple else MutedText,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(Modifier.width(5.dp))
+                            Text(
+                                text = title,
+                                fontSize = 12.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) AppPurple else MutedText,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
             }
         }
+
         when (judge.tab) {
-            0 -> InputsTab(judge, simulateCall, onSimulateCall, onRunInApp, simulateScreenShare, onSimulateScreenShare)
-            1 -> StoriesTab(judge)
-            2 -> FileTab(judge, onPickFile, onLoadSample)
+            0 -> InputsTab(
+                judge = judge,
+                simulateCall = simulateCall,
+                onSimulateCall = onSimulateCall,
+                onRunInApp = onRunInApp,
+                simulateScreenShare = simulateScreenShare,
+                onSimulateScreenShare = onSimulateScreenShare
+            )
+            1 -> StoriesTab(judge = judge)
+            2 -> FileTab(
+                judge = judge,
+                onPickFile = onPickFile,
+                onLoadSample = onLoadSample
+            )
             else -> resultsContent()
         }
     }
 }
 
-// ---------------------------------------------------------------------------------- Try inputs
+// ---------------------------------------------------------------------------------- Sandbox Tab
 @Composable
-private fun InputsTab(judge: JudgeMode, simulateCall: Boolean, onSimulateCall: (Boolean) -> Unit, onRunInApp: () -> Unit,
-                      simulateScreenShare: Boolean, onSimulateScreenShare: (Boolean) -> Unit) {
+private fun InputsTab(
+    judge: JudgeMode,
+    simulateCall: Boolean,
+    onSimulateCall: (Boolean) -> Unit,
+    onRunInApp: () -> Unit,
+    simulateScreenShare: Boolean,
+    onSimulateScreenShare: (Boolean) -> Unit
+) {
     val p = judge.inputs
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item { Spacer(Modifier.height(4.dp)) }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        item { Spacer(Modifier.height(2.dp)) }
+
+        // 1-Tap Quick Presets for Hackathon Judges
         item {
-            ResultCard(judge.result, judge.modelVersion,
-                judge.stories.firstOrNull { it.id == judge.storyId }?.let { "${it.id}: ${it.title} · Round 1 design level ${it.round1Level}" })
+            QuickPresetsRow(
+                currentInputs = p,
+                onSelect = { payment, q1, q2 ->
+                    judge.edit { payment }
+                    judge.setAnswers(q1, q2)
+                }
+            )
         }
+
+        // Live AI Decision Verdict Banner
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                DemoPrimaryButton("Run in app", onRunInApp, Modifier.weight(1f), enabled = p.amount > 0)
-                DemoSecondaryButton("Reset", { judge.reset() }, Modifier.weight(1f))
+            ResultCard(
+                r = judge.result,
+                modelVersion = judge.modelVersion,
+                story = judge.stories.firstOrNull { it.id == judge.storyId }?.let {
+                    "${it.id}: ${it.title} (Design Target: ${it.round1Level})"
+                },
+                onRunInApp = onRunInApp,
+                onReset = { judge.reset() },
+                canRun = p.amount > 0
+            )
+        }
+
+        // Card 1: Payment & Baseline Spending Profile
+        item {
+            SectionCard(
+                title = "Payment & Spending Baseline",
+                icon = AppIcons.CreditCard,
+                subtitle = "How this transfer compares to the user's historical account behavior"
+            ) {
+                JudgeNumberField(
+                    label = "Payment Amount (₹)",
+                    helper = "Amount the user is attempting to transfer",
+                    value = p.amount.toLong()
+                ) { v -> judge.edit { it.copy(amount = v.toDouble()) } }
+
+                JudgeNumberField(
+                    label = "Typical 90-Day Normal Payment (₹)",
+                    helper = "User's median transaction baseline (0 = new account without history)",
+                    value = p.median90d.toLong()
+                ) { v -> judge.edit { it.copy(median90d = v.toDouble()) } }
+
+                JudgeNumberField(
+                    label = "Past 90-Day Transaction Count",
+                    helper = "Number of completed transfers in the past 3 months",
+                    value = p.payments90d.toLong()
+                ) { v -> judge.edit { it.copy(payments90d = v.toInt()) } }
             }
         }
-        item { Hint("\"Run in app\" opens the Amount screen with exactly these inputs; tap Pay to see the real screens.") }
-        item { Section("Payment") }
-        item { NumberField("Amount (₹)", "amount", p.amount.toLong()) { v -> judge.edit { it.copy(amount = v.toDouble()) } } }
-        item { NumberField("Usual payment: 90-day median (₹, 0 = no history)", "median_90d", p.median90d.toLong()) { v -> judge.edit { it.copy(median90d = v.toDouble()) } } }
-        item { NumberField("Payments in the last 90 days", "payments_90d", p.payments90d.toLong()) { v -> judge.edit { it.copy(payments90d = v.toInt()) } } }
-        item { Section("Phone signals") }
-        item { SwitchRow("On a call right now", "call_now", p.callNow) { v -> judge.edit { it.copy(callNow = v) } } }
-        item { SwitchRow("Call seen in the app in the last 30 min", "call_seen_30m", p.callSeen30m) { v -> judge.edit { it.copy(callSeen30m = v) } } }
-        item { SwitchRow("Screen shared or remote-access app", "screen_share", p.screenShare) { v -> judge.edit { it.copy(screenShare = v) } } }
-        item { SwitchRow("Payee UPI ID was pasted", "payee_pasted", p.payeePasted) { v -> judge.edit { it.copy(payeePasted = v) } } }
-        item { SwitchRow("Left the app and came back", "app_switch", p.appSwitch) { v -> judge.edit { it.copy(appSwitch = v) } } }
-        item { SwitchRow("Late at night (23:00–06:00)", "night", p.night) { v -> judge.edit { it.copy(night = v) } } }
-        item { Section("Payee and today's payments") }
-        item { Choice("Payee status", "payee_status", listOf("known", "new", "recent", "warned", "flagged"), p.payeeStatus) { v -> judge.edit { it.copy(payeeStatus = v) } } }
-        item { Choice("Payee kind", "payee_kind", listOf("person", "merchant", "biller"), p.payeeKind) { v -> judge.edit { it.copy(payeeKind = v) } } }
-        item { NumberField("Earlier payments to this new payee today", "same_payee_24h", p.samePayee24h.toLong()) { v -> judge.edit { it.copy(samePayee24h = v.toInt()) } } }
-        item { NumberField("Other new payees paid in the last hour", "new_payees_60m", p.newPayees60m.toLong()) { v -> judge.edit { it.copy(newPayees60m = v.toInt()) } } }
-        item { NumberField("Already sent to new payees today (₹)", "sent_new_24h", p.sentNew24h.toLong()) { v -> judge.edit { it.copy(sentNew24h = v.toDouble()) } } }
-        item { NumberField("Money received from a stranger, last 48 h (₹, 0 = none)", "credit_unknown_48h", p.creditUnknown48h.toLong()) { v -> judge.edit { it.copy(creditUnknown48h = v.toDouble()) } } }
-        item { SwitchRow("This payee is the person who sent that money", "payee_is_sender", p.payeeIsSender) { v -> judge.edit { it.copy(payeeIsSender = v) } } }
-        item { Section("The two questions (safety layer only, never model inputs)") }
-        item { Answer("Q1: told it's needed to verify, protect or release money?", judge.q1) { judge.setAnswers(it, judge.q2) } }
-        item { Answer("Q2: asked to keep it secret from family or bank?", judge.q2) { judge.setAnswers(judge.q1, it) } }
-        item { Section("Demo") }
-        item { SwitchRow("Simulate a phone call in the whole app (for emulators)", "", simulateCall, onSimulateCall) }
-        item { SwitchRow("Simulate screen sharing in the whole app (phones older than Android 15)", "", simulateScreenShare, onSimulateScreenShare) }
+
+        // Card 2: Live Device & Sensor Telemetry
+        item {
+            SectionCard(
+                title = "Real-Time Device Telemetry",
+                icon = AppIcons.Phone,
+                subtitle = "Live sensors detecting social engineering, coercion, or remote takeover"
+            ) {
+                JudgeSwitchRow(
+                    label = "Active phone call right now",
+                    helper = "User is on a live voice or video call while paying",
+                    checked = p.callNow
+                ) { v -> judge.edit { it.copy(callNow = v) } }
+
+                JudgeSwitchRow(
+                    label = "Phone call detected in last 30 minutes",
+                    helper = "Call concluded immediately before launching DemoPay",
+                    checked = p.callSeen30m
+                ) { v -> judge.edit { it.copy(callSeen30m = v) } }
+
+                JudgeSwitchRow(
+                    label = "Screen sharing or remote access active",
+                    helper = "AnyDesk, TeamViewer, RustDesk, or screen recording running",
+                    checked = p.screenShare
+                ) { v -> judge.edit { it.copy(screenShare = v) } }
+
+                JudgeSwitchRow(
+                    label = "Payee UPI ID was pasted from clipboard",
+                    helper = "Address copied from an external chat (WhatsApp, Telegram, SMS)",
+                    checked = p.payeePasted
+                ) { v -> judge.edit { it.copy(payeePasted = v) } }
+
+                JudgeSwitchRow(
+                    label = "Switched apps during payment checkout",
+                    helper = "User minimized DemoPay to view external messages or consult caller",
+                    checked = p.appSwitch
+                ) { v -> judge.edit { it.copy(appSwitch = v) } }
+
+                JudgeSwitchRow(
+                    label = "Late-night transaction (11:00 PM – 6:00 AM)",
+                    helper = "High-urgency off-hours payment window typical of panic extortion",
+                    checked = p.night
+                ) { v -> judge.edit { it.copy(night = v) } }
+            }
+        }
+
+        // Card 3: Payee Trust & Relationship Velocity
+        item {
+            SectionCard(
+                title = "Payee Trust & Relationship Velocity",
+                icon = AppIcons.Person,
+                subtitle = "Recipient familiarity, categorization, and rapid velocity spikes"
+            ) {
+                JudgeChoiceRow(
+                    label = "Payee Trust Status",
+                    helper = "Historical relationship with this recipient",
+                    options = listOf("known", "new", "recent", "warned", "flagged"),
+                    selected = p.payeeStatus
+                ) { v -> judge.edit { it.copy(payeeStatus = v) } }
+
+                JudgeChoiceRow(
+                    label = "Payee Classification",
+                    helper = "Merchant, biller, or person-to-person transfer",
+                    options = listOf("person", "merchant", "biller"),
+                    selected = p.payeeKind
+                ) { v -> judge.edit { it.copy(payeeKind = v) } }
+
+                JudgeNumberField(
+                    label = "Earlier payments to this payee today",
+                    helper = "Repeat transfers to this unfamiliar recipient in past 24 hours",
+                    value = p.samePayee24h.toLong()
+                ) { v -> judge.edit { it.copy(samePayee24h = v.toInt()) } }
+
+                JudgeNumberField(
+                    label = "Other new payees paid in last hour",
+                    helper = "Rapid consecutive payments to multiple new accounts",
+                    value = p.newPayees60m.toLong()
+                ) { v -> judge.edit { it.copy(newPayees60m = v.toInt()) } }
+
+                JudgeNumberField(
+                    label = "Total ₹ sent to new payees today",
+                    helper = "Daily cumulative volume transferred to unverified recipients",
+                    value = p.sentNew24h.toLong()
+                ) { v -> judge.edit { it.copy(sentNew24h = v.toDouble()) } }
+
+                JudgeNumberField(
+                    label = "Money received from stranger in last 48h (₹)",
+                    helper = "Recent incoming transfer from unknown account (0 = none)",
+                    value = p.creditUnknown48h.toLong()
+                ) { v -> judge.edit { it.copy(creditUnknown48h = v.toDouble()) } }
+
+                JudgeSwitchRow(
+                    label = "Payee is the stranger who sent that money",
+                    helper = "Simulates reverse 'wrong credit' refund scam",
+                    checked = p.payeeIsSender
+                ) { v -> judge.edit { it.copy(payeeIsSender = v) } }
+            }
+        }
+
+        // Card 4: Psychological Coercion Screening (Safety Guardrail Questions)
+        item {
+            SectionCard(
+                title = "Psychological Coercion Screening",
+                icon = AppIcons.HelpOutline,
+                subtitle = "During a Pause reflection step, DemoPay prompts the user with these two questions:"
+            ) {
+                JudgeAnswerRow(
+                    label = "Q1: Were you told this payment is required to verify, unfreeze, or protect funds?",
+                    value = judge.q1
+                ) { judge.setAnswers(it, judge.q2) }
+
+                HorizontalDivider(color = LineBorder.copy(alpha = 0.5f))
+
+                JudgeAnswerRow(
+                    label = "Q2: Were you instructed to keep this transaction secret from family or bank?",
+                    value = judge.q2
+                ) { judge.setAnswers(judge.q1, it) }
+            }
+        }
+
+        // Card 5: Demo Hardware Simulation (For Emulators & Hackathon Demos)
+        item {
+            SectionCard(
+                title = "Demo Hardware Simulation",
+                icon = AppIcons.Science,
+                subtitle = "Inject simulated device states across the entire DemoPay app for live testing:"
+            ) {
+                JudgeSwitchRow(
+                    label = "Simulate Live Phone Call (Whole App)",
+                    helper = "Enables ongoing call state across all screens for Android emulators",
+                    checked = simulateCall,
+                    onChange = onSimulateCall
+                )
+
+                JudgeSwitchRow(
+                    label = "Simulate Screen Sharing (Whole App)",
+                    helper = "Enables remote screen capture detection on older Android devices",
+                    checked = simulateScreenShare,
+                    onChange = onSimulateScreenShare
+                )
+            }
+        }
+
         item { Spacer(Modifier.height(24.dp)) }
     }
 }
 
+// ---------------------------------------------------------------------------------- Presets Row
 @Composable
-private fun levelColors(level: String): Pair<Color, Color> = when (level) {
+private fun QuickPresetsRow(
+    currentInputs: Payment,
+    onSelect: (Payment, Boolean?, Boolean?) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Quick Presets for Judges",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = InkDark
+            )
+            Text(
+                text = "Scroll for more",
+                fontSize = 12.sp,
+                color = FaintText
+            )
+        }
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(PRESET_SCENARIOS, key = { it.id }) { preset ->
+                val isSelected = currentInputs.amount == preset.payment.amount &&
+                    currentInputs.callNow == preset.payment.callNow &&
+                    currentInputs.screenShare == preset.payment.screenShare &&
+                    currentInputs.creditUnknown48h == preset.payment.creditUnknown48h &&
+                    currentInputs.payeeStatus == preset.payment.payeeStatus
+
+                val (badgeFg, badgeBg) = levelColors(preset.badgeColorType)
+
+                Surface(
+                    color = if (isSelected) PanelBg else AppSurface,
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(
+                        if (isSelected) 2.dp else 1.dp,
+                        if (isSelected) AppPurple else LineBorder
+                    ),
+                    shadowElevation = if (isSelected) 2.dp else 0.5.dp,
+                    modifier = Modifier
+                        .width(220.dp)
+                        .height(130.dp)
+                        .clickable { onSelect(preset.payment, preset.q1, preset.q2) }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = preset.icon,
+                                contentDescription = null,
+                                tint = if (isSelected) AppPurple else badgeFg,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Surface(
+                                color = badgeBg,
+                                shape = RoundedCornerShape(6.dp)
+                            ) {
+                                Text(
+                                    text = preset.expectedBadge,
+                                    color = badgeFg,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = preset.title,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = InkDark,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = preset.subtitle,
+                                fontSize = 12.sp,
+                                color = MutedText,
+                                maxLines = 2,
+                                lineHeight = 16.sp
+                            )
+                        }
+
+                        Text(
+                            text = if (isSelected) "Active Preset" else "Tap to Select",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isSelected) AppPurple else AppBlue
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------- Result Card
+@Composable
+private fun ResultCard(
+    r: Result?,
+    modelVersion: String,
+    story: String?,
+    onRunInApp: () -> Unit,
+    onReset: () -> Unit,
+    canRun: Boolean,
+) {
+    if (r == null) {
+        Surface(
+            color = CritRedTint,
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.5.dp, CritRed),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = AppIcons.Warning,
+                        contentDescription = null,
+                        tint = CritRed,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Model Offline", fontWeight = FontWeight.Bold, color = CritRed, fontSize = 16.sp)
+                }
+                Text("Fail-open protection active: payments are allowed through safely.", color = MutedText, fontSize = 14.sp)
+            }
+        }
+        return
+    }
+
+    val (fg, bg) = levelColors(r.level)
+    val levelTitle = when (r.level) {
+        "CRITICAL" -> "CRITICAL SCAM BLOCKED"
+        "PAUSE" -> "PAUSE & REFLECT (10s)"
+        "NUDGE" -> "NUDGE ADVISORY"
+        else -> "SAFE TO PROCEED"
+    }
+    val levelIcon = when (r.level) {
+        "CRITICAL" -> AppIcons.Warning
+        "PAUSE" -> AppIcons.HourglassEmpty
+        "NUDGE" -> AppIcons.Info
+        else -> AppIcons.VerifiedUser
+    }
+    val levelDesc = when (r.level) {
+        "CRITICAL" -> "Transaction blocked by safety policies. Immediate intervention triggered."
+        "PAUSE" -> "10-second cognitive delay with psychological safety screening active."
+        "NUDGE" -> "Non-blocking contextual advisory banner presented before payment."
+        else -> "Zero high-risk signals detected. Payment processed instantly without friction."
+    }
+
+    Surface(
+        color = AppSurface,
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.5.dp, fg.copy(alpha = 0.6f)),
+        shadowElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Story subtitle if loaded from stories
+            if (story != null) {
+                Surface(
+                    color = PanelBg,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = AppIcons.MenuBook,
+                            contentDescription = null,
+                            tint = MutedText,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = story,
+                            fontSize = 12.sp,
+                            color = MutedText
+                        )
+                    }
+                }
+            }
+
+            // Top Status Badge & Score
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = bg,
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, fg.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = levelIcon,
+                            contentDescription = null,
+                            tint = fg,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = levelTitle,
+                            color = fg,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+
+                Surface(
+                    color = PanelBg,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "v$modelVersion (Offline ML)",
+                        fontSize = 11.sp,
+                        color = FaintText,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+            }
+
+            Text(levelDesc, fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
+
+            // Risk Gauge Meter
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = "AI Scam Risk Score",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MutedText
+                    )
+                    Text(
+                        text = String.format(Locale.ENGLISH, "%.1f%%", r.score * 100),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = fg
+                    )
+                }
+
+                LinearProgressIndicator(
+                    progress = { r.score.toFloat() },
+                    color = fg,
+                    trackColor = PanelBg,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                )
+
+                // Threshold Markers
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("0% Safe", fontSize = 11.sp, color = FaintText)
+                    Text("30% Nudge", fontSize = 11.sp, color = FaintText)
+                    Text("65% Pause", fontSize = 11.sp, color = FaintText)
+                    Text("85% Critical", fontSize = 11.sp, color = FaintText)
+                }
+            }
+
+            // Reasons Section
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "AI Detection Insights",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = InkDark
+                )
+                if (r.reasons.isEmpty()) {
+                    Surface(
+                        color = PanelBg,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.VerifiedUser,
+                                contentDescription = null,
+                                tint = SafeGreen,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Zero risk signals triggered. Transaction matches normal spending behavior.",
+                                fontSize = 13.sp,
+                                color = SafeGreen,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                } else {
+                    r.reasons.forEach { reason ->
+                        Surface(
+                            color = PanelBg,
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, LineBorder),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = reasonIcon(reason),
+                                    contentDescription = null,
+                                    tint = AppPurple,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = reason,
+                                    fontSize = 13.sp,
+                                    color = InkDark,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Guardrails Section
+            if (r.guardrails.isNotEmpty()) {
+                Surface(
+                    color = CritRedTint.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, CritRed.copy(alpha = 0.3f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = AppIcons.Security,
+                                contentDescription = null,
+                                tint = CritRed,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "Deterministic Safety Rule Override Active",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = CritRed
+                            )
+                        }
+                        r.guardrails.forEach { g ->
+                            val expl = when (g) {
+                                "G1" -> "Rule G1: Payee is on Bank/RBI Fraud Watchlist (Mandatory Block)"
+                                "G2" -> "Rule G2: Payee was previously paid despite security warning"
+                                "G4" -> "Rule G4: User confirmed psychological coercion (secret demand / fake verification)"
+                                else -> "$g: Safety rule approved by banking policy"
+                            }
+                            Text("• $expl", fontSize = 12.sp, color = InkDark)
+                        }
+                    }
+                }
+            }
+
+            HorizontalDivider(color = LineBorder)
+
+            // Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                DemoPrimaryButton(
+                    text = "Run in Real App Checkout",
+                    onClick = onRunInApp,
+                    modifier = Modifier.weight(1.3f),
+                    enabled = canRun
+                )
+                DemoSecondaryButton(
+                    text = "Reset",
+                    onClick = onReset,
+                    modifier = Modifier.weight(0.7f)
+                )
+            }
+        }
+    }
+}
+
+private fun reasonIcon(text: String): ImageVector = when {
+    text.contains("call", ignoreCase = true) -> AppIcons.Phone
+    text.contains("screen", ignoreCase = true) -> AppIcons.ScreenShare
+    text.contains("amount", ignoreCase = true) || text.contains("higher", ignoreCase = true) -> AppIcons.TrendingUp
+    text.contains("payee", ignoreCase = true) || text.contains("new", ignoreCase = true) -> AppIcons.Person
+    text.contains("secret", ignoreCase = true) -> AppIcons.Lock
+    text.contains("verify", ignoreCase = true) || text.contains("protect", ignoreCase = true) -> AppIcons.Warning
+    text.contains("night", ignoreCase = true) -> AppIcons.DarkMode
+    text.contains("pasted", ignoreCase = true) -> AppIcons.ContentPaste
+    text.contains("switch", ignoreCase = true) -> AppIcons.SwapHoriz
+    else -> AppIcons.Info
+}
+
+@Composable
+private fun levelColors(level: String): Pair<Color, Color> = when (level.uppercase()) {
     "NUDGE" -> NudgeAmber to NudgeAmberTint
     "PAUSE" -> PauseOrange to PauseOrangeTint
     "CRITICAL" -> CritRed to CritRedTint
     else -> SafeGreen to SafeGreenTint
 }
 
-private val GUARDRAIL_TEXT = mapOf(
-    "G1" to "G1: bank-flagged payee is always Critical",
-    "G2" to "G2: payee paid after an earlier warning",
-    "G4" to "G4: a \"Yes\" answer at Pause raises it to Critical",
-)
-
+// ---------------------------------------------------------------------------------- Form Components
 @Composable
-private fun ResultCard(r: Result?, modelVersion: String, story: String?) {
-    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (story != null) Text(story, fontSize = 14.sp, color = MutedText)
-            if (r == null) {
-                Text("Model unavailable: the app lets this payment through (fail-open).", fontSize = 16.sp, color = CritRed)
-                return@Column
-            }
-            val (fg, bg) = levelColors(r.level)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(color = bg, shape = RoundedCornerShape(8.dp)) {
-                    Text(r.level, color = fg, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+private fun SectionCard(
+    title: String,
+    icon: ImageVector,
+    subtitle: String? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Surface(
+        color = AppSurface,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, LineBorder),
+        shadowElevation = 0.5.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = AppPurple,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = title,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = InkDark
+                    )
                 }
-                Spacer(Modifier.width(12.dp))
-                Text("AI scam score ${String.format(Locale.ENGLISH, "%.3f (%.1f%%)", r.score, r.score * 100)}", fontSize = 16.sp, color = InkDark, fontWeight = FontWeight.SemiBold)
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        fontSize = 12.sp,
+                        color = MutedText,
+                        lineHeight = 16.sp
+                    )
+                }
             }
-            LinearProgressIndicator(progress = { r.score.toFloat() }, color = fg, trackColor = PanelBg, modifier = Modifier.fillMaxWidth().height(8.dp))
-            if (r.reasons.isEmpty()) Text("No warning signs pushed the score up.", fontSize = 15.sp, color = MutedText)
-            r.reasons.forEach { Text("• $it", fontSize = 15.sp, color = InkDark) }
-            if (r.guardrails.isNotEmpty()) {
-                Text("Safety rules that set the level: " + r.guardrails.joinToString("; ") { GUARDRAIL_TEXT[it] ?: "$it: rule approved by analysts" },
-                    fontSize = 14.sp, color = MutedText)
-            }
-            Text("Model $modelVersion · on this phone, no network · synthetic training data", fontSize = 12.sp, color = FaintText)
+            HorizontalDivider(color = LineBorder.copy(alpha = 0.6f))
+            content()
         }
     }
 }
 
-@Composable private fun Section(t: String) = Text(t, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = InkDark, modifier = Modifier.padding(top = 8.dp))
-@Composable private fun Hint(t: String) = Text(t, fontSize = 14.sp, color = MutedText)
-
 @Composable
-private fun FieldLabel(label: String, key: String) {
-    Column {
-        Text(label, fontSize = 15.sp, color = InkDark)
-        if (key.isNotEmpty()) Text(key, fontSize = 12.sp, color = FaintText)
+private fun JudgeFieldHeader(label: String, helper: String? = null) {
+    Column(modifier = Modifier.padding(bottom = 4.dp)) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = InkDark
+        )
+        if (!helper.isNullOrEmpty()) {
+            Text(
+                text = helper,
+                fontSize = 12.sp,
+                color = MutedText,
+                lineHeight = 16.sp
+            )
+        }
     }
 }
 
 @Composable
-private fun NumberField(label: String, key: String, value: Long, onChange: (Long) -> Unit) {
+private fun JudgeNumberField(
+    label: String,
+    helper: String,
+    value: Long,
+    onChange: (Long) -> Unit
+) {
     var text by remember(value) { mutableStateOf(value.toString()) }
-    OutlinedTextField(
-        value = text,
-        onValueChange = { s -> val d = s.filter(Char::isDigit).take(10); text = d; onChange(d.toLongOrNull() ?: 0L) },
-        label = { Text(label, fontSize = 13.sp) },
-        supportingText = { Text(key, fontSize = 12.sp, color = FaintText) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = InkDark,
-            unfocusedTextColor = InkDark,
-            cursorColor = AppPurple,
-            focusedBorderColor = AppPurple,
-            unfocusedBorderColor = Color(0xFFDDE2EA)
-        ),
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
-@Composable
-private fun SwitchRow(label: String, key: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { onChange(!checked) }) {
-        Column(Modifier.weight(1f)) { FieldLabel(label, key) }
-        Switch(checked = checked, onCheckedChange = onChange, colors = SwitchDefaults.colors(checkedTrackColor = AppPurple))
+    Column(modifier = Modifier.fillMaxWidth()) {
+        JudgeFieldHeader(label, helper)
+        OutlinedTextField(
+            value = text,
+            onValueChange = { s ->
+                val d = s.filter(Char::isDigit).take(10)
+                text = d
+                onChange(d.toLongOrNull() ?: 0L)
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = InkDark,
+                unfocusedTextColor = InkDark,
+                cursorColor = AppPurple,
+                focusedBorderColor = AppPurple,
+                unfocusedBorderColor = LineBorder,
+                focusedContainerColor = AppSurface,
+                unfocusedContainerColor = AppSurface
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
 @Composable
-private fun Choice(label: String, key: String, options: List<String>, selected: String, onPick: (String) -> Unit) {
-    Column {
-        FieldLabel(label, key)
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            options.forEach { o ->
-                FilterChip(selected = o == selected, onClick = { onPick(o) }, label = { Text(o, fontSize = 15.sp) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppPurpleLight, selectedLabelColor = AppPurple))
+private fun JudgeSwitchRow(
+    label: String,
+    helper: String,
+    checked: Boolean,
+    onChange: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onChange(!checked) }
+            .padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(
+                text = label,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = InkDark
+            )
+            if (helper.isNotEmpty()) {
+                Text(
+                    text = helper,
+                    fontSize = 12.sp,
+                    color = MutedText,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = AppPurple,
+                uncheckedTrackColor = PanelBg
+            )
+        )
+    }
+}
+
+@Composable
+private fun JudgeChoiceRow(
+    label: String,
+    helper: String,
+    options: List<String>,
+    selected: String,
+    onPick: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        JudgeFieldHeader(label, helper)
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            options.forEach { opt ->
+                val isSelected = opt.equals(selected, ignoreCase = true)
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { onPick(opt) },
+                    label = {
+                        Text(
+                            text = opt.replaceFirstChar { it.uppercase() },
+                            fontSize = 13.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = PanelBg,
+                        labelColor = InkDark,
+                        selectedContainerColor = AppPurpleLight,
+                        selectedLabelColor = AppPurple
+                    ),
+                    border = BorderStroke(1.dp, if (isSelected) AppPurple else LineBorder)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun Answer(label: String, value: Boolean?, onPick: (Boolean?) -> Unit) {
-    Column {
-        Text(label, fontSize = 15.sp, color = InkDark)
+private fun JudgeAnswerRow(
+    label: String,
+    value: Boolean?,
+    onPick: (Boolean?) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = InkDark,
+            lineHeight = 18.sp
+        )
+        Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf<Pair<String, Boolean?>>("Not asked" to null, "Yes" to true, "No" to false).forEach { (t, v) ->
-                FilterChip(selected = value == v, onClick = { onPick(v) }, label = { Text(t, fontSize = 15.sp) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppPurpleLight, selectedLabelColor = AppPurple))
+            listOf(
+                Triple("Not Asked", null, MutedText),
+                Triple("Yes (Coerced)", true, CritRed),
+                Triple("No (Safe)", false, SafeGreen)
+            ).forEach { (title, v, _) ->
+                val isSelected = value == v
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { onPick(v) },
+                    label = {
+                        Text(
+                            text = title,
+                            fontSize = 13.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = PanelBg,
+                        labelColor = InkDark,
+                        selectedContainerColor = if (v == true) CritRedTint else if (v == false) SafeGreenTint else AppPurpleLight,
+                        selectedLabelColor = if (v == true) CritRed else if (v == false) SafeGreen else AppPurple
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        if (isSelected) (if (v == true) CritRed else if (v == false) SafeGreen else AppPurple) else LineBorder
+                    )
+                )
             }
         }
     }
 }
 
-// ---------------------------------------------------------------------------------- 28 stories
+// ---------------------------------------------------------------------------------- Stories Tab
 @Composable
 private fun StoriesTab(judge: JudgeMode) {
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        item {
-            Hint("The 28 Round 1 behaviour stories, never used to train the model. \"Round 1\" is the level the old " +
-                "rules were designed to give; where the AI differs it is marked, not hidden. Tap a story to load it.")
+    var selectedKind by remember { mutableStateOf("all") }
+    val filteredStories = remember(judge.stories, selectedKind) {
+        when (selectedKind) {
+            "scam" -> judge.stories.filter { it.kind == "scam" }
+            "boundary" -> judge.stories.filter { it.kind == "boundary" }
+            "legit" -> judge.stories.filter { it.kind == "legit" }
+            else -> judge.stories
         }
-        items(judge.stories, key = { it.id }) { s ->
-            val ai = judge.levelOf(s)
-            Surface(color = AppSurface, shape = RoundedCornerShape(14.dp), shadowElevation = 0.5.dp,
-                modifier = Modifier.fillMaxWidth().clickable { judge.loadStory(s) }) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("${s.id} · ${s.kind}", fontSize = 13.sp, color = FaintText)
-                    Text(s.title, fontSize = 16.sp, color = InkDark, fontWeight = FontWeight.SemiBold)
-                    Spacer(Modifier.height(4.dp))
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item { Spacer(Modifier.height(4.dp)) }
+
+        // Explanatory Banner
+        item {
+            Surface(
+                color = AppSurface,
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, LineBorder),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Round 1: ${s.round1Level}", fontSize = 14.sp, color = MutedText)
-                        Spacer(Modifier.width(12.dp))
-                        Text("AI: $ai", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = levelColors(ai).first)
-                        if (ai != s.round1Level) Text("  ⚠ differs", fontSize = 14.sp, color = NudgeAmber)
+                        Icon(
+                            imageVector = AppIcons.MenuBook,
+                            contentDescription = null,
+                            tint = AppPurple,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "28 Behavioral Scam Test Stories",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = InkDark
+                        )
+                    }
+                    Text(
+                        text = "Curated real-world fraud cases withheld from model training. Tap any scenario to load its exact inputs into the sandbox and test live.",
+                        fontSize = 13.sp,
+                        color = MutedText,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+        }
+
+        // Category Filter Chips
+        item {
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(
+                    "all" to "All (${judge.stories.size})",
+                    "scam" to "Scams (${judge.stories.count { it.kind == "scam" }})",
+                    "boundary" to "Edge Cases (${judge.stories.count { it.kind == "boundary" }})",
+                    "legit" to "Genuine (${judge.stories.count { it.kind == "legit" }})"
+                ).forEach { (kind, label) ->
+                    val isSelected = selectedKind == kind
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { selectedKind = kind },
+                        label = { Text(label, fontSize = 13.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = PanelBg,
+                            labelColor = InkDark,
+                            selectedContainerColor = AppPurpleLight,
+                            selectedLabelColor = AppPurple
+                        ),
+                        border = BorderStroke(1.dp, if (isSelected) AppPurple else LineBorder)
+                    )
+                }
+            }
+        }
+
+        items(filteredStories, key = { it.id }) { s ->
+            val aiLevel = judge.levelOf(s)
+            val isMatch = aiLevel == s.round1Level
+            val (aiFg, aiBg) = levelColors(aiLevel)
+            val (kindFg, kindBg) = when (s.kind) {
+                "scam" -> CritRed to CritRedTint
+                "boundary" -> PauseOrange to PauseOrangeTint
+                else -> SafeGreen to SafeGreenTint
+            }
+
+            Surface(
+                color = AppSurface,
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(1.dp, LineBorder),
+                shadowElevation = 0.5.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { judge.loadStory(s) }
+            ) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Surface(color = kindBg, shape = RoundedCornerShape(6.dp)) {
+                                Text(
+                                    text = s.kind.uppercase(),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = kindFg,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Text(s.id, fontSize = 12.sp, color = FaintText, fontWeight = FontWeight.SemiBold)
+                        }
+
+                        Surface(color = PanelBg, shape = RoundedCornerShape(6.dp)) {
+                            Text(
+                                text = "₹${s.payment.amount.toLong()}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = InkDark,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = s.title,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = InkDark,
+                        lineHeight = 20.sp
+                    )
+
+                    HorizontalDivider(color = LineBorder.copy(alpha = 0.5f))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Target: ", fontSize = 12.sp, color = MutedText)
+                            Text(s.round1Level, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                            Spacer(Modifier.width(10.dp))
+                            Text("AI: ", fontSize = 12.sp, color = MutedText)
+                            Surface(color = aiBg, shape = RoundedCornerShape(4.dp)) {
+                                Text(
+                                    text = aiLevel,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = aiFg,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
+                                )
+                            }
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (isMatch) {
+                                Icon(
+                                    imageVector = AppIcons.Check,
+                                    contentDescription = null,
+                                    tint = SafeGreen,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text("Matches Target", fontSize = 12.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
+                            } else {
+                                Icon(
+                                    imageVector = AppIcons.Warning,
+                                    contentDescription = null,
+                                    tint = NudgeAmber,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text("AI Adjusted", fontSize = 12.sp, color = NudgeAmber, fontWeight = FontWeight.SemiBold)
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Test", fontSize = 12.sp, color = AppPurple, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.width(2.dp))
+                                Icon(
+                                    imageVector = AppIcons.ChevronRight,
+                                    contentDescription = null,
+                                    tint = AppPurple,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+
         item { Spacer(Modifier.height(24.dp)) }
     }
 }
 
-// ---------------------------------------------------------------------------------- Test file
+// ---------------------------------------------------------------------------------- Batch Test Tab
 @Composable
 private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -> Unit) {
     val kit = judge.kit
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    var filterTab by remember { mutableIntStateOf(0) }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item { Spacer(Modifier.height(4.dp)) }
+
+        // Evaluator Intro Card
         item {
-            Hint("Load a test file and the model scores every payment on this phone. Formats: JSON array, " +
-                "{\"records\": [...]}, JSON Lines, or CSV with a header row. Field names as in ml/schema.json " +
-                "(amount, median_90d, call_now, payee_status, …), either flat or inside \"features\". Add \"label\" " +
-                "(1 scam, 0 genuine) to get error rates; optional \"workflow\", \"q1\", \"q2\".")
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                DemoPrimaryButton("Choose a file", onPickFile, Modifier.weight(1f), enabled = !judge.kitLoading)
-                DemoSecondaryButton("Our sample file", onLoadSample, Modifier.weight(1f))
+            Surface(
+                color = AppSurface,
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, LineBorder),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = AppIcons.Folder,
+                            contentDescription = null,
+                            tint = AppPurple,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Offline Batch Benchmark Evaluator",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = InkDark
+                        )
+                    }
+                    Text(
+                        text = "Score hundreds of transactions offline on this phone in real time. Validate detection rate, false friction rate, and Wilson 95% confidence intervals.",
+                        fontSize = 13.sp,
+                        color = MutedText,
+                        lineHeight = 18.sp
+                    )
+                }
             }
         }
-        if (judge.kitLoading) item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(color = AppPurple); Spacer(Modifier.width(12.dp)); Text("Scoring on this phone…", fontSize = 16.sp)
+
+        // Action Buttons
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                DemoPrimaryButton(
+                    text = "Run 400-Payment Benchmark",
+                    onClick = onLoadSample,
+                    modifier = Modifier.weight(1.2f),
+                    enabled = !judge.kitLoading
+                )
+                DemoSecondaryButton(
+                    text = "Upload Custom File",
+                    onClick = onPickFile,
+                    modifier = Modifier.weight(0.8f),
+                    enabled = !judge.kitLoading
+                )
             }
         }
+
+        if (judge.kitLoading) {
+            item {
+                Surface(
+                    color = AppSurface,
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, LineBorder),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(color = AppPurple, modifier = Modifier.size(24.dp))
+                        Spacer(Modifier.width(14.dp))
+                        Column {
+                            Text("Evaluating Payments Offline...", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = InkDark)
+                            Text("Running on-device neural model with 0 network latency", fontSize = 12.sp, color = MutedText)
+                        }
+                    }
+                }
+            }
+        }
+
         if (kit != null && !judge.kitLoading) {
             item { KitSummaryCard(kit) }
-            if (kit.missedScams.isNotEmpty()) {
-                item { Section("Missed scams (${kit.missedScams.size})") }
-                items(kit.missedScams.take(20)) { RowLine(it) }
+
+            // Filter Tabs for rows
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(
+                        "All Payments (${kit.rows.size})" to 0,
+                        "Missed Scams (${kit.missedScams.size})" to 1,
+                        "False Alarms (${kit.falseAlarms.size})" to 2
+                    ).forEach { (label, idx) ->
+                        val isSelected = filterTab == idx
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { filterTab = idx },
+                            label = { Text(label, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = PanelBg,
+                                labelColor = InkDark,
+                                selectedContainerColor = AppPurpleLight,
+                                selectedLabelColor = AppPurple
+                            ),
+                            border = BorderStroke(1.dp, if (isSelected) AppPurple else LineBorder)
+                        )
+                    }
+                }
             }
-            if (kit.falseAlarms.isNotEmpty()) {
-                item { Section("Genuine payments interrupted (${kit.falseAlarms.size})") }
-                items(kit.falseAlarms.take(20)) { RowLine(it) }
+
+            val displayedRows = when (filterTab) {
+                1 -> kit.missedScams
+                2 -> kit.falseAlarms
+                else -> kit.rows.take(200)
             }
-            item { Section("All rows (first 200 of ${kit.rows.size})") }
-            items(kit.rows.take(200)) { RowLine(it) }
+
+            if (displayedRows.isEmpty()) {
+                item {
+                    Surface(
+                        color = AppSurface,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(24.dp)) {
+                            Text("No transactions in this category", fontSize = 14.sp, color = MutedText)
+                        }
+                    }
+                }
+            } else {
+                items(displayedRows) { RowLine(it) }
+            }
+
             if (kit.problems.isNotEmpty()) {
-                item { Section("Rows that could not be read (${kit.problems.size})") }
-                items(kit.problems.take(30)) { Text(it, fontSize = 14.sp, color = CritRed) }
+                item {
+                    Text(
+                        text = "Unparseable Rows (${kit.problems.size})",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = CritRed
+                    )
+                }
+                items(kit.problems.take(20)) { Text(it, fontSize = 12.sp, color = CritRed) }
             }
         }
+
         item { Spacer(Modifier.height(24.dp)) }
     }
 }
@@ -338,44 +1559,196 @@ private fun per1000(x: Double) = String.format(Locale.ENGLISH, "%.1f", x * 1000)
 
 @Composable
 private fun KitSummaryCard(k: KitResult) {
-    Surface(color = AppSurface, shape = RoundedCornerShape(16.dp), shadowElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(k.fileName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = InkDark)
-            Text("${k.rows.size} payments scored, ${k.problems.size} skipped", fontSize = 15.sp, color = MutedText)
-            Text(k.levelCounts.entries.joinToString("  ·  ") { "${it.key} ${it.value}" }, fontSize = 15.sp, color = InkDark)
-            HorizontalDivider(color = LineBorder)
-            if (!k.hasLabels) {
-                Text("No labels in this file, so no error rates. Add \"label\" (1 scam, 0 genuine).", fontSize = 15.sp, color = MutedText)
-            } else {
-                Metric("Scams flagged (Pause or Critical)", k.scamsFlagged, false)
-                Metric("Genuine payments interrupted", k.genuineInterrupted, true)
-                Metric("Genuine payments given a Nudge", k.genuineNudged, true)
-                if (k.byWorkflow.isNotEmpty()) {
-                    Text("By scam type", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                    k.byWorkflow.forEach { (w, r) -> Text("$w: ${r.k}/${r.n} = ${pct(r.rate)}", fontSize = 14.sp, color = InkDark) }
+    Surface(
+        color = AppSurface,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, LineBorder),
+        shadowElevation = 1.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(k.fileName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = InkDark)
+                    Text("${k.rows.size} payments evaluated offline", fontSize = 12.sp, color = MutedText)
                 }
-                Text("95% ranges are Wilson intervals. Synthetic data tests our assumptions, not real-world accuracy.", fontSize = 12.sp, color = FaintText)
+                Surface(color = SafeGreenTint, shape = RoundedCornerShape(8.dp)) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = AppIcons.Check,
+                            contentDescription = null,
+                            tint = SafeGreen,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "Completed",
+                            color = SafeGreen,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
+
+            // Stat Cards Row
+            if (k.hasLabels) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StatTile(
+                        title = "Scams Flagged",
+                        value = pct(k.scamsFlagged.rate),
+                        subtitle = "${k.scamsFlagged.k} of ${k.scamsFlagged.n}",
+                        accentColor = CritRed,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatTile(
+                        title = "Legit Protected",
+                        value = pct(1.0 - k.genuineInterrupted.rate),
+                        subtitle = "Smooth checkout",
+                        accentColor = SafeGreen,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatTile(
+                        title = "False Alarms",
+                        value = per1000(k.genuineInterrupted.rate),
+                        subtitle = "per 1,000 txns",
+                        accentColor = NudgeAmber,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Level Distribution Breakdown
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Decision Level Distribution", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    k.levelCounts.forEach { (level, count) ->
+                        val (fg, bg) = levelColors(level)
+                        Surface(color = bg, shape = RoundedCornerShape(8.dp)) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(level, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = fg)
+                                Spacer(Modifier.width(4.dp))
+                                Text("$count", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = InkDark)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (k.hasLabels && k.byWorkflow.isNotEmpty()) {
+                HorizontalDivider(color = LineBorder)
+                Text("Detection Rate by Fraud Type", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                k.byWorkflow.forEach { (workflow, rate) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(workflow, fontSize = 13.sp, color = InkDark)
+                        Text("${pct(rate.rate)} (${rate.k}/${rate.n})", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CritRed)
+                    }
+                }
+            }
+
+            Text("Confidence intervals calculated using Wilson 95% score interval.", fontSize = 11.sp, color = FaintText)
         }
     }
 }
 
 @Composable
-private fun Metric(label: String, r: Rate, perThousand: Boolean) {
-    val v = if (perThousand) "${per1000(r.rate)} per 1,000 (95%: ${per1000(r.low)}–${per1000(r.high)})"
-            else "${pct(r.rate)} (95%: ${pct(r.low)}–${pct(r.high)})"
-    Text("$label: ${r.k}/${r.n} = $v", fontSize = 15.sp, color = InkDark)
+private fun StatTile(
+    title: String,
+    value: String,
+    subtitle: String,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = PanelBg,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, LineBorder),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(title, fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.Medium)
+            Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = accentColor)
+            Text(subtitle, fontSize = 10.sp, color = FaintText)
+        }
+    }
 }
 
 @Composable
 private fun RowLine(r: KitRow) {
-    val (fg, _) = levelColors(r.level)
-    Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("#${r.index}", fontSize = 14.sp, color = FaintText, modifier = Modifier.width(56.dp))
-        Text(when (r.label) { 1 -> "scam"; 0 -> "genuine"; else -> "-" } + (r.workflow?.let { " · $it" } ?: ""),
-            fontSize = 14.sp, color = MutedText, modifier = Modifier.weight(1f))
-        Text("₹${r.amount.toLong()}", fontSize = 14.sp, color = InkDark, modifier = Modifier.width(80.dp))
-        Text(r.level, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = fg, modifier = Modifier.width(76.dp))
-        Text(String.format(Locale.ENGLISH, "%.2f (%d%%)", r.score, Math.round(r.score * 100)), fontSize = 13.sp, color = InkDark)
+    val (fg, bg) = levelColors(r.level)
+    Surface(
+        color = AppSurface,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, LineBorder.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "#${r.index}",
+                fontSize = 12.sp,
+                color = FaintText,
+                modifier = Modifier.width(42.dp)
+            )
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = when (r.label) { 1 -> "Scam"; 0 -> "Genuine"; else -> "Unlabeled" } + (r.workflow?.let { " · $it" } ?: ""),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = InkDark
+                )
+                Text(
+                    text = "Amount: ₹${r.amount.toLong()}",
+                    fontSize = 11.sp,
+                    color = MutedText
+                )
+            }
+
+            Surface(color = bg, shape = RoundedCornerShape(6.dp)) {
+                Text(
+                    text = r.level,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = fg,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                text = String.format(Locale.ENGLISH, "%.0f%%", r.score * 100),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = InkDark,
+                modifier = Modifier.width(36.dp)
+            )
+        }
     }
 }
