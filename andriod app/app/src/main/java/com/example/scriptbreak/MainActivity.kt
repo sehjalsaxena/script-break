@@ -50,7 +50,10 @@ class MainActivity : ComponentActivity() {
         analyst = AnalystMode(beforeModel, discovery) { rules -> flow.approvedRules = rules }
         setContent {
             ScriptBreakTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = com.example.scriptbreak.ui.theme.AppBackground
+                ) {
                     AppRoot(flow, signals, judge, analyst)
                 }
             }

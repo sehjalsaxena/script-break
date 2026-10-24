@@ -1,7 +1,13 @@
 package com.example.scriptbreak.ui.screens
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +15,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -19,6 +27,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,18 +114,53 @@ fun AmountScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Large Amount display
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        // Large Amount display with vertical blinking cursor
+        val infiniteTransition = rememberInfiniteTransition(label = "amountCursor")
+        val cursorAlpha by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 0f,
+            animationSpec = infiniteRepeatable(
+                animation = keyframes {
+                    durationMillis = 1000
+                    1f at 0
+                    1f at 499
+                    0f at 500
+                    0f at 999
+                },
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "cursorAlpha"
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val displayAmount = if (state.amountText.isBlank()) "0" else state.amountText
             Text(
-                text = "₹ $displayAmount",
-                fontSize = 38.sp,
+                text = "₹",
+                fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
-                color = InkDark,
-                textAlign = TextAlign.Center
+                color = InkDark
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            if (state.amountText.isNotEmpty()) {
+                Text(
+                    text = state.amountText,
+                    fontSize = 44.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = InkDark
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+            }
+            // Vertical blinking cursor line like other UPI apps
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(38.dp)
+                    .clip(RoundedCornerShape(1.5.dp))
+                    .graphicsLayer { alpha = cursorAlpha }
+                    .background(AppPurple)
             )
         }
 
@@ -171,8 +215,11 @@ fun AmountScreen(
             },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = InkDark,
+                unfocusedTextColor = InkDark,
                 focusedBorderColor = AppPurple,
                 unfocusedBorderColor = Color(0xFFDDE2EA),
+                cursorColor = AppPurple,
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White
             ),
@@ -193,7 +240,8 @@ fun AmountScreen(
         DemoPrimaryButton(
             text = stringResource(R.string.continue_btn),
             onClick = onPay,
-            enabled = state.payEnabled
+            enabled = state.payEnabled,
+            modifier = Modifier.navigationBarsPadding()
         )
     }
 }

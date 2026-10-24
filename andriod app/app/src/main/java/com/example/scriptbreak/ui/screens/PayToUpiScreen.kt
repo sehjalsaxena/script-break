@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -51,6 +52,11 @@ fun PayToUpiScreen(
     onBack: () -> Unit,
     // Picking from the app's own recent list is not a paste (it changes the "pasted" signal)
     onPickSuggestion: ((String) -> Unit)? = null,
+    recentPayees: List<Pair<String, String>> = listOf(
+        "suresh.verma@demoupi" to "Suresh Verma",
+        "sunita.iyer@demoupi" to "Sunita Iyer",
+        "rohit.sharma@demoupi" to "Rohit (son)"
+    ),
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -115,9 +121,13 @@ fun PayToUpiScreen(
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = InkDark,
+                        unfocusedTextColor = InkDark,
                         focusedBorderColor = AppPurple,
                         unfocusedBorderColor = Color(0xFFDDE2EA),
-                        cursorColor = AppPurple
+                        cursorColor = AppPurple,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -136,17 +146,11 @@ fun PayToUpiScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        val suggestions = listOf(
-            "ramesh.k@demoupi" to "Ramesh K.",
-            "anil.mehta@demoupi" to "Anil Mehta",
-            "suresh.verma@demoupi" to "Suresh Verma"
-        )
-
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            suggestions.forEach { (id, name) ->
+            recentPayees.forEach { (id, name) ->
                 Surface(
                     color = Color.White,
                     shape = RoundedCornerShape(14.dp),
@@ -197,7 +201,8 @@ fun PayToUpiScreen(
         DemoPrimaryButton(
             text = stringResource(R.string.continue_btn),
             onClick = onContinue,
-            enabled = upiId.isNotBlank()
+            enabled = upiId.isNotBlank(),
+            modifier = Modifier.navigationBarsPadding()
         )
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -207,6 +208,13 @@ private fun NumberField(label: String, key: String, value: Long, onChange: (Long
         supportingText = { Text(key, fontSize = 12.sp, color = FaintText) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = InkDark,
+            unfocusedTextColor = InkDark,
+            cursorColor = AppPurple,
+            focusedBorderColor = AppPurple,
+            unfocusedBorderColor = Color(0xFFDDE2EA)
+        ),
         modifier = Modifier.fillMaxWidth(),
     )
 }

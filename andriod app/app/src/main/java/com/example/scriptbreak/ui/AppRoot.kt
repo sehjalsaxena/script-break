@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -107,7 +108,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
     val tts = rememberTextToSpeech(context)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Crossfade(targetState = flow.screen, label = "screens") { screen ->
             when (screen) {
                 Screen.UserPicker -> UserPickerScreen(onPick = flow::pickProfile)
@@ -127,14 +128,24 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBalance = { toast(context, "Demo app: no real bank balance") },
                 )
 
-                Screen.PayToUpi -> PayToUpiScreen(
-                    upiId = flow.upiInput,
-                    onUpiIdChange = flow::upiChanged,
-                    onPaste = { flow.pasteUpi(readClipboardOnTap(context)) },
-                    onContinue = flow::continueWithUpi,
-                    onBack = { flow.back() },
-                    onPickSuggestion = flow::pickSuggestion,
-                )
+                Screen.PayToUpi -> {
+                    val recentUpiList = remember(flow.ledger) {
+                        val fromLedger = flow.ledger.reversed().mapNotNull { txn ->
+                            DemoWorld.payees.firstOrNull { it.name == txn.payeeName }?.let { it.upiId to it.name }
+                        }
+                        val knownPeople = DemoWorld.homePeople.map { it.upiId to it.name }
+                        (fromLedger + knownPeople).distinctBy { it.first }.take(3)
+                    }
+                    PayToUpiScreen(
+                        upiId = flow.upiInput,
+                        onUpiIdChange = flow::upiChanged,
+                        onPaste = { flow.pasteUpi(readClipboardOnTap(context)) },
+                        onContinue = flow::continueWithUpi,
+                        onBack = { flow.back() },
+                        onPickSuggestion = flow::pickSuggestion,
+                        recentPayees = recentUpiList,
+                    )
+                }
 
                 Screen.Payee -> flow.payee?.let { p ->
                     PayeeScreen(
