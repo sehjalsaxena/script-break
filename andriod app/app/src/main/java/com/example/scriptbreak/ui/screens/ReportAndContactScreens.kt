@@ -111,6 +111,8 @@ fun TrustedContactScreen(
     onVerify: (code: String) -> Unit,
     onCancelPending: () -> Unit,
     onBack: () -> Unit,
+    usualPaymentText: String? = null,
+    onResetDemo: (() -> Unit)? = null,
 ) {
     var name by remember { mutableStateOf("") }
     var relation by remember { mutableStateOf("") }
@@ -167,6 +169,16 @@ fun TrustedContactScreen(
                     Spacer(Modifier.width(10.dp))
                     DemoSecondaryButton("Cancel", onCancelPending, Modifier.weight(1f))
                 }
+            }
+        }
+        if (usualPaymentText != null || onResetDemo != null) {
+            WhiteCard {
+                Text("Demo", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = InkDark)
+                if (usualPaymentText != null) {
+                    Text("Usual payment the AI sees: $usualPaymentText", fontSize = 15.sp, color = InkDark)
+                    Text("Learned from your payments: it changes as you pay.", fontSize = 14.sp, color = MutedText)
+                }
+                if (onResetDemo != null) DemoSecondaryButton("Reset demo (clear this session's payments)", onResetDemo)
             }
         }
         Spacer(Modifier.height(16.dp))

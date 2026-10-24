@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="Sciptbreak">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-10-24T14:36:47.569919900Z">
+        <DropdownSelection timestamp="2026-10-24T16:17:58.632837300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=AMAQHYZXGIUK8DI7" />

@@ -27,7 +27,14 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.scriptbreak.ui.theme.CritRed
+import com.example.scriptbreak.ui.theme.PauseOrange
+import com.example.scriptbreak.ui.theme.SafeGreen
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -201,6 +208,11 @@ fun AmountScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
+        if (state.aiLevel != null) {
+            AiSeesCard(state.aiLevel, state.aiScore, state.aiFacts)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         // Add note field
         OutlinedTextField(
             value = state.note,
@@ -243,6 +255,44 @@ fun AmountScreen(
             enabled = state.payEnabled,
             modifier = Modifier.navigationBarsPadding()
         )
+    }
+}
+
+/** Demo view: the facts the AI was given and its decision, updated on every key press. Tap to open. */
+@Composable
+private fun AiSeesCard(level: String, score: Double?, facts: List<String>) {
+    var open by remember { mutableStateOf(false) }
+    val color = when (level) {
+        "CRITICAL" -> CritRed
+        "PAUSE" -> PauseOrange
+        "NUDGE" -> NudgeAmber
+        "NONE" -> SafeGreen
+        else -> MutedText
+    }
+    val label = when (level) {
+        "NONE" -> "No warning"
+        "UNAVAILABLE" -> "Check unavailable, you can still pay"
+        else -> level.lowercase().replaceFirstChar(Char::uppercaseChar) + " before the PIN"
+    }
+    Surface(
+        color = Color.White,
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDDE2EA)),
+        modifier = Modifier.fillMaxWidth().clickable { open = !open }
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("What the AI sees", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark, modifier = Modifier.weight(1f))
+                Text(label + (score?.let { "  ·  score %.2f".format(it) } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = color)
+                Text(if (open) "  ▲" else "  ▼", fontSize = 12.sp, color = MutedText)
+            }
+            if (open) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(facts.joinToString("  ·  "), fontSize = 13.sp, color = MutedText, lineHeight = 18.sp)
+                Text("Demo view. The AI weighs all of these together: there is no fixed amount limit.",
+                    fontSize = 12.sp, color = MutedText, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
     }
 }
 

@@ -40,7 +40,10 @@ data class AmountUi(
     val amountText: String,
     val note: String,
     val nudge: String?, // show amber inline line only when not null
-    val payEnabled: Boolean
+    val payEnabled: Boolean,
+    val aiLevel: String? = null,          // demo view: what the AI decided for this amount
+    val aiScore: Double? = null,
+    val aiFacts: List<String> = emptyList(),
 )
 
 data class PauseUi(

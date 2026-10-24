@@ -10,8 +10,8 @@ import java.security.MessageDigest
 data class Profile(
     val id: String,
     val displayName: String,
-    val median90d: Double,      // usual (median) payment over 90 days, in rupees
-    val payments90d: Int,       // number of payments in 90 days
+    val median90d: Double,      // usual (median) payment in the synthetic 90-day history the demo starts with
+    val payments90d: Int,       // number of payments in that history
     val contactName: String,    // trusted contact for "Ask family"
     val shownToFamilyAs: String // how the trusted contact's phone names this person
 )
@@ -119,6 +119,24 @@ object DemoWorld {
         val name = words.joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }.ifBlank { local }
         val initials = words.take(2).joinToString("") { it.first().uppercase() }.ifBlank { local.take(2).uppercase() }
         return PayeeRecord("upi:$id", name, id, name.uppercase(), initials = initials, colorHex = "#6B74D6")
+    }
+
+    /**
+     * The synthetic 90-day payment history each person starts with (amounts only, all within 90 days).
+     * Built so its median is exactly the profile's usual payment. Every real payment made in the app is
+     * added to it (PaymentFlow.paymentsLast90d), so the usual payment the AI sees changes as the person pays.
+     */
+    fun history90d(profileId: String): List<Long> {
+        val p = profiles[profileId] ?: return emptyList()
+        val m = p.median90d
+        // Mr. Sharma's regular payments: rent to Suresh and money to Rohit, every month
+        val recurring = if (profileId == "sharma") listOf(18_000L, 18_000L, 18_000L, 3_000L, 3_000L, 3_000L) else emptyList()
+        val below = p.payments90d / 2 - 1
+        val above = p.payments90d - below - 2 - recurring.size
+        fun r10(x: Double) = Math.round(x / 10) * 10
+        val low = List(below) { i -> r10(m * (0.2 + 0.75 * i / maxOf(1, below - 1))) }    // 20% to 95% of usual
+        val high = List(above) { i -> r10(m * (1.1 + 2.9 * i / maxOf(1, above - 1))) }    // 110% to 400% of usual
+        return low + listOf(m.toLong(), m.toLong()) + high + recurring
     }
 
     /** Earlier payments shown on Home (synthetic). */

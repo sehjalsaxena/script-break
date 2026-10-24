@@ -76,6 +76,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import kotlin.math.roundToLong
 
 /** The real app: Sehjal's screens driven by PaymentFlow (AI model + safety layer + phone signals). */
 @Composable
@@ -239,6 +240,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                 }
 
                 Screen.Amount -> flow.payee?.let { p ->
+                    val ai = flow.aiView
                     AmountScreen(
                         state = AmountUi(
                             payeeName = p.name,
@@ -246,6 +248,9 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             note = flow.note,
                             nudge = flow.nudge,
                             payEnabled = flow.amount in 1..DemoWorld.UPI_LIMIT,
+                            aiLevel = ai?.level,
+                            aiScore = ai?.score,
+                            aiFacts = ai?.facts.orEmpty(),
                         ),
                         onDigit = flow::amountDigit,
                         onDelete = flow::amountDelete,
@@ -336,6 +341,8 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onVerify = flow::verifyContactOtp,
                     onCancelPending = flow::cancelPendingContact,
                     onBack = { flow.back() },
+                    usualPaymentText = "${rupees(flow.usualPayment.roundToLong())} (median of ${flow.paymentsLast90d().size} payments in 90 days)",
+                    onResetDemo = flow::resetDemo,
                 )
 
                 Screen.Judge -> JudgeScreen(

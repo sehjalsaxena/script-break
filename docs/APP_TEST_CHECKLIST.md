@@ -168,7 +168,16 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 | 7c.7 | Settings → **Cancel this change** | Pending change removed | |
 | 7c.8 | Log in as judge → **Results** tab | Live check runs: 28 stories (14/16, 2/10), 400 payments scored with ms per payment, error ranges; full test table AI vs rules vs bank rule; per-type bars; fairness; where it fails | |
 
+## 7d. No fixed amount limits: the AI learns the usual payment
+
+- [ ] Settings (trusted contact screen) → "Demo" card shows "Usual payment the AI sees: ₹650 (median of 42 payments in 90 days)".
+- [ ] On the Amount screen, tap "What the AI sees": it lists the call, payee, usual payment, pasted ID, left the app, night, and the score.
+      Every time the level differs between two tries, one of these facts differs. Check it there first.
+- [ ] Type ₹2,000 then ₹20,000 to Ramesh on a call: the amber line stays at both amounts (it no longer disappears at Pause level).
+- [ ] Pay Suresh ₹20,000 ten times → the usual payment rises (about ₹1,225 over 52 payments). Reset demo → back to ₹650.
+- [ ] Type a UPI ID with keyboard suggestions on: NOT counted as pasted. Paste a whole ID: counted as pasted.
+- [ ] Let the screen turn off on the Amount screen, turn it on again: "Left the app" is NOT listed.
+
 ## 8. Not built yet (don't report as bugs)
 
-- History and Balance (show a "not part of this demo" message).
 - Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).

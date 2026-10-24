@@ -24,6 +24,9 @@ enum class Screen {
 }
 
 /** A payment made during this demo session (the app's own payment record). */
+/** What the AI saw and decided for the payment being typed (demo view). */
+data class AiView(val level: String, val score: Double?, val facts: List<String>)
+
 data class SessionPayment(
     val payeeId: String,
     val payeeName: String,
@@ -127,10 +130,7 @@ class PaymentFlow(
     private var runModel: ScamModel? = null
 
     // ---- trusted contact (per person) ----
-    private val contacts = mutableStateMapOf(
-        "sharma" to TrustedContact("Rohit", "son", "9876543210"),
-        "priya" to TrustedContact("Rohit", "brother", "9876543210"),
-    )
+    private val contacts = mutableStateMapOf(*DEFAULT_CONTACTS.toList().toTypedArray())
     private val pendingContacts = mutableStateMapOf<String, PendingContact>()
     /** Demo OTP: no SMS is sent, the code is shown on screen. Never a real OTP. */
     var otpFor by mutableStateOf<TrustedContact?>(null); private set
@@ -275,7 +275,9 @@ class PaymentFlow(
 
     /** Typing in the UPI ID field. A jump of 5+ characters at once is a paste from the keyboard. */
     fun upiChanged(text: String) {
-        if (text.length - upiInput.length >= 5) pasted = true
+        // 5+ characters at once that bring in the "@handle" = a whole UPI ID pasted. A keyboard suggestion
+        // completing a word ("ramesh") or the handle after "@" was typed is still typing.
+        if (text.length - upiInput.length >= 5 && '@' in text && '@' !in upiInput) pasted = true
         if (text.isEmpty()) pasted = false
         upiInput = text
     }
@@ -356,7 +358,8 @@ class PaymentFlow(
     val nudge: String?
         get() {
             val r = assessSafely(null, null, refreshSignals = false) ?: return null
-            return if (r.level == "NUDGE") nudgeText(r) else null
+            // shown for Nudge AND above: it must not vanish when a bigger amount makes it a Pause
+            return if (r.level != "NONE") nudgeText(r) else null
         }
 
     fun pay() {
@@ -520,6 +523,13 @@ class PaymentFlow(
         }
     }
 
+    /** Every payment in the last 90 days: the synthetic starting history plus each real payment made in this app. */
+    fun paymentsLast90d(now: Long = clock()): List<Long> =
+        DemoWorld.history90d(profile.id) + ledger.filter { now - it.atMs < NINETY_DAYS }.map { it.amount }
+
+    /** The usual payment the AI compares against: the median of the last 90 days, so it moves as the person pays. */
+    val usualPayment: Double get() = median(paymentsLast90d())
+
     /** The 16 facts the model sees for the current payment, or null if there is no payment yet. */
     fun currentPayment(refreshSignals: Boolean = true): Payment? {
         val p = payee ?: return null
@@ -528,10 +538,11 @@ class PaymentFlow(
         judgeInputs?.let { return it.copy(amount = amount.toDouble()) }   // Judge "Run in app": exact inputs
         val status = statusOf(p)
         val isNew = status == "new" || status == "recent"
+        val history = paymentsLast90d(now)
         return Payment(
             amount = amount.toDouble(),
-            median90d = profile.median90d,
-            payments90d = profile.payments90d,
+            median90d = median(history),
+            payments90d = history.size,
             callNow = signals.callNow || simulateCall,
             callSeen30m = signals.callSeenWithin30m(now),
             screenShare = signals.screenShare,
@@ -546,6 +557,48 @@ class PaymentFlow(
             appSwitch = leftApp,
             night = signals.isNight(now),
         )
+    }
+
+    /** Demo view on the Amount screen: exactly what the AI was given for this payment, and what it decided. */
+    val aiView: AiView?
+        get() {
+            val p = currentPayment(refreshSignals = false) ?: return null
+            if (p.amount <= 0) return null
+            val r = assessSafely(null, null, refreshSignals = false)
+            val facts = buildList {
+                add(when {
+                    !p.callNow -> "Not on a call"
+                    judgeInputs == null && simulateCall && !signals.callNow -> "On a call (simulated in Judge mode)"
+                    else -> "On a call now"
+                })
+                if (p.callSeen30m) add("A call ended in the last 30 minutes")
+                if (p.screenShare) add("Screen is being shared or recorded")
+                add(when (p.payeeStatus) {
+                    "new" -> "New payee: never paid"
+                    "recent" -> "Payee first paid in the last 7 days"
+                    "warned" -> "Payee paid after an earlier warning"
+                    "flagged" -> "Payee is in a fraud report"
+                    else -> "Payee paid before"
+                })
+                add(if (p.payments90d >= 10 && p.median90d > 0)
+                    "Usual payment ${rupees(p.median90d.roundToLong())} (median of ${p.payments90d} payments in 90 days)"
+                    else "Little payment history")
+                if (p.payeePasted) add("UPI ID was pasted")
+                if (p.appSwitch) add("Left the app during this payment")
+                if (p.night) add("Night time (11 pm to 6 am)")
+                if (p.newPayees60m > 0) add("${p.newPayees60m} other new payee(s) in the last hour")
+                if (p.sentNew24h > 0) add("${rupees(p.sentNew24h.roundToLong())} sent to new payees in 24 hours")
+                if (p.samePayee24h > 0) add("Paid this payee ${p.samePayee24h} time(s) today")
+            }
+            return AiView(r?.level ?: "UNAVAILABLE", r?.score, facts)
+        }
+
+    /** Clears everything this session did (payments, contact changes, alerts), back to the starting demo. */
+    fun resetDemo() {
+        ledgers.clear(); contacts.clear(); contacts.putAll(DEFAULT_CONTACTS); pendingContacts.clear()
+        otpFor = null; demoOtp = null; lastAlert = null; simulateCall = false
+        resetPayment()
+        message = "Demo reset: payment history is back to the start"
     }
 
     /** The model + safety layer, wrapped so that any failure lets the payment through (null). */
@@ -594,6 +647,19 @@ class PaymentFlow(
         private const val HOUR = 60 * 60 * 1000L
         private const val DAY = 24 * HOUR
         private const val SEVEN_DAYS = 7 * DAY
+        private const val NINETY_DAYS = 90 * DAY
+
+        private val DEFAULT_CONTACTS = mapOf(
+            "sharma" to TrustedContact("Rohit", "son", "9876543210"),
+            "priya" to TrustedContact("Rohit", "brother", "9876543210"),
+        )
+
+        /** Median, the same way Python's statistics.median does it (mean of the middle two for an even count). */
+        fun median(xs: List<Long>): Double {
+            if (xs.isEmpty()) return 0.0
+            val s = xs.sorted(); val n = s.size
+            return if (n % 2 == 1) s[n / 2].toDouble() else (s[n / 2 - 1] + s[n / 2]) / 2.0
+        }
         private const val NEVER_PAID = "You have never paid this payee before"
 
         /** ₹1,50,000 (Indian digit grouping). */

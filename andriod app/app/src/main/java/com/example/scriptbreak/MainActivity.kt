@@ -2,6 +2,7 @@ package com.example.scriptbreak
 
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -93,7 +94,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
-        flow.onAppStopped()   // leaving the app mid-payment is one of the model's signals
+        // leaving the app mid-payment is one of the model's signals; the screen turning off is not leaving
+        val screenOn = getSystemService(PowerManager::class.java)?.isInteractive ?: true
+        if (screenOn) flow.onAppStopped()
         signals.appVisible = false
         if (Build.VERSION.SDK_INT >= 35) windowManager.removeScreenRecordingCallback(screenRecording)
         super.onStop()
