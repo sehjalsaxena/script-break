@@ -14,9 +14,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -174,19 +174,21 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
             targetState = flow.screen,
             label = "water_drop_screens",
             transitionSpec = {
+                val waveDecelerate = CubicBezierEasing(0.08f, 0.82f, 0.12f, 1.0f)
                 (scaleIn(
-                    initialScale = 0.84f,
-                    transformOrigin = TransformOrigin(0.5f, 0.4f),
-                    animationSpec = spring(
-                        dampingRatio = 0.72f,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
-                ) + fadeIn(animationSpec = tween(240, easing = FastOutSlowInEasing)))
-                .togetherWith(
+                    initialScale = 0.68f,
+                    transformOrigin = TransformOrigin(0.5f, 0.42f),
+                    animationSpec = tween(durationMillis = 520, easing = waveDecelerate)
+                ) + fadeIn(
+                    animationSpec = tween(durationMillis = 380, easing = LinearOutSlowInEasing)
+                )).togetherWith(
                     scaleOut(
-                        targetScale = 1.08f,
-                        animationSpec = tween(180, easing = FastOutSlowInEasing)
-                    ) + fadeOut(animationSpec = tween(140))
+                        targetScale = 0.94f,
+                        transformOrigin = TransformOrigin(0.5f, 0.42f),
+                        animationSpec = tween(durationMillis = 340, easing = FastOutSlowInEasing)
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing)
+                    )
                 )
             }
         ) { screen ->
