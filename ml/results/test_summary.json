@@ -1,0 +1,315 @@
+{
+ "when_utc": "2026-10-24 11:03",
+ "environment": {
+  "python": "3.13.14",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "scikit-learn": "1.9.1",
+  "joblib": "1.6.0"
+ },
+ "seconds": 276,
+ "step_seconds": {
+  "make_dataset": 5.0,
+  "train": 38.9,
+  "export_model": 1.5,
+  "evaluate": 172.4,
+  "discovery_unseen": 34.8,
+  "discovery": 2.7
+ },
+ "dataset_sha256": {
+  "train.jsonl": "7615cedab94db55269777d6dd63c61426247f2a2f66a47c6b24488f72d193041",
+  "val.jsonl": "7df16c984d0f2d33aae75f4725f5667a25de315cf71e6376dc941d9f223ab506",
+  "test.jsonl": "76534b568f8c2f1285ace4bb940b8642c712591b6ee3ab93d1b069526599a93d"
+ },
+ "committed_model_version": "20261024-0701",
+ "checks": [
+  {
+   "name": "Datasets match the published checksums",
+   "passed": true,
+   "detail": "all 3 identical"
+  },
+  {
+   "name": "Rebuilt model gives the same scores as the committed model",
+   "passed": true,
+   "detail": "3 of 200 trees written differently (library versions break exact ties differently); max score difference on all 33,600 test payments = 0.00e+00; max threshold difference = 1.11e-16"
+  },
+  {
+   "name": "Every number in the rebuilt report equals the committed report",
+   "passed": true,
+   "detail": "all identical"
+  },
+  {
+   "name": "Analyst discovery (discovery.json) reproduces",
+   "passed": true,
+   "detail": "identical"
+  },
+  {
+   "name": "Analyst discovery (discovery_unseen_sent_by_mistake.json) reproduces",
+   "passed": true,
+   "detail": "identical"
+  },
+  {
+   "name": "Answers never lower the level",
+   "passed": true,
+   "detail": "33,600 test payments x 8 answer combinations: 0 lowered"
+  },
+  {
+   "name": "'No' or no answer changes nothing",
+   "passed": true,
+   "detail": "0 payments changed level after 'No'"
+  },
+  {
+   "name": "G4: 'Yes' at Pause or above gives Critical",
+   "passed": true,
+   "detail": "3,111 paused payments answered Yes: 0 not Critical"
+  },
+  {
+   "name": "Guardrails never lower the model's level",
+   "passed": true,
+   "detail": "0 lowered"
+  },
+  {
+   "name": "G1: bank-flagged payee is always Critical",
+   "passed": true,
+   "detail": "2,000 payments made flagged: 0 not Critical"
+  },
+  {
+   "name": "G2: warned payee + live call is Critical",
+   "passed": true,
+   "detail": "0 of 2,000 not Critical"
+  },
+  {
+   "name": "G2: warned payee without a call is at least Nudge",
+   "passed": true,
+   "detail": "0 of 2,000 below Nudge"
+  },
+  {
+   "name": "G3: an approved analyst rule gives at least Pause",
+   "passed": true,
+   "detail": "rule(s) ['L1'] matched 450 test payments: 0 below Pause"
+  },
+  {
+   "name": "No Nudge below Rs 1,000 (except warned payee, G2)",
+   "passed": true,
+   "detail": "0 found"
+  },
+  {
+   "name": "Q1/Q2 answers are never model inputs",
+   "passed": true,
+   "detail": "0 of 2,000 changed the model input"
+  },
+  {
+   "name": "Reasons only name signals that are present (and at most 3)",
+   "passed": true,
+   "detail": "25,041 reasons checked: 0 wrong, 0 payments with >3"
+  },
+  {
+   "name": "Scoring is deterministic",
+   "passed": true,
+   "detail": "0 of 2,000 differed on a second run"
+  },
+  {
+   "name": "28 stories: answers never lower the level",
+   "passed": true,
+   "detail": "0 stories lowered"
+  },
+  {
+   "name": "Edge cases score without crashing (score 0-1, valid level)",
+   "passed": true,
+   "detail": "10 cases, 0 failed"
+  },
+  {
+   "name": "Android: Kotlin = Python on 500 payments",
+   "passed": true,
+   "detail": "ScamModelParityTest: matchesPython, answersOnlyRaise | tests 2, failures 0, errors 0"
+  }
+ ],
+ "passed": 20,
+ "failed": 0,
+ "error_bars_95": {
+  "scams_flagged_in_scope6": {
+   "k": 2152,
+   "n": 2700,
+   "rate": 0.797037037037037,
+   "low": 0.7814486507926123,
+   "high": 0.8117813668238042
+  },
+  "scams_flagged_all8": {
+   "k": 2892,
+   "n": 3600,
+   "rate": 0.8033333333333333,
+   "low": 0.7900285960697057,
+   "high": 0.8159913799469983
+  },
+  "genuine_interrupted": {
+   "k": 219,
+   "n": 30000,
+   "rate": 0.0073,
+   "low": 0.006397772386753106,
+   "high": 0.008328395211732013
+  },
+  "genuine_nudged": {
+   "k": 606,
+   "n": 30000,
+   "rate": 0.0202,
+   "low": 0.018668360920098243,
+   "high": 0.02185450332539224
+  },
+  "by_workflow": {
+   "chat_task": {
+    "k": 290,
+    "n": 450,
+    "rate": 0.6444444444444445,
+    "low": 0.5991644941562878,
+    "high": 0.687279057955286
+   },
+   "courier": {
+    "k": 370,
+    "n": 450,
+    "rate": 0.8222222222222222,
+    "low": 0.7842138891484715,
+    "high": 0.85477557325427
+   },
+   "customer_care": {
+    "k": 335,
+    "n": 450,
+    "rate": 0.7444444444444445,
+    "low": 0.7021925990915724,
+    "high": 0.7825580275587832
+   },
+   "digital_arrest": {
+    "k": 399,
+    "n": 450,
+    "rate": 0.8866666666666667,
+    "low": 0.8540455352293219,
+    "high": 0.9127418196539678
+   },
+   "genuine": {
+    "k": 219,
+    "n": 30000,
+    "rate": 0.0073,
+    "low": 0.006397772386753106,
+    "high": 0.008328395211732013
+   },
+   "hang_up_and_pay": {
+    "k": 356,
+    "n": 450,
+    "rate": 0.7911111111111111,
+    "low": 0.7511651250002813,
+    "high": 0.8261288031015057
+   },
+   "kyc_official": {
+    "k": 328,
+    "n": 450,
+    "rate": 0.7288888888888889,
+    "low": 0.6860069831807644,
+    "high": 0.767895876319114
+   },
+   "sent_by_mistake": {
+    "k": 450,
+    "n": 450,
+    "rate": 1.0,
+    "low": 0.9915353726939092,
+    "high": 1.0
+   },
+   "voice_clone": {
+    "k": 364,
+    "n": 450,
+    "rate": 0.8088888888888889,
+    "low": 0.7700063237757084,
+    "high": 0.8425421953551955
+   }
+  }
+ },
+ "edge_cases": [
+  {
+   "case": "Rs 0",
+   "score": 0.0008,
+   "level": "NONE",
+   "reasons": [],
+   "ok": true
+  },
+  {
+   "case": "Rs 1",
+   "score": 0.0008,
+   "level": "NONE",
+   "reasons": [],
+   "ok": true
+  },
+  {
+   "case": "Rs 100 crore, tiny median",
+   "score": 0.042,
+   "level": "NONE",
+   "reasons": [
+    "The amount is 500 times your usual payment"
+   ],
+   "ok": true
+  },
+  {
+   "case": "No payment history",
+   "score": 0.0166,
+   "level": "NONE",
+   "reasons": [
+    "This is a large payment and you have little payment history"
+   ],
+   "ok": true
+  },
+  {
+   "case": "Only the amount given",
+   "score": 0.0207,
+   "level": "NONE",
+   "reasons": [
+    "This is a large payment and you have little payment history"
+   ],
+   "ok": true
+  },
+  {
+   "case": "Fields set to None",
+   "score": 0.0022,
+   "level": "NONE",
+   "reasons": [],
+   "ok": true
+  },
+  {
+   "case": "Unknown payee status/kind",
+   "score": 0.0064,
+   "level": "NONE",
+   "reasons": [],
+   "ok": true
+  },
+  {
+   "case": "Huge counts",
+   "score": 0.0052,
+   "level": "NONE",
+   "reasons": [
+    "You paid several new accounts in the last hour",
+    "You have never paid this payee before",
+    "This is a repeat payment to a payee you only started paying today"
+   ],
+   "ok": true
+  },
+  {
+   "case": "Credit exactly equal to amount",
+   "score": 0.9802,
+   "level": "CRITICAL",
+   "reasons": [
+    "This sends back the same amount you received from a stranger",
+    "You have never paid this payee before"
+   ],
+   "ok": true
+  },
+  {
+   "case": "Huge money already sent today",
+   "score": 0.0248,
+   "level": "NONE",
+   "reasons": [
+    "You have never paid this payee before",
+    "Together with today's payments to new payees, this is unusually large"
+   ],
+   "ok": true
+  }
+ ],
+ "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
+ "python_scorer_ms_per_payment": 0.14
+}

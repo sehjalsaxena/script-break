@@ -175,7 +175,11 @@ deliberate cuts explained (15).
 Stage 2 (top 10→3): problem & user (20), deployability & scale: who runs it, cost, pilot (15),
 communication & Q&A incl. "we don't know" (10), live user journey jury can vary (25), adversarial
 robustness (20), responsible AI & handling mistakes: show a genuine user getting past a false alarm (10).
-**Open question: ask organisers the spot-check kit format** (file? fields?), then build the loader.
+**Spot-check kit (organisers' answer, 24 Oct):** the test workflow is part of our submission. We choose
+the dataset (any open public dataset, or our own synthetic data, in which case we must submit the
+generation code too) and submit results with reproducibility instructions. "Completeness of tests is
+just as important as accuracy." We use synthetic data: generator + dataset code + pinned versions +
+step-by-step reproduce instructions + complete test coverage (see TESTING.md once written).
 
 ## 9. Explaining changes from the Round 1 PDF
 - PDF: "rules decide at the PIN; AI proposes rules upstream" → now a trained model scores, rules are guardrails,
