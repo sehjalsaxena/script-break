@@ -781,7 +781,7 @@ private fun ResultCard(
                     border = BorderStroke(0.5.dp, LineBorder)
                 ) {
                     Text(
-                        text = "On-Device AI",
+                        text = "Sentinel AI · Offline",
                         fontSize = 11.sp,
                         color = MutedText,
                         fontWeight = FontWeight.Medium,
@@ -970,7 +970,7 @@ private fun ResultCard(
             }
 
             Text(
-                text = "Model v$modelVersion · Evaluated on this phone offline",
+                text = "AI Engine: $modelVersion · Evaluated on this phone offline",
                 fontSize = 11.sp,
                 color = FaintText,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp)

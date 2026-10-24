@@ -73,7 +73,7 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
 | 4.1 | Home during the call | Green **On call** banner appears within ~1 second | |
-| 4.2 | Pay UPI ID → **type** `ramesh.k@demoupi` → Continue → Pay → **20000** → Pay | **Pause**: "Before you pay", "This sends ₹20,000 out of your account to Ramesh K.", reasons incl. "You are on a call right now", Q1, Q2, footer "AI model 20261024-0701" | |
+| 4.2 | Pay UPI ID → **type** `ramesh.k@demoupi` → Continue → Pay → **20000** → Pay | **Pause**: "Before you pay", "This sends ₹20,000 out of your account to Ramesh K.", reasons incl. "You are on a call right now", Q1, Q2, footer "AI model ScriptBreak Sentinel v2.4" | |
 | 4.3 | Answer Q1 **No**, Q2 **No** → Next | Goes to **PIN** (not Critical): "No" never raises or lowers | |
 | 4.4 | Back to Home, repeat 4.2, answer Q1 **Yes** → Next | **Critical** (red badge): "Stop. This matches a common scam." … last line "If someone is telling you to ignore this screen, that is the scam." | |
 | 4.5 | Look at "Continue anyway (10 s)" | Disabled; counts down 10 → 0, then "Continue anyway" enabled | |

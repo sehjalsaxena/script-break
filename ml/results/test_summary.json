@@ -22,7 +22,7 @@
   "val.jsonl": "7df16c984d0f2d33aae75f4725f5667a25de315cf71e6376dc941d9f223ab506",
   "test.jsonl": "76534b568f8c2f1285ace4bb940b8642c712591b6ee3ab93d1b069526599a93d"
  },
- "committed_model_version": "20261024-0701",
+ "committed_model_version": "ScriptBreak Sentinel v2.4",
  "checks": [
   {
    "name": "Datasets match the published checksums",

@@ -1,6 +1,6 @@
 {
  "model_type": "gradient_boosting",
- "model_version": "20261024-0701",
+ "model_version": "ScriptBreak Sentinel v2.4",
  "thresholds": {
   "nudge": 0.07086418758277967,
   "pause": 0.48645956275991725,
