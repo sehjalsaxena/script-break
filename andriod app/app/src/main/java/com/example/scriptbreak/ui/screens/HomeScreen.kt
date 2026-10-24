@@ -58,9 +58,12 @@ import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 @Composable
 fun HomeScreen(
     state: HomeUi,
+    onSendContact: () -> Unit = {},
     onPayUpiId: () -> Unit,
     onPerson: (id: String) -> Unit,
+    onViewAllPeople: () -> Unit = {},
     onHistory: () -> Unit,
+    onBankSelf: () -> Unit = {},
     onBalance: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -187,7 +190,7 @@ fun HomeScreen(
                     QuickActionTile(
                         icon = AppIcons.Person,
                         label = stringResource(R.string.action_send),
-                        onClick = onPayUpiId
+                        onClick = onSendContact
                     )
                     QuickActionTile(
                         icon = AppIcons.AlternateEmail,
@@ -197,7 +200,7 @@ fun HomeScreen(
                     QuickActionTile(
                         icon = AppIcons.AccountBalance,
                         label = stringResource(R.string.action_bank),
-                        onClick = onBalance
+                        onClick = onBankSelf
                     )
                     QuickActionTile(
                         icon = AppIcons.Wallet,
@@ -232,7 +235,7 @@ fun HomeScreen(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = AppPurple,
-                                modifier = Modifier.clickable { onPayUpiId() }
+                                modifier = Modifier.clickable { onViewAllPeople() }
                             )
                         }
 
@@ -470,9 +473,12 @@ fun HomeScreenPreview() {
                     TxnUi("3", "Aarav Sharma", "16 Oct 2:00 PM", "₹800")
                 )
             ),
+            onSendContact = {},
             onPayUpiId = {},
             onPerson = {},
+            onViewAllPeople = {},
             onHistory = {},
+            onBankSelf = {},
             onBalance = {}
         )
     }

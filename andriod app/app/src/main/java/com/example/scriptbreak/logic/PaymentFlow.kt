@@ -16,7 +16,10 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
-enum class Screen { Login, UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst }
+enum class Screen {
+    Login, UserPicker, Home, PayToUpi, Contacts, AllPeople, History, BankSelf, CheckBalance,
+    Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst
+}
 
 /** A payment made during this demo session (the app's own payment record). */
 data class SessionPayment(
@@ -136,7 +139,7 @@ class PaymentFlow(
         when (screen) {
             Screen.Login -> return false
             Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyAlert, Screen.FamilyWaiting -> logout()
-            Screen.PayToUpi, Screen.Payee, Screen.Waiting -> finish()
+            Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.History, Screen.BankSelf, Screen.CheckBalance, Screen.Payee, Screen.Waiting -> finish()
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
             Screen.Pause, Screen.Critical, Screen.Pin -> backToAmount()
             Screen.Success -> done()
@@ -145,7 +148,7 @@ class PaymentFlow(
     }
 
     fun onAppStopped() {
-        if (screen in setOf(Screen.PayToUpi, Screen.Payee, Screen.Amount, Screen.Pause, Screen.Critical, Screen.Pin)) leftApp = true
+        if (screen in setOf(Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.Payee, Screen.Amount, Screen.Pause, Screen.Critical, Screen.Pin)) leftApp = true
     }
 
     // ---- Judge mode: run the judge's inputs through the real screens ----------------------------
@@ -166,8 +169,13 @@ class PaymentFlow(
         screen = Screen.Amount
     }
 
-    // ---- choosing the payee ------------------------------------------------------------------
+    // ---- choosing the payee and navigation ---------------------------------------------------
     fun startPayToUpi() { resetPayment(); screen = Screen.PayToUpi }
+    fun startContacts() { resetPayment(); screen = Screen.Contacts }
+    fun startAllPeople() { resetPayment(); screen = Screen.AllPeople }
+    fun startHistory() { screen = Screen.History }
+    fun startBankSelf() { screen = Screen.BankSelf }
+    fun startCheckBalance() { screen = Screen.CheckBalance }
 
     /** Typing in the UPI ID field. A jump of 5+ characters at once is a paste from the keyboard. */
     fun upiChanged(text: String) {
@@ -187,14 +195,31 @@ class PaymentFlow(
     }
 
     fun continueWithUpi() {
-        val p = DemoWorld.lookup(upiInput)
-        if (p == null) { message = "Enter a valid UPI ID, like name@demoupi"; return }
+        val trimmed = upiInput.trim().lowercase()
+        if (!trimmed.endsWith("@demoupi")) {
+            message = "Only @demoupi UPI IDs are supported (e.g. name@demoupi)"
+            return
+        }
+        val p = DemoWorld.lookup(trimmed)
+        if (p == null) {
+            message = "Enter a valid UPI ID, like name@demoupi"
+            return
+        }
         payee = p
         screen = Screen.Payee
     }
 
     fun openPerson(id: String) {
         val p = DemoWorld.byId(id) ?: return
+        resetPayment()
+        payee = p
+        screen = Screen.Payee
+    }
+
+    fun openContact(c: ContactItem) {
+        val p = (if (c.payeeId != null) DemoWorld.byId(c.payeeId) else null)
+            ?: DemoWorld.lookup(c.upiId)
+            ?: PayeeRecord(c.id, c.name, c.upiId, c.name.uppercase(), initials = c.initials, colorHex = c.colorHex)
         resetPayment()
         payee = p
         screen = Screen.Payee

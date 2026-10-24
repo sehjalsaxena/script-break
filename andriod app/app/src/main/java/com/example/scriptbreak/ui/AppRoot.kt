@@ -41,11 +41,16 @@ import com.example.scriptbreak.ui.model.PauseUi
 import com.example.scriptbreak.ui.model.PayeeUi
 import com.example.scriptbreak.ui.model.PersonUi
 import com.example.scriptbreak.ui.model.TxnUi
+import com.example.scriptbreak.ui.screens.AllPeopleScreen
 import com.example.scriptbreak.ui.screens.AmountScreen
 import com.example.scriptbreak.ui.screens.AnalystScreen
+import com.example.scriptbreak.ui.screens.BankSelfScreen
+import com.example.scriptbreak.ui.screens.CheckBalanceScreen
+import com.example.scriptbreak.ui.screens.ContactsScreen
 import com.example.scriptbreak.ui.screens.CriticalScreen
 import com.example.scriptbreak.ui.screens.FamilyAlertScreen
 import com.example.scriptbreak.ui.screens.FamilyWaitingScreen
+import com.example.scriptbreak.ui.screens.HistoryScreen
 import com.example.scriptbreak.ui.screens.HomeScreen
 import com.example.scriptbreak.ui.screens.JudgeScreen
 import com.example.scriptbreak.ui.screens.LoginScreen
@@ -134,10 +139,41 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                             TxnUi("p${it.atMs}", it.payeeName, "Today", rupees(it.amount))
                         } + DemoWorld.seededRecent(flow.profile.id),
                     ),
+                    onSendContact = flow::startContacts,
                     onPayUpiId = flow::startPayToUpi,
                     onPerson = flow::openPerson,
-                    onHistory = { toast(context, "Full history is not part of this demo") },
-                    onBalance = { toast(context, "Demo app: no real bank balance") },
+                    onViewAllPeople = flow::startAllPeople,
+                    onHistory = flow::startHistory,
+                    onBankSelf = flow::startBankSelf,
+                    onBalance = flow::startCheckBalance,
+                )
+
+                Screen.Contacts -> ContactsScreen(
+                    contacts = DemoWorld.contacts,
+                    onSelectContact = flow::openContact,
+                    onBack = { flow.back() }
+                )
+
+                Screen.AllPeople -> AllPeopleScreen(
+                    people = DemoWorld.homePeople + DemoWorld.payees.filter { it.status != "known" },
+                    onPerson = flow::openPerson,
+                    onBack = { flow.back() }
+                )
+
+                Screen.History -> HistoryScreen(
+                    transactions = flow.ledger.reversed().map {
+                        TxnUi("p${it.atMs}", it.payeeName, "Today", rupees(it.amount))
+                    } + DemoWorld.seededRecent(flow.profile.id),
+                    onBack = { flow.back() }
+                )
+
+                Screen.BankSelf -> BankSelfScreen(
+                    onBack = { flow.back() }
+                )
+
+                Screen.CheckBalance -> CheckBalanceScreen(
+                    userProfileName = flow.profile.displayName,
+                    onBack = { flow.back() }
                 )
 
                 Screen.PayToUpi -> {

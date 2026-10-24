@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,19 +104,12 @@ fun PayToUpiScreen(
                         )
                     },
                     trailingIcon = {
-                        TextButton(onClick = onPaste) {
+                        IconButton(onClick = onPaste) {
                             Icon(
                                 imageVector = AppIcons.ContentPaste,
-                                contentDescription = null,
+                                contentDescription = "Paste",
                                 tint = AppPurple,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.paste),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AppPurple
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     },
