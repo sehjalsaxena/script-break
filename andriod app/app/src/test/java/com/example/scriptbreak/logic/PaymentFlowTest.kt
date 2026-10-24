@@ -95,13 +95,28 @@ class PaymentFlowTest {
     }
 
     @Test
-    fun newLandlordGetsTheInlineNudgeLine() {
+    fun newPersonGetsTheInlineNudgeLine() {
+        val f = newFlow(FakeSignals())
+        f.startPayToUpi(); "anil.mehta@demoupi".forEach { f.upiChanged(f.upiInput + it) }; f.continueWithUpi()
+        f.toAmount(); f.typeAmount(15_000)
+        assertEquals("First payment to Anil Mehta. ₹15,000 is 23× your usual payment. Check you know who this is.", f.nudge)
+        f.pay()
+        assertEquals("a Nudge needs no extra tap", Screen.Pin, f.screen)
+    }
+
+    @Test
+    fun aVeryLargeFirstPaymentToANewPersonGetsAPause() {
+        // Decision of 25 Oct (guardrail G5): ₹40,000 to someone never paid, 62× the usual amount, is at least a Pause
+        // even with no call. Before G5 this was only the amber line. The cost: a genuine new-landlord deposit is paused too.
         val f = newFlow(FakeSignals())
         f.startPayToUpi(); "anil.mehta@demoupi".forEach { f.upiChanged(f.upiInput + it) }; f.continueWithUpi()
         f.toAmount(); f.typeAmount(40_000)
         assertEquals("First payment to Anil Mehta. ₹40,000 is 62× your usual payment. Check you know who this is.", f.nudge)
         f.pay()
-        assertEquals("a Nudge needs no extra tap", Screen.Pin, f.screen)
+        assertEquals(Screen.Pause, f.screen)
+        assertTrue(f.pauseResult!!.guardrails.contains("G5"))
+        f.pauseNext()                                               // answers "No" (or none): the person can continue
+        assertEquals(Screen.Pin, f.screen)
     }
 
     @Test

@@ -84,7 +84,7 @@ val scams flagged 86.3% vs LR 83.5%, RF 83.3%. Thresholds: nudge 0.071, pause 0.
 | | AI model | Round 1 rules v0.3 | Bank rule (new person ≥ ₹10,000) |
 |---|---|---|---|
 | Scams flagged, 6 in-scope types | **80%** | 60% | 24% |
-| Genuine interrupted per 1,000 | **7.3** | 7.7 | 3.6 |
+| Genuine interrupted per 1,000 | **7.4** | 7.7 | 3.6 |
 Per type: digital arrest 89%, courier 82%, voice clone 81%, hang-up-then-pay 79%, customer care 74%,
 KYC 73%, chat task 64%, sent-by-mistake 100%. ROC AUC 0.994. Nudge on 20/1,000 genuine.
 Hidden-type test (retrain without that type): call-based types still 67–83%, hang-up 70%,
@@ -103,7 +103,7 @@ e.g. "The amount is 74 times your usual payment · You have never paid this paye
 **Safety layer (`policy.py` = Kotlin `assess`):** score → level; C1 coaching check (25 Oct): Pause/Critical
 only with at least one coaching sign (call, recent call, screen share, paste, app switch, new-payee activity,
 money from a stranger), else at most Nudge, e.g. a TV bought in a shop (0 scams lost on test); G1 flagged payee → Critical;
-G2 warned payee → ≥ Nudge (Critical with live call/screen-share); G3 analyst-approved rule → ≥ Pause;
+G2 warned payee → ≥ Nudge (Critical with live call/screen-share); G3 analyst-approved rule → ≥ Pause; G5 (25 Oct) first payment to a new person ≥ 30× usual and ≥ ₹20,000 → ≥ Pause;
 G4 "Yes" to Q1/Q2 at Pause+ → Critical. Answers only RAISE the level. App: "Continue anyway" always
 available; if scoring throws, the payment goes through (fail-open).
 

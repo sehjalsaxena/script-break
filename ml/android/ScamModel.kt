@@ -45,6 +45,13 @@ data class Payment(
     fun hasCoachingSign(): Boolean = callNow || callSeen30m || screenShare || payeePasted || appSwitch ||
         newPayees60m > 0 || sentNew24h > 0 || creditUnknown48h > 0 || samePayee24h > 0
 
+    /** G5: a first payment to a new person, at least 30x the usual amount and at least Rs 20,000 (same as policy.py). */
+    fun isBigFirstPaymentToPerson(): Boolean {
+        val hasHistory = payments90d >= 10 && median90d > 0
+        return (payeeStatus == "new" || payeeStatus == "recent") && payeeKind == "person" && hasHistory &&
+            amount >= 30 * median90d && amount >= 20000
+    }
+
     /** Event tokens, used to match rules approved in the analyst console. */
     fun tokens(): Set<String> = buildSet {
         if (callNow) add("call_now")
@@ -256,7 +263,7 @@ class ScamModel private constructor(private val m: JSONObject) {
     }
 
     /**
-     * Score -> level, then the safety layer (policy.py): C1 coaching check, then G1-G4.
+     * Score -> level, then the safety layer (policy.py): C1 coaching check, then G1, G2, G3, G5, G4.
      * Answers can only RAISE the level.
      * If anything throws, the caller must let the payment go through (fail-open).
      */
@@ -273,7 +280,8 @@ class ScamModel private constructor(private val m: JSONObject) {
         val reasons = ArrayList(reasons(x, contrib))
         // C1 coaching check: a full-screen Pause/Critical needs at least one sign that someone may be steering
         // the payment. A big amount alone (e.g. a TV in a shop) gets the amber Nudge line. Same as policy.py.
-        if (rank(level) > rank("NUDGE") && !p.hasCoachingSign()) {
+        val big = p.isBigFirstPaymentToPerson()
+        if (rank(level) > rank("NUDGE") && !p.hasCoachingSign() && !big) {
             level = if (p.amount >= nudgeMinAmount) "NUDGE" else "NONE"; fired.add("C1")
         }
         val live = p.callNow || p.callSeen30m || p.screenShare
@@ -286,6 +294,8 @@ class ScamModel private constructor(private val m: JSONObject) {
                 if (r.explain.isNotEmpty()) reasons.add(r.explain)
             }
         }
+        // G5: a first payment to a new person of at least 30x the usual amount and Rs 20,000 -> at least Pause
+        if (big && rank(level) < rank("PAUSE")) { level = "PAUSE"; fired.add("G5") }
         if (rank(level) >= rank("PAUSE") && (q1 == true || q2 == true)) {
             level = "CRITICAL"; fired.add("G4")
             if (q1 == true) reasons.add("You said you were told this is needed to verify, protect or release money")

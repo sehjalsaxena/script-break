@@ -80,6 +80,31 @@ class MoneyBetweenPeopleTest {
     }
 
     @Test
+    fun deepakScansSambhavsOwnQrAndPaysHim() {
+        val text = UpiQr.payText("sambhav.jain@demoupi", "Sambhav Jain")
+        assertEquals("upi://pay?pa=sambhav.jain@demoupi&pn=Sambhav%20Jain&cu=INR", text)
+        val size = 400
+        val cells = UpiQr.matrix(text, size)
+        val pixels = IntArray(size * size) { i -> if (cells[i / size][i % size]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt() }
+        val scanned = QrDecoder.decode(pixels, size, size)
+        assertEquals("the QR made on the phone scans back exactly", text, scanned)
+
+        val sent = mutableListOf<DemoTransfer>()
+        val deepak = phone("deepak", "2222", sent)
+        assertTrue(deepak.openFromQr(scanned))
+        assertEquals("Sambhav Jain", deepak.payee!!.name)
+        assertFalse("the QR's name matches the banking name", deepak.qrNameMismatch)
+        deepak.toAmount(); "250".forEach { deepak.amountDigit(it.digitToInt()) }; deepak.pay()
+        "7316".forEach { deepak.pinDigit(it.digitToInt()) }; deepak.pinSubmit()
+        assertEquals(Screen.Success, deepak.screen)
+        assertEquals("sharma", sent.single().toProfile)
+
+        val sambhav = phone("sambhav", "1111", mutableListOf())    // scanning your own QR: not allowed to pay yourself
+        sambhav.openFromQr(scanned); sambhav.toAmount(); "100".forEach { sambhav.amountDigit(it.digitToInt()) }; sambhav.pay()
+        assertEquals("That's your own UPI ID. Pick someone else to pay.", sambhav.message)
+    }
+
+    @Test
     fun youCannotPayYourselfOrMoreThanYouHave() {
         val sent = mutableListOf<DemoTransfer>()
         val f = phone("sambhav", "1111", sent)

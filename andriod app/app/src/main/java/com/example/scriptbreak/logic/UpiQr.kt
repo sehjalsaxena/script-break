@@ -37,6 +37,17 @@ data class UpiQr(val upiId: String, val name: String?, val amount: Double?, val 
         }
 
         private fun decode(s: String): String = try { URLDecoder.decode(s, "UTF-8") } catch (e: Exception) { s }
+
+        /** The text for a person's own "receive money" QR code (no amount: the payer types it). */
+        fun payText(upiId: String, name: String): String =
+            "upi://pay?pa=$upiId&pn=" + java.net.URLEncoder.encode(name, "UTF-8").replace("+", "%20") + "&cu=INR"
+
+        /** The QR code for [text] as black (true) / white (false) cells, [size] x [size]. Made on the phone (ZXing). */
+        fun matrix(text: String, size: Int): Array<BooleanArray> {
+            val m = com.google.zxing.qrcode.QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size,
+                mapOf(com.google.zxing.EncodeHintType.MARGIN to 2))
+            return Array(size) { y -> BooleanArray(size) { x -> m.get(x, y) } }
+        }
     }
 }
 

@@ -44,6 +44,22 @@ class CoachingCheckTest {
     }
 
     @Test
+    fun g5BigFirstPaymentToANewPersonIsAlwaysAtLeastAPause() {
+        // ₹35,000 to someone never paid, 54× the usual ₹650, typed, no call, at night: the model alone says 0.48 (Nudge)
+        val stranger = Payment(amount = 35_000.0, median90d = 650.0, payments90d = 42, payeeStatus = "new", night = true)
+        val r = model.assess(stranger)
+        assertTrue("model alone: below the Pause line (${r.score})", r.score <= 0.4865)
+        assertEquals("PAUSE", r.level)
+        assertTrue(r.guardrails.contains("G5"))
+        assertEquals("a Yes answer still gives Critical", "CRITICAL", model.assess(stranger, q1 = true).level)
+        // not G5: a shop (the TV), under 30× the usual amount, under ₹20,000, or someone paid before
+        assertEquals("NUDGE", model.assess(tv).level)
+        assertTrue(!model.assess(stranger.copy(amount = 19_000.0)).guardrails.contains("G5"))
+        assertTrue(!model.assess(stranger.copy(median90d = 1_500.0)).guardrails.contains("G5"))
+        assertTrue(!model.assess(stranger.copy(payeeStatus = "known")).guardrails.contains("G5"))
+    }
+
+    @Test
     fun inTheAppTheTvPurchaseShowsTheAmberLineAndGoesStraightToThePin() {
         val signals = object : SignalSource {
             override val callNow = false
@@ -56,5 +72,12 @@ class CoachingCheckTest {
         assertNotNull("amber line while typing", f.nudge)
         f.pay()
         assertEquals("no popup: straight to the UPI PIN", Screen.Pin, f.screen)
+
+        // but ₹35,000 to a stranger's UPI ID (typed, no call) gets the Pause screen
+        val g = PaymentFlow(model, signals, { }).apply { login("sambhav", "1111") }
+        g.startPayToUpi(); "new.person@demoupi".forEach { g.upiChanged(g.upiInput + it) }; g.continueWithUpi(); g.toAmount()
+        "35000".forEach { g.amountDigit(it.digitToInt()) }
+        g.pay()
+        assertEquals(Screen.Pause, g.screen)
     }
 }

@@ -43,8 +43,8 @@ The model never sees the Q1/Q2 answers, the scenario label or anything personal.
 - **Reasons:** each tree records how much each feature pushed the score. We add these up per group and show the top 3 groups that pushed it up.
 
 **Results on the test set** (synthetic):
-- Scams stopped: 79.7% of the 6 in-scope types (95% range 78.1–81.2); 80.3% of all 8 types
-- Genuine payments interrupted: 7.3 per 1,000 (6.4–8.3); Nudge only on 20 per 1,000
+- Scams stopped: 79.9% of the 6 in-scope types (95% range 78.3–81.3); 80.4% of all 8 types
+- Genuine payments interrupted: 7.4 per 1,000 (6.5–8.4, the top just above our budget of 8); Nudge only on 20 per 1,000
 - Precision 93% on this test mix; ROC AUC 0.994; accuracy 97.2%. Don't lead with accuracy: calling everything genuine already scores 89%.
 
 **AI vs our Round 1 rules, same test set**
@@ -54,7 +54,7 @@ The model never sees the Q1/Q2 answers, the scenario label or anything personal.
 | Hang up, then pay | 23% | **79%** | The rules need a live call; the AI also weighs a recent call, a pasted ID and the amount |
 | Task scam over chat | 31% | **64%** | No call at all; the AI combines new payees in an hour, money sent today and pasting |
 | Voice clone | 64% | **81%** | |
-| Courier | 69% | **82%** | |
+| Courier | 69% | **83%** | |
 | Customer care | 59% | **74%** | |
 | KYC | 63% | **73%** | |
 | Digital arrest | 82% | **89%** | |
@@ -66,7 +66,7 @@ Demo of the difference: Judge mode → Stories → **S12**, "Told to hang up and
 - **Synthetic data:** the results test our assumptions, not real-world accuracy. A pilot on real, consented data is the next step.
 - **Unseen mechanisms are weak:** retrained without "sent by mistake", the model catches only 11% of them. That's why the analyst console exists.
 - **Named failures:** S06 (split small payments to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 deposit to a new landlord, wrongly Paused).
-- **Fairness:** first-time users get more false alarms, 12.5 vs 6.9 per 1,000. Most false alarms are genuine first payments to a new person during a call.
+- **Fairness:** first-time users get more false alarms, 12.5 vs 7.1 per 1,000. Most false alarms are genuine first payments to a new person during a call.
 - **The score is not a real-world probability:** on our test mix 11% of payments are scams, far more than in real life.
 
 ## What the phone really detects, and what is simulated
@@ -92,7 +92,7 @@ table data like ours, and small enough to run on a phone.
 
 **Why not just if/else rules?**
 We had rules in Round 1. On the same unseen test data, the model flags 80% of in-scope scam sessions
-vs 60% for our rules, with fewer false alarms (7.3 vs 7.7 per 1,000). Rules have hard cut-offs
+vs 60% for our rules, with fewer false alarms (7.4 vs 7.7 per 1,000). Rules have hard cut-offs
 (5× the usual amount); the model weighs all the signals together. We keep a few fixed rules as
 safety guardrails, because some things should never depend on a model.
 
@@ -104,6 +104,13 @@ payees today, money from a stranger). In a shop there is none, so only the amber
 straight to the PIN. On the test set this check lost 0 scams and kept the 28 stories the same.
 The risk we accept: a scam with no sign the phone can see gets only the amber line. If such a wave
 appears, the analyst console can approve a rule for it (guardrail G3 still raises to Pause).
+
+**I paid ₹35,000 to a stranger with no call. Why was that not stopped?** (fixed 25 Oct)
+The model scored it 0.48, just under the Pause line (0.486): with no call, screen sharing, pasted ID or app
+switch, nothing showed someone steering the payment. We added guardrail G5: a first payment to a new *person*
+of at least 30× the usual amount and ₹20,000 is always at least a Pause. It catches 4 more test scams for
++0.13 false alarms per 1,000 (7.27 → 7.40, budget 8). Shops are excluded, so a TV in a shop still gets only the
+amber line. We never look at the payee's name: scammers use ordinary names.
 
 **What data did you train on?**
 Synthetic only: 2 lakh genuine payments and 3,000 of each of 8 scam types, generated from

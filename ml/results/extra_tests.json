@@ -4,32 +4,32 @@
  "test_payments": 33600,
  "error_bars_95": {
   "scams_flagged_in_scope6": {
-   "k": 2152,
+   "k": 2156,
    "n": 2700,
-   "rate": 0.797037037037037,
-   "low": 0.7814486507926123,
-   "high": 0.8117813668238042
+   "rate": 0.7985185185185185,
+   "low": 0.7829693523802372,
+   "high": 0.8132194184412487
   },
   "scams_flagged_all8": {
-   "k": 2892,
+   "k": 2896,
    "n": 3600,
-   "rate": 0.8033333333333333,
-   "low": 0.7900285960697057,
-   "high": 0.8159913799469983
+   "rate": 0.8044444444444444,
+   "low": 0.7911662494765362,
+   "high": 0.8170735799321701
   },
   "genuine_interrupted": {
-   "k": 218,
+   "k": 222,
    "n": 30000,
-   "rate": 0.007266666666666667,
-   "low": 0.00636662393651553,
-   "high": 0.008292885531098776
+   "rate": 0.0074,
+   "low": 0.0064912479729185525,
+   "high": 0.008434894018179014
   },
   "genuine_nudged": {
-   "k": 607,
+   "k": 604,
    "n": 30000,
-   "rate": 0.020233333333333332,
-   "low": 0.018700405310424453,
-   "high": 0.021889117065936846
+   "rate": 0.020133333333333333,
+   "low": 0.018604275520712723,
+   "high": 0.021785272463036128
   },
   "by_workflow": {
    "chat_task": {
@@ -40,11 +40,11 @@
     "high": 0.687279057955286
    },
    "courier": {
-    "k": 370,
+    "k": 372,
     "n": 450,
-    "rate": 0.8222222222222222,
-    "low": 0.7842138891484715,
-    "high": 0.85477557325427
+    "rate": 0.8266666666666667,
+    "low": 0.788965429312619,
+    "high": 0.8588376808474015
    },
    "customer_care": {
     "k": 335,
@@ -54,25 +54,25 @@
     "high": 0.7825580275587832
    },
    "digital_arrest": {
-    "k": 399,
+    "k": 400,
     "n": 450,
-    "rate": 0.8866666666666667,
-    "low": 0.8540455352293219,
-    "high": 0.9127418196539678
+    "rate": 0.8888888888888888,
+    "low": 0.8564964275767813,
+    "high": 0.9146977511851478
    },
    "genuine": {
-    "k": 218,
+    "k": 222,
     "n": 30000,
-    "rate": 0.007266666666666667,
-    "low": 0.00636662393651553,
-    "high": 0.008292885531098776
+    "rate": 0.0074,
+    "low": 0.0064912479729185525,
+    "high": 0.008434894018179014
    },
    "hang_up_and_pay": {
-    "k": 356,
+    "k": 357,
     "n": 450,
-    "rate": 0.7911111111111111,
-    "low": 0.7511651250002813,
-    "high": 0.8261288031015057
+    "rate": 0.7933333333333333,
+    "low": 0.7535142306387096,
+    "high": 0.8281865213417171
    },
    "kyc_official": {
     "k": 328,
@@ -106,18 +106,18 @@
    "high": 0.018875736276562784
   },
   "Regular users": {
-   "k": 196,
+   "k": 200,
    "n": 28242,
-   "rate": 0.006940018412293747,
-   "low": 0.006036598440095376,
-   "high": 0.00797755647890693
+   "rate": 0.007081651441116069,
+   "low": 0.006168477081636285,
+   "high": 0.008128905369166668
   },
   "Paying a person": {
-   "k": 184,
+   "k": 188,
    "n": 9867,
-   "rate": 0.018648018648018648,
-   "low": 0.01616003838584814,
-   "high": 0.021510670462321406
+   "rate": 0.019053410357758184,
+   "low": 0.016537057040909246,
+   "high": 0.021944119680637985
   },
   "Paying a merchant": {
    "k": 32,
@@ -134,11 +134,11 @@
    "high": 0.010914549990615315
   },
   "Day": {
-   "k": 209,
+   "k": 213,
    "n": 28438,
-   "rate": 0.007349321330613967,
-   "low": 0.006420978553687156,
-   "high": 0.008410747391935154
+   "rate": 0.007489978198185527,
+   "low": 0.006552255411355783,
+   "high": 0.008560746272754573
   }
  },
  "checks": [
@@ -155,7 +155,7 @@
   {
    "name": "G4: 'Yes' at Pause or above gives Critical",
    "passed": true,
-   "detail": "3,110 paused payments answered Yes: 0 not Critical"
+   "detail": "3,118 paused payments answered Yes: 0 not Critical"
   },
   {
    "name": "G1-G4 never lower the model's level; only C1 does, to Nudge, with no coaching sign",
@@ -163,9 +163,14 @@
    "detail": "1 lowered by C1 (no call, screen share, paste, app switch or new-payee activity), 0 wrongly"
   },
   {
-   "name": "C1: no full-screen popup without a sign of coaching (flagged/warned payees excepted)",
+   "name": "C1: no full-screen popup without a sign of coaching (flagged/warned payees and G5 excepted)",
    "passed": true,
    "detail": "0 found"
+  },
+  {
+   "name": "G5: a first payment to a new person of 30x+ usual and Rs 20,000+ is at least Pause",
+   "passed": true,
+   "detail": "247 such test payments: 0 below Pause"
   },
   {
    "name": "G1: bank-flagged payee is always Critical",
@@ -307,5 +312,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.13
+ "python_scorer_ms_per_payment": 0.138
 }

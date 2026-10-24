@@ -44,6 +44,9 @@ interrupted (budget ≤ 8).
 - G1: a bank-flagged payee is always Critical.
 - G2: a warned payee gets at least a Nudge, or Critical with a live call.
 - G3: a rule approved by analysts gives at least a Pause.
+- G5 big first payment (added 25 Oct): a first payment to a new **person** of at least 30× the usual amount and at least
+  ₹20,000 is at least a Pause, even with no call. Shops are not included, so the TV still gets only the amber line.
+  Measured: +4 scams caught, genuine interrupted 7.27 → 7.40 per 1,000, 28 stories unchanged.
 - G4: "Yes" to Q1 or Q2 at Pause or above gives Critical. Answers can only raise the level.
 - In the app: "Continue anyway" is always available, and if scoring fails the payment goes through.
 
@@ -51,7 +54,7 @@ interrupted (budget ≤ 8).
 | | AI model | Round 1 rules | Bank amount rule |
 |---|---|---|---|
 | Scam sessions flagged, 6 in-scope types | **80%** | 60% | 24% |
-| Genuine payments interrupted per 1,000 | **7.3** | 7.7 | 3.6 |
+| Genuine payments interrupted per 1,000 | **7.4** | 7.7 | 3.6 |
 
 By scam type: digital arrest 89%, courier 82%, voice clone 81%, hang up then pay 79%, fake customer
 care 74%, fake KYC 73%, task scam over chat 64%, "sent by mistake" 100%. ROC AUC 0.994.

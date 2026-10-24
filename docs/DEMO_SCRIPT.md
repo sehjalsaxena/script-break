@@ -14,12 +14,12 @@ delivery against the Round 1 plan (15).
 | 0:00–0:45 | Sambhav | The one-liner (README, first line). "A scammer on a call talks the victim through the payment. Banks check amounts; we check the pattern, on the phone, before the PIN." |
 | 0:45–4:00 | All three | **Scenario 1, legitimate:** rent to the usual landlord → nothing; ₹90,000 TV in a shop → amber line only (scenes 1, 1b). **Scenario 2, obviously suspicious:** scam call → ₹20,000 to a new payee → Pause ("What the AI sees" shows why) → "No, No" stays → Yes → Critical → Sehjal's phone buzzes → Sehjal calls → "I've called" (scenes 2–5). Keep it moving: no explanations mid-flow |
 | 4:00–6:30 | Judge + Deepak | Hand Phone C (judge mode) to a judge: "Change anything." Inputs tab, then **Run in app**. Then Test file → load the sample, or their own file: error rates with 95% ranges |
-| 6:30–8:30 | Deepak (or Sambhav) | **AI vs rules:** Judge → Stories → S12 "hang up and pay": Round 1 rules Nudge, AI Critical; hang-up scams 23% (rules) vs 79% (AI) on the same test set. Results tab: 80% vs 60% (our rules) vs 24% (bank rule) at 7.3 per 1,000 false alarms, with 95% ranges. Scam types never seen (sent by mistake only 11%). **Named failures:** S06 (small splits to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 new-landlord deposit, wrongly Paused), most false alarms = genuine first payment to a new person during a call, first-time users get 1.8× more false alarms (12.5 vs 6.9 per 1,000). "We report these instead of tuning on test data." Reproduce: `python run_all_tests.py`, 20 checks |
+| 6:30–8:30 | Deepak (or Sambhav) | **AI vs rules:** Judge → Stories → S12 "hang up and pay": Round 1 rules Nudge, AI Critical; hang-up scams 23% (rules) vs 79% (AI) on the same test set. Results tab: 80% vs 60% (our rules) vs 24% (bank rule) at 7.4 per 1,000 false alarms, with 95% ranges. Scam types never seen (sent by mistake only 11%). **Named failures:** S06 (small splits to several new accounts, missed), S08 (first small payment, Nudge only), L04 (₹40,000 new-landlord deposit, wrongly Paused), most false alarms = genuine first payment to a new person during a call, first-time users get 1.8× more false alarms (12.5 vs 7.1 per 1,000). "We report these instead of tuning on test data." Reproduce: `python run_all_tests.py`, 20 checks |
 | 8:30–9:30 | Sambhav | **Scenario 3, a scam the model misses:** analyst on Phone C → **Run in app first: the "sent by mistake" payment goes straight to the PIN (missed)** → the AI grouped 89 such missed reports, all one pattern, and proposes one rule (catches 100%, +0.05 false alarms per 1,000) → a human taps **Approve** → Run in app again → Pause. "The AI proposes, a human approves before anything reaches phones." No architecture talk |
 | 9:30–12:00 | All | Questions. Changes from Round 1: web app → native Android (a website can't see calls); rules decide → trained AI decides, rules stay as guardrails. Deliberate cuts: no push to a fully closed app (needs a server); screen-share detection is Android 15+ |
 
 Who answers what (but everyone must manage the 30-second version of everything):
-- **Sambhav:** payment flow, signals, safety layer (C1, G1–G4), Firebase alert, Judge and Analyst modes.
+- **Sambhav:** payment flow, signals, safety layer (C1, G1–G5), Firebase alert, Judge and Analyst modes.
 - **Sehjal:** screens, wording (SPEC.md), Hindi, read-aloud, big text and buttons.
 - **Deepak:** data generator, model choice, thresholds, results, failures ([ml/JUDGE_QA.md](../ml/JUDGE_QA.md)).
 
@@ -27,7 +27,7 @@ For the technical team, have ready:
 - the repo link and the check-in commit `f14de57`
 - [README.md](../README.md), which maps every form promise to the file that implements it
 - [DISCLOSURE.md](../DISCLOSURE.md)
-- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (81 tests) and `python run_all_tests.py` (20 passed) were already run, with the output on screen
+- a laptop with the repo, where `gradlew.bat testDebugUnitTest` (81 tests) and `python run_all_tests.py` (21 passed) were already run, with the output on screen
 - the APK at `andriod app/app/build/outputs/apk/debug/app-debug.apk` on the laptop and a USB stick
 
 ## Who holds what

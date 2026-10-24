@@ -1,20 +1,20 @@
 {
  "model": "ScriptBreak Sentinel v2.4",
  "reports": 1200,
- "missed_by_model": 179,
+ "missed_by_model": 178,
  "missed_by_type": {
   "digital_arrest": 15,
   "customer_care": 44,
   "kyc_official": 41,
   "courier": 15,
   "voice_clone": 10,
-  "hang_up_and_pay": 20,
+  "hang_up_and_pay": 19,
   "chat_task": 34
  },
  "clustering": {
   "method": "average-linkage, Jaccard distance",
   "cut_height": 0.7,
-  "silhouette": 0.347
+  "silhouette": 0.348
  },
  "policy": {
   "new_rule_budget_per_1000": 0.5,
@@ -24,7 +24,7 @@
  "clusters": [
   {
    "cluster_id": "C1",
-   "size": 177,
+   "size": 176,
    "pattern": [
     "new payee"
    ],
@@ -32,7 +32,7 @@
     "customer_care": 44,
     "kyc_official": 41,
     "chat_task": 34,
-    "hang_up_and_pay": 20,
+    "hang_up_and_pay": 19,
     "courier": 15,
     "digital_arrest": 13,
     "voice_clone": 10

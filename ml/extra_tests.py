@@ -154,9 +154,12 @@ def main(test_path: Path | None = None) -> dict:
     checks.append(check("G1-G4 never lower the model's level; only C1 does, to Nudge, with no coaching sign", lowered_bad == 0,
                         f"{lowered_ok} lowered by C1 (no call, screen share, paste, app switch or new-payee activity), {lowered_bad} wrongly"))
     popup_without_sign = sum(R[b] >= R["PAUSE"] and not policy.coaching_signs(f) and f.get("payee_status") not in ("flagged", "warned")
-                             for f, b in zip(raws, base))
-    checks.append(check("C1: no full-screen popup without a sign of coaching (flagged/warned payees excepted)", popup_without_sign == 0,
+                             and not policy.big_first_payment_to_person(f) for f, b in zip(raws, base))
+    checks.append(check("C1: no full-screen popup without a sign of coaching (flagged/warned payees and G5 excepted)", popup_without_sign == 0,
                         f"{popup_without_sign} found"))
+    g5 = [b for f, b in zip(raws, base) if policy.big_first_payment_to_person(f)]
+    checks.append(check("G5: a first payment to a new person of 30x+ usual and Rs 20,000+ is at least Pause",
+                        len(g5) > 0 and all(R[b] >= R["PAUSE"] for b in g5), f"{len(g5)} such test payments: {sum(R[b] < R['PAUSE'] for b in g5)} below Pause"))
 
     rng = random.Random(42)
     sample = rng.sample(raws, 2000)

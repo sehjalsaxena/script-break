@@ -28,7 +28,7 @@ class AnalystModeTest {
     @Test
     fun discoveryFileIsReadCompletely() {
         assertEquals(1200, discovery.reports)
-        assertEquals(273, discovery.missed)   // 270 before the C1 coaching check (25 Oct): 3 reports with no coaching sign are now Nudge only
+        assertEquals(270, discovery.missed)   // C1 coaching check (25 Oct) made it 273; G5 (big first payment to a new person) catches 3 again
         assertEquals(89, discovery.missedByType["sent_by_mistake"])
         assertEquals(5, discovery.clusters.size)
         val c1 = discovery.clusters.first()

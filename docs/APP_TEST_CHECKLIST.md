@@ -192,6 +192,7 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 - [ ] No call: pay **Gupta Electronics ₹90,000** → amber line, "What the AI sees" shows **Nudge**, Continue goes straight to the PIN.
 - [ ] Same payment while on a call → Pause/Critical as before.
 - [ ] Same payment with a **pasted** UPI ID, or after leaving the app and coming back → Pause.
+- [ ] **G5:** no call, type a new UPI ID (e.g. `new.person@demoupi`), ₹35,000 → **Pause** (a first payment to a new person, 54× usual). ₹15,000 to the same person → amber line only.
 
 ## 7f. Pay from a QR image
 

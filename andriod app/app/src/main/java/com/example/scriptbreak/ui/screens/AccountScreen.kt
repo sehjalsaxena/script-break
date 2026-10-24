@@ -27,6 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -180,12 +185,14 @@ fun AccountScreen(
                 }
             }
 
-            // Quick QR Code Card
+            // Quick QR Code Card: tap to show this person's own UPI QR (others scan it to pay them)
+            var showQr by remember { mutableStateOf(false) }
+            if (showQr) MyUpiQrDialog(userName, upiId) { showQr = false }
             Surface(
-                color = Color.White,
+                color = AppSurface,   // follows light / dark mode
                 shape = RoundedCornerShape(18.dp),
                 shadowElevation = 0.5.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().clickable { showQr = true }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -411,4 +418,32 @@ fun AccountScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+/** This person's own UPI QR code, made on the phone (ZXing, no network). Black on white even in dark mode, so it scans. */
+@Composable
+private fun MyUpiQrDialog(userName: String, upiId: String, onClose: () -> Unit) {
+    val qr = remember(upiId, userName) {
+        val size = 600
+        val cells = com.example.scriptbreak.logic.UpiQr.matrix(com.example.scriptbreak.logic.UpiQr.payText(upiId, userName), size)
+        val pixels = IntArray(size * size) { i -> if (cells[i / size][i % size]) android.graphics.Color.BLACK else android.graphics.Color.WHITE }
+        android.graphics.Bitmap.createBitmap(pixels, size, size, android.graphics.Bitmap.Config.ARGB_8888).asImageBitmap()
+    }
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onClose,
+        confirmButton = { androidx.compose.material3.TextButton(onClick = onClose) { Text("Close", color = AppBlue) } },
+        title = { Text("Pay $userName", fontWeight = FontWeight.Bold, color = InkDark) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Box(Modifier.background(Color.White, RoundedCornerShape(12.dp)).padding(10.dp)) {
+                    androidx.compose.foundation.Image(bitmap = qr, contentDescription = "UPI QR code for $upiId",
+                        modifier = Modifier.size(220.dp))
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(upiId, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
+                Text("Scan in DemoPay to pay $userName. Demo only: no real money.", fontSize = 13.sp, color = MutedText)
+            }
+        },
+        containerColor = AppSurface,
+    )
 }

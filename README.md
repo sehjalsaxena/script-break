@@ -38,7 +38,7 @@ Android photo picker shares only the one image chosen.
 phone signals + payment history ──► 16 facts ──► AI model (gradient boosting, 200 trees, on the phone)
                                                       │ scam score 0-1
                                                       ▼
-                                safety layer: C1 coaching check, guardrails G1-G4
+                                safety layer: C1 coaching check, guardrails G1-G5
                                                       │
                                          None / Nudge / Pause / Critical + plain reasons
 ```
@@ -59,6 +59,7 @@ phone signals + payment history ──► 16 facts ──► AI model (gradient 
   - G1: a bank-flagged payee is always Critical.
   - G2: a payee paid after an earlier warning gets at least a Nudge.
   - G3: an analyst-approved rule gives at least a Pause.
+  - G5: a first payment to a new person of 30× the usual amount and ₹20,000 or more gives at least a Pause, even with no call.
   - G4: "Yes" to a question gives Critical.
   - Answers only raise the level. If scoring fails, the payment goes through (fail-open).
 - **Analyst console:** scam reports the model missed are clustered, a rule is proposed for each cluster, and a human approves it.
@@ -67,8 +68,8 @@ phone signals + payment history ──► 16 facts ──► AI model (gradient 
 
 | | AI model | Our Round 1 rules | Bank rule (new person ≥ ₹10,000) |
 |---|---|---|---|
-| Scams stopped, 6 in-scope types | **79.7%** (95% range 78.1–81.2) | 60% | 24% |
-| Genuine payments interrupted per 1,000 | **7.3** (6.4–8.3) | 7.7 | 3.6 |
+| Scams stopped, 6 in-scope types | **79.9%** (95% range 78.3–81.3) | 60% | 24% |
+| Genuine payments interrupted per 1,000 | **7.4** (6.5–8.4) | 7.7 | 3.6 |
 
 Per scam type, scam types the model never saw, the 28 Round 1 stories and the known failures are in
 [ml/results/REPORT.md](ml/results/REPORT.md). All checks are in [ml/results/TEST_SUMMARY.md](ml/results/TEST_SUMMARY.md).
@@ -81,7 +82,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 |---|---|
 | AI scam-score model trained on synthetic sessions | `ml/make_dataset.py`, `ml/train.py`, `ml/export_model.py`; on the phone `ml/ScamModel.kt` |
 | Automatic feature extraction from payment history and device state | `logic/PaymentFlow.kt` (`currentPayment`, learned usual payment), `logic/Signals.kt` (call, screen share) |
-| Rules stay as safety guardrails | `ml/policy.py` = `ml/ScamModel.kt` `assess` (C1, G1–G4) |
+| Rules stay as safety guardrails | `ml/policy.py` = `ml/ScamModel.kt` `assess` (C1, G1–G5) |
 | Plain reasons for every payment | `ScamModel.reasons`, shown on Nudge, Pause and Critical; "What the AI sees" on the Amount screen |
 | Ask family: alert to a second phone | `logic/FamilyLink.kt` (Firebase), `logic/FamilyBuzz.kt`, `ui/screens/FamilyAlertScreen.kt` |
 | Analyst console: AI clusters new scam reports, proposes rules, a human approves | `ml/analyst_discovery.py`; `logic/AnalystMode.kt`, `ui/screens/AnalystScreen.kt` (log in as analyst) |

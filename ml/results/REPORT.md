@@ -8,7 +8,7 @@ Model: **gradient_boosting** (version 20261024-0701). All data synthetic. Test s
 |---|---|---|---|
 | Scam sessions flagged (6 in-scope types) | **80%** | 60% | 24% |
 | Scam sessions flagged (all 8 types) | **80%** | 61% | 20% |
-| Genuine payments interrupted per 1,000 (budget ≤ 8) | **7.3** | 7.7 | 3.6 |
+| Genuine payments interrupted per 1,000 (budget ≤ 8) | **7.4** | 7.7 | 3.6 |
 
 Other: Nudge on 20 per 1,000 genuine payments; ROC AUC 0.994; precision 93% on this test mix (scams are ~11% of it, far more than in real life, so real precision would be lower).
 
@@ -19,7 +19,7 @@ Other: Nudge on 20 per 1,000 genuine payments; ROC AUC 0.994; precision 93% on t
 | Digital arrest | 89% | 82% | 83% |
 | Fake customer care / refund | 74% | 59% | 72% |
 | Fake KYC / bank official | 73% | 63% | 67% |
-| Courier / customs | 82% | 69% | 81% |
+| Courier / customs | 83% | 69% | 81% |
 | AI voice clone of a relative | 81% | 64% | 78% |
 | Hang up, then pay | 79% | 23% | 70% |
 | 'Sent by mistake' return | 100% | 100% | 11% |
@@ -64,12 +64,12 @@ Scams flagged: 14 of 16. Genuine interrupted: 2 of 10. Same level as the Round 1
 
 ## Where it fails
 
-Missed scams by type: Hang up, then pay 94, Fake customer care / refund 115, Courier / customs 80, Fake KYC / bank official 122, Task scam over chat 160, AI voice clone of a relative 86, Digital arrest 51
+Missed scams by type: Hang up, then pay 93, Fake customer care / refund 115, Courier / customs 78, Fake KYC / bank official 122, Task scam over chat 160, AI voice clone of a relative 86, Digital arrest 50
 
 Most common genuine false alarms:
 
 - new person, on call: 126
-- new person, no call: 51
+- new person, no call: 55
 - new merchant, on call: 19
 - new merchant, no call: 10
 - recent person, on call: 3

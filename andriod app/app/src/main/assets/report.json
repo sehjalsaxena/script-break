@@ -12,20 +12,20 @@
   "note": "shifted settings, never used in training or selection"
  },
  "model": {
-  "scams_flagged_all8": 0.8033333333333333,
-  "scams_flagged_in_scope6": 0.797037037037037,
-  "genuine_interrupted_per_1000": 7.266666666666667,
-  "genuine_nudged_per_1000": 20.23333333333333,
-  "precision_on_this_test_mix": 0.929903536977492,
+  "scams_flagged_all8": 0.8044444444444444,
+  "scams_flagged_in_scope6": 0.7985185185185184,
+  "genuine_interrupted_per_1000": 7.4,
+  "genuine_nudged_per_1000": 20.133333333333333,
+  "precision_on_this_test_mix": 0.9288005131494548,
   "roc_auc": 0.9941315092592594,
   "brier": 0.019708309716146885,
   "by_workflow": {
    "digital_arrest": {
     "label": "Digital arrest",
     "n": 450,
-    "flagged": 0.8866666666666667,
+    "flagged": 0.8888888888888888,
     "critical_by_score": 0.5355555555555556,
-    "nudge_only": 0.08888888888888889,
+    "nudge_only": 0.08666666666666667,
     "nothing": 0.024444444444444446
    },
    "customer_care": {
@@ -47,9 +47,9 @@
    "courier": {
     "label": "Courier / customs",
     "n": 450,
-    "flagged": 0.8222222222222222,
+    "flagged": 0.8266666666666667,
     "critical_by_score": 0.43555555555555553,
-    "nudge_only": 0.10666666666666667,
+    "nudge_only": 0.10222222222222223,
     "nothing": 0.07111111111111111
    },
    "voice_clone": {
@@ -63,9 +63,9 @@
    "hang_up_and_pay": {
     "label": "Hang up, then pay",
     "n": 450,
-    "flagged": 0.7911111111111111,
+    "flagged": 0.7933333333333333,
     "critical_by_score": 0.37777777777777777,
-    "nudge_only": 0.14222222222222222,
+    "nudge_only": 0.14,
     "nothing": 0.06666666666666667
    },
    "sent_by_mistake": {
@@ -150,16 +150,16 @@
  },
  "comparison": {
   "ai_model": {
-   "scams_flagged_all8": 0.8033333333333333,
-   "scams_flagged_in_scope6": 0.797037037037037,
-   "genuine_interrupted_per_1000": 7.266666666666667,
+   "scams_flagged_all8": 0.8044444444444444,
+   "scams_flagged_in_scope6": 0.7985185185185184,
+   "genuine_interrupted_per_1000": 7.4,
    "by_workflow": {
-    "digital_arrest": 0.8866666666666667,
+    "digital_arrest": 0.8888888888888888,
     "customer_care": 0.7444444444444445,
     "kyc_official": 0.7288888888888889,
-    "courier": 0.8222222222222222,
+    "courier": 0.8266666666666667,
     "voice_clone": 0.8088888888888889,
-    "hang_up_and_pay": 0.7911111111111111,
+    "hang_up_and_pay": 0.7933333333333333,
     "sent_by_mistake": 1.0,
     "chat_task": 0.6444444444444445
    }
@@ -199,7 +199,7 @@
   "digital_arrest": {
    "label": "Digital arrest",
    "flagged_when_never_seen": 0.8266666666666667,
-   "flagged_when_seen": 0.8866666666666667
+   "flagged_when_seen": 0.8888888888888888
   },
   "customer_care": {
    "label": "Fake customer care / refund",
@@ -214,7 +214,7 @@
   "courier": {
    "label": "Courier / customs",
    "flagged_when_never_seen": 0.8133333333333334,
-   "flagged_when_seen": 0.8222222222222222
+   "flagged_when_seen": 0.8266666666666667
   },
   "voice_clone": {
    "label": "AI voice clone of a relative",
@@ -224,7 +224,7 @@
   "hang_up_and_pay": {
    "label": "Hang up, then pay",
    "flagged_when_never_seen": 0.7044444444444444,
-   "flagged_when_seen": 0.7911111111111111
+   "flagged_when_seen": 0.7933333333333333
   },
   "sent_by_mistake": {
    "label": "'Sent by mistake' return",
@@ -624,13 +624,13 @@
  },
  "failures": {
   "missed_scams_by_type": {
-   "hang_up_and_pay": 94,
+   "hang_up_and_pay": 93,
    "customer_care": 115,
-   "courier": 80,
+   "courier": 78,
    "kyc_official": 122,
    "chat_task": 160,
    "voice_clone": 86,
-   "digital_arrest": 51
+   "digital_arrest": 50
   },
   "missed_examples": [
    {
@@ -789,7 +789,7 @@
     "payee": "new",
     "kind": "person",
     "call": "no call",
-    "count": 51
+    "count": 55
    },
    {
     "payee": "new",
