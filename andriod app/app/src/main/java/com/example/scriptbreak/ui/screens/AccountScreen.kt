@@ -385,7 +385,7 @@ fun AccountScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text("UPI Daily Limit", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = InkDark)
-                            Text("₹1,00,000 / day per RBI standards", fontSize = 12.sp, color = MutedText)
+                            Text("₹1,00,000 per payment (demo limit)", fontSize = 12.sp, color = MutedText)
                         }
                     }
                 }

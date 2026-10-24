@@ -25,7 +25,7 @@ Rohit's phone buzzes → Rohit calls → scam breaks.
    (the form promised "Rules stay as safety guardrails").
 3. **One app, 5 modes** chosen at start: User Mr. Sharma, User Priya, Family Rohit (second phone),
    Judge mode, Analyst.
-4. **No real login**: a profile picker. Trusted-contact setup with a demo OTP; changing it later shows
+4. **Demo login** (added 24 Oct): username + PIN per account, each payer has their own UPI PIN, ₹1 lakh per payment. Trusted-contact setup with a demo OTP; changing it later shows
    "Active in 24 hours".
 5. Fake UPI app has **its own name and branding ("DemoPay")**, never PhonePe/GPay look or logos.
    Show "Demo app – no real money". All names, UPI IDs, numbers fictional.
@@ -95,7 +95,7 @@ most false alarms = genuine first payment to a new person during a call.
 Always say: synthetic results test our assumptions, not real-world accuracy.
 
 **On the phone:** `scam_model.json` (91 KB) + `ml/android/ScamModel.kt` (no network, no ML library,
-~0.1 ms/payment). Kotlin output matches Python exactly on 500 vectors (`test_vectors.json`,
+speed timed live in Judge mode → Results). Kotlin output matches Python exactly on 500 vectors (`test_vectors.json`,
 `ScamModelParityTest.kt`). API: `ScamModel.fromAssets(context).assess(Payment(...), q1, q2, approvedRules)`
 → `Result(level, score, reasons[≤3], guardrails, modelVersion)`. Reasons are grouped plain sentences,
 e.g. "The amount is 74 times your usual payment · You have never paid this payee before · You are on a call right now".

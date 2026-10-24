@@ -61,7 +61,7 @@ scammer can't change everything at once: someone guiding live, a new account and
 amount are what the scam needs.
 
 **Does it run on the phone?**
-Yes. A 91 KB JSON file plus about 300 lines of Kotlin, 0.1 ms per payment, offline. The Kotlin
+Yes. A 91 KB JSON file plus about 300 lines of Kotlin, offline. Speed is timed live on the phone: Judge mode → Results scores 400 test payments and shows the time. The Kotlin
 output matches Python exactly on 500 test payments (parity test).
 
 **What happens if the model is wrong?**
