@@ -12,6 +12,18 @@ import androidx.compose.ui.unit.dp
  */
 object AppIcons {
 
+    /** A screen (monitor) with its stand: screen sharing. */
+    val ScreenShare: ImageVector = ImageVector.Builder(
+        name = "ScreenShare",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).path(fill = SolidColor(Color.White)) {
+        moveTo(3f, 4f); horizontalLineTo(21f); verticalLineTo(16f); horizontalLineTo(3f); close()
+        moveTo(8f, 18f); horizontalLineTo(16f); verticalLineTo(20f); horizontalLineTo(8f); close()
+    }.build()
+
     val ArrowBack: ImageVector = ImageVector.Builder(
         name = "ArrowBack",
         defaultWidth = 24.dp,

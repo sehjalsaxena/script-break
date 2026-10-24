@@ -108,6 +108,7 @@ class PaymentFlow(
     var pauseResult by mutableStateOf<Result?>(null); private set
     var criticalResult by mutableStateOf<Result?>(null); private set
     var lastAlert by mutableStateOf<FamilyAlertUi?>(null); private set
+    private var lastAlertAt = 0L   // when this phone got it (its own clock), so an old alert is not shown
     var success by mutableStateOf<SuccessUi?>(null); private set
     var reportPacket by mutableStateOf<ReportPacket?>(null); private set
     /** A short notice for the person (shown as a toast), cleared by [consumeMessage]. */
@@ -121,6 +122,8 @@ class PaymentFlow(
 
     /** Judge mode switch: treat the phone as being on a call (for emulators and demos). Shown on screen. */
     var simulateCall by mutableStateOf(false)
+    /** Judge mode switch: act as if the screen is being shared (for phones older than Android 15). */
+    var simulateScreenShare by mutableStateOf(false)
     /** Judge mode "Run in app": these inputs replace the phone's signals for one payment. */
     var judgeInputs by mutableStateOf<Payment?>(null); private set
     var judgeAnswers: Pair<Boolean?, Boolean?> = null to null; private set
@@ -146,6 +149,7 @@ class PaymentFlow(
     val modelVersion: String get() = (runModel ?: model)?.modelVersion ?: "unavailable"
     val amount: Long get() = amountDigits.toLongOrNull() ?: 0L
     val callNow: Boolean get() = signals.callNow || simulateCall
+    val screenShareNow: Boolean get() = signals.screenShare || simulateScreenShare
 
     fun consumeMessage() { message = null }
 
@@ -220,6 +224,7 @@ class PaymentFlow(
             }
             "rohit" -> {
                 familyMode = true
+                if (freshAlert == null) lastAlert = null
                 screen = if (lastAlert != null) Screen.FamilyAlert else Screen.FamilyWaiting
             }
             "judge" -> screen = Screen.Judge
@@ -412,22 +417,35 @@ class PaymentFlow(
     fun askFamily() {
         val p = payee ?: return
         if (askedFamily) return
-        val reasons = (criticalResult ?: pauseResult)?.reasons?.take(3).orEmpty()
+        val all = (criticalResult ?: pauseResult)?.reasons.orEmpty()
+        val live = all.filter { it == CALL_NOW || it == SCREEN_SHARE }
+        val reasons = (live + (all - live.toSet())).take(3)
         val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons)
-        lastAlert = alert
+        lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Rohit)
         askedFamily = true
         family.send(alert)
         message = "${contact.name} has been alerted"
     }
 
     // ---- the trusted contact's side (Rohit's phone) -----------------------------------------
-    /** An alert arrived from the family link. Returns true if this phone should buzz. */
+    /**
+     * An alert arrived from another phone. It is ALWAYS kept, even if nobody is logged in, and opens as
+     * soon as Rohit logs in. Returns true if this phone should buzz.
+     */
     fun onIncomingAlert(alert: FamilyAlertUi): Boolean {
-        if (!familyMode) return false          // the sender's own alert echoing back
-        lastAlert = alert
-        screen = Screen.FamilyAlert
-        return true
+        lastAlert = alert; lastAlertAt = clock()
+        return when {
+            familyMode -> { screen = Screen.FamilyAlert; true }  // Rohit is logged in: show it now
+            account == null -> true                              // login screen: buzz, it opens when Rohit logs in
+            else -> false                                        // someone else is using this phone: keep it quietly
+        }
     }
+
+    /** The alert was handled, deleted or became too old: stop keeping it (unless it is on screen now). */
+    fun onAlertCleared() { if (screen != Screen.FamilyAlert) lastAlert = null }
+
+    /** A kept alert, if it is still fresh (10 minutes, the same as Firebase keeps it). */
+    private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < TEN_MINUTES }
 
     /** Rohit's answer reached the sender's phone. */
     fun onFamilyStatus(status: String) {
@@ -550,7 +568,7 @@ class PaymentFlow(
             payments90d = history.size,
             callNow = signals.callNow || simulateCall,
             callSeen30m = signals.callSeenWithin30m(now),
-            screenShare = signals.screenShare,
+            screenShare = screenShareNow,
             payeeStatus = status,
             payeeKind = p.kind,
             samePayee24h = if (isNew) ledger.count { it.payeeId == p.id && now - it.atMs < DAY } else 0,
@@ -581,7 +599,8 @@ class PaymentFlow(
                     else -> "On a call now"
                 })
                 if (p.callSeen30m) add("A call ended in the last 30 minutes")
-                if (p.screenShare) add("Screen is being shared or recorded")
+                if (p.screenShare) add(if (judgeInputs == null && simulateScreenShare && !signals.screenShare)
+                    "Screen is being shared (simulated in Judge mode)" else "Screen is being shared or recorded")
                 add(when (p.payeeStatus) {
                     "new" -> "New payee: never paid"
                     "recent" -> "Payee first paid in the last 7 days"
@@ -605,9 +624,21 @@ class PaymentFlow(
     /** Clears everything this session did (payments, contact changes, alerts), back to the starting demo. */
     fun resetDemo() {
         ledgers.clear(); contacts.clear(); contacts.putAll(DEFAULT_CONTACTS); pendingContacts.clear()
-        otpFor = null; demoOtp = null; lastAlert = null; simulateCall = false
+        otpFor = null; demoOtp = null; lastAlert = null; simulateCall = false; simulateScreenShare = false
         resetPayment()
         message = "Demo reset: payment history is back to the start"
+    }
+
+    /**
+     * The model lists its top 3 reasons, so with a call AND screen sharing one could drop off the list.
+     * Both are facts the person must see: add whichever is missing (the level is not changed).
+     */
+    private fun withLiveSignals(r: Result, p: Payment): Result {
+        val missing = buildList {
+            if (p.callNow && CALL_NOW !in r.reasons) add(CALL_NOW)
+            if (p.screenShare && SCREEN_SHARE !in r.reasons) add(SCREEN_SHARE)
+        }
+        return if (missing.isEmpty()) r else r.copy(reasons = r.reasons + missing)
     }
 
     /** The model + safety layer, wrapped so that any failure lets the payment through (null). */
@@ -616,7 +647,7 @@ class PaymentFlow(
         val payment = currentPayment(refreshSignals) ?: return null
         if (payment.amount <= 0) return null
         return try {
-            m.assess(payment, q1, q2, approvedRules)
+            withLiveSignals(m.assess(payment, q1, q2, approvedRules), payment)
         } catch (e: Exception) {
             null
         }
@@ -657,6 +688,9 @@ class PaymentFlow(
         private const val DAY = 24 * HOUR
         private const val SEVEN_DAYS = 7 * DAY
         private const val NINETY_DAYS = 90 * DAY
+        private const val TEN_MINUTES = 10 * 60 * 1000L
+        const val CALL_NOW = "You are on a call right now"
+        const val SCREEN_SHARE = "Your screen is being shared or a remote-access app is active"
 
         private val DEFAULT_CONTACTS = mapOf(
             "sharma" to TrustedContact("Rohit", "son", "9876543210"),

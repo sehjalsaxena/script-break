@@ -158,6 +158,16 @@ fun HomeScreen(
                     CallStatusBanner()
                 }
             }
+            // Screen-sharing banner: shown together with the call banner when both are happening
+            if (state.screenShared) {
+                item {
+                    CallStatusBanner(
+                        title = "Screen sharing detected",
+                        subtitle = "Never share your screen while paying",
+                        icon = AppIcons.ScreenShare,
+                    )
+                }
+            }
 
             // Search bar
             item {

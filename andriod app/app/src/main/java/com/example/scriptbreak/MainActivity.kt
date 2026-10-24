@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
     // Android 15+: is this app's own window being recorded or shared right now?
     private val screenRecording = Consumer<Int> { state ->
-        signals.screenShare = state == WindowManager.SCREEN_RECORDING_STATE_VISIBLE
+        signals.screenRecorded = state == WindowManager.SCREEN_RECORDING_STATE_VISIBLE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,8 +58,9 @@ class MainActivity : ComponentActivity() {
             onStatus = { _, status ->
                 flow.onFamilyStatus(status)
                 // Rohit has called: the alert has done its job, so the sender's phone deletes it from Firebase
-                if (status == "called" && !flow.familyMode) family.clear()
+                if (status == "called") family.clear()
             },
+            onCleared = { flow.onAlertCleared() },
         )
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }

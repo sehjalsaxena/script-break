@@ -1,6 +1,7 @@
 package com.example.scriptbreak.logic
 
 import android.content.Context
+import java.util.UUID
 import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.model.FamilyAlertUi
 import com.google.firebase.FirebaseApp
@@ -30,6 +31,14 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     }
     private val auth: FirebaseAuth? = if (node != null) try { FirebaseAuth.getInstance() } catch (e: Exception) { null } else null
 
+    /**
+     * A random id for this install (no phone number, IMEI or account). It tells "my own alert echoing
+     * back" apart from "an alert from another phone", whoever is logged in on either phone.
+     */
+    private val deviceId: String = context.getSharedPreferences("scriptbreak", Context.MODE_PRIVATE).let { prefs ->
+        prefs.getString("device_id", null) ?: UUID.randomUUID().toString().also { prefs.edit().putString("device_id", it).apply() }
+    }
+
     /** True when alerts can reach another phone (Firebase configured). */
     val online: Boolean get() = node != null
 
@@ -55,6 +64,8 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                 "reasons" to alert.reasons.take(3),
                 "status" to "sent",
                 "sentAt" to now,
+                "fromDevice" to deviceId,
+                "to" to "rohit",            // the trusted contact's demo account
             ))
         }
     }
@@ -74,30 +85,37 @@ class FamilyLink(context: Context) : FamilyAlertSender {
     private var listener: ValueEventListener? = null
 
     /**
-     * Listen for alerts and status changes. [onAlert] gets new alerts (sent in the last 10 minutes);
-     * [onStatus] gets Rohit's answers. Call [stop] to remove the listener.
+     * Listen for alerts and status changes, from app start, whoever is logged in.
+     * [onAlert]: a new alert from ANOTHER phone (sent in the last 10 minutes).
+     * [onStatus]: Rohit's answer to an alert THIS phone sent.
+     * [onCleared]: the alert is gone (handled, deleted or too old). Call [stop] to remove the listener.
      */
-    fun listen(onAlert: (Long, FamilyAlertUi) -> Unit, onStatus: (Long, String) -> Unit) {
+    fun listen(onAlert: (Long, FamilyAlertUi) -> Unit, onStatus: (Long, String) -> Unit, onCleared: () -> Unit = {}) {
         val n = node ?: return
         stop()
         signedIn {
             val l = object : ValueEventListener {
                 override fun onDataChange(s: DataSnapshot) {
-                    val id = (s.child("id").value as? Number)?.toLong() ?: return
+                    val id = (s.child("id").value as? Number)?.toLong()
+                    if (id == null) { onCleared(); return }                     // no alert: deleted or never sent
                     val sentAt = (s.child("sentAt").value as? Number)?.toLong() ?: 0L
                     val status = s.child("status").value as? String ?: "sent"
                     if (System.currentTimeMillis() - sentAt >= TEN_MINUTES) {   // stale: delete, keep nothing
-                        s.ref.removeValue(); return
+                        s.ref.removeValue(); onCleared(); return
                     }
+                    val mine = s.child("fromDevice").value == deviceId
                     if (status == "sent") {
+                        if (mine) return                                         // our own alert echoing back
                         onAlert(id, FamilyAlertUi(
                             fromName = s.child("fromName").value as? String ?: "",
                             amountText = s.child("amountText").value as? String ?: "",
                             payeeName = s.child("payeeName").value as? String ?: "",
                             reasons = s.child("reasons").children.mapNotNull { it.value as? String },
                         ))
-                    } else {
-                        onStatus(id, status)
+                    } else if (mine) {
+                        onStatus(id, status)                                     // Rohit answered OUR alert
+                    } else if (status == "called") {
+                        onCleared()                                              // handled on Rohit's phone
                     }
                 }
                 override fun onCancelled(e: DatabaseError) {}

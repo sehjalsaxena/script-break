@@ -224,7 +224,10 @@ fun DemoSecondaryButton(
 
 @Composable
 fun CallStatusBanner(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String = "Active phone call detected",
+    subtitle: String = "Live protection active on this payment",
+    icon: androidx.compose.ui.graphics.vector.ImageVector = AppIcons.Phone,
 ) {
     Surface(
         color = CallGreenTint,
@@ -243,7 +246,7 @@ fun CallStatusBanner(
                     .background(CallGreen)
             ) {
                 Icon(
-                    imageVector = AppIcons.Phone,
+                    imageVector = icon,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
@@ -252,13 +255,13 @@ fun CallStatusBanner(
             Spacer(modifier = Modifier.width(10.dp))
             Column {
                 Text(
-                    text = "Active phone call detected",
+                    text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = CallGreen
                 )
                 Text(
-                    text = "Live protection active on this payment",
+                    text = subtitle,
                     fontSize = 14.sp,
                     color = MutedText
                 )

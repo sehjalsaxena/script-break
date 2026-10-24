@@ -79,6 +79,8 @@ fun JudgeScreen(
     judge: JudgeMode,
     simulateCall: Boolean,
     onSimulateCall: (Boolean) -> Unit,
+    simulateScreenShare: Boolean = false,
+    onSimulateScreenShare: (Boolean) -> Unit = {},
     onRunInApp: () -> Unit,
     onPickFile: () -> Unit,
     onLoadSample: () -> Unit,
@@ -94,7 +96,7 @@ fun JudgeScreen(
             }
         }
         when (judge.tab) {
-            0 -> InputsTab(judge, simulateCall, onSimulateCall, onRunInApp)
+            0 -> InputsTab(judge, simulateCall, onSimulateCall, onRunInApp, simulateScreenShare, onSimulateScreenShare)
             1 -> StoriesTab(judge)
             2 -> FileTab(judge, onPickFile, onLoadSample)
             else -> resultsContent()
@@ -104,7 +106,8 @@ fun JudgeScreen(
 
 // ---------------------------------------------------------------------------------- Try inputs
 @Composable
-private fun InputsTab(judge: JudgeMode, simulateCall: Boolean, onSimulateCall: (Boolean) -> Unit, onRunInApp: () -> Unit) {
+private fun InputsTab(judge: JudgeMode, simulateCall: Boolean, onSimulateCall: (Boolean) -> Unit, onRunInApp: () -> Unit,
+                      simulateScreenShare: Boolean, onSimulateScreenShare: (Boolean) -> Unit) {
     val p = judge.inputs
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Spacer(Modifier.height(4.dp)) }
@@ -143,6 +146,7 @@ private fun InputsTab(judge: JudgeMode, simulateCall: Boolean, onSimulateCall: (
         item { Answer("Q2: asked to keep it secret from family or bank?", judge.q2) { judge.setAnswers(judge.q1, it) } }
         item { Section("Demo") }
         item { SwitchRow("Simulate a phone call in the whole app (for emulators)", "", simulateCall, onSimulateCall) }
+        item { SwitchRow("Simulate screen sharing in the whole app (phones older than Android 15)", "", simulateScreenShare, onSimulateScreenShare) }
         item { Spacer(Modifier.height(24.dp)) }
     }
 }

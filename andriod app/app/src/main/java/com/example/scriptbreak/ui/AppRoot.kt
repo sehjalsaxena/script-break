@@ -199,6 +199,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     state = HomeUi(
                         userName = flow.profile.displayName,
                         onCall = flow.callNow,
+                        screenShared = flow.screenShareNow,
                         people = DemoWorld.homePeople.map { PersonUi(it.id, it.name, it.initials, it.upiId, it.colorHex) },
                         recent = flow.ledger.mapIndexed { i, it ->
                             TxnUi("p$i-${it.atMs}", it.payeeName, "Today", rupees(it.amount))
@@ -412,6 +413,8 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     judge = judge,
                     simulateCall = flow.simulateCall,
                     onSimulateCall = { flow.simulateCall = it },
+                    simulateScreenShare = flow.simulateScreenShare,
+                    onSimulateScreenShare = { flow.simulateScreenShare = it },
                     onRunInApp = { flow.runJudge(judge.inputs, judge.q1, judge.q2) },
                     onPickFile = { pickFile.launch(arrayOf("application/json", "text/csv", "text/comma-separated-values", "text/plain", "application/octet-stream", "*/*")) },
                     onLoadSample = { scoreKit({ context.assets.open("sample_kit.jsonl").bufferedReader().use { it.readText() } }, "sample_kit.jsonl (400 synthetic test payments)") },

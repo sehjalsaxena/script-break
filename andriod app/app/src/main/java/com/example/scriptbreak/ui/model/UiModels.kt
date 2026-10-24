@@ -25,7 +25,8 @@ data class HomeUi(
     val userName: String,
     val onCall: Boolean,
     val people: List<PersonUi>,
-    val recent: List<TxnUi>
+    val recent: List<TxnUi>,
+    val screenShared: Boolean = false,
 )
 
 data class PayeeUi(

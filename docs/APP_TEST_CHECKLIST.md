@@ -96,8 +96,12 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 |---|---|---|---|
 | 5.1 | Be on a call with the app open for a few seconds, **hang up**, then pay Ramesh ₹20,000 | Still warned: reason "You were on a call in the last 30 minutes" | |
 | 5.2 | Android 15+: start **Screen record** (quick settings), open the app, pay Ramesh ₹9,999 | Critical (screen-share signal; reason mentions screen being shared) | |
+| 5.3 | Android 15+: video call (Meet/WhatsApp) and **share screen**, open DemoPay | Home shows BOTH banners: "Active phone call detected" and "Screen sharing detected" | |
+| 5.4 | Same, pay Ramesh ₹20,000 | Critical; reasons include BOTH "You are on a call right now" and "Your screen is being shared…" | |
+| 5.5 | Any Android: **Cast / Screen mirror** to a TV, open DemoPay | "Screen sharing detected" banner | |
+| 5.6 | Older phone: log in as judge → Inputs → **Simulate screen sharing** on → log out → sharma → pay Ramesh ₹20,000 | Pause, reason "Your screen is being shared…"; "What the AI sees" says "(simulated in Judge mode)". Reset demo turns it off | |
 
-## 6a. Family alert on TWO phones (internet on both)
+## 6a. Family alert on two or three phones (internet on all)
 
 | # | Steps | Expected | ✅/❌ |
 |---|---|---|---|
@@ -108,6 +112,10 @@ Make a **real call** to the demo phone from another phone and answer it, **then*
 | 6a.5 | Phone B: **Call Papa now** | Dialer opens on B; Phone A shows "Rohit is calling you now" | |
 | 6a.6 | Phone B: **I've called** | B back to waiting; A shows "Rohit says they have called you" | |
 | 6a.7 | Turn off internet on A, ask Rohit, turn internet back on | Alert arrives on B once A is back online | |
+| 6a.8 | Phone B **logged out** (login screen). Phone A asks Rohit | B vibrates + notification on the login screen. Log in as rohit → the alert opens straight away | |
+| 6a.9 | Phone B logged in as **judge**. Phone A asks Rohit | B does NOT buzz (someone else is using it). Log out → log in as rohit → the alert opens | |
+| 6a.10 | Phone B: wait more than 10 minutes after the alert, then log in as rohit | No old alert: "Waiting for alerts" | |
+| 6a.11 | Phone C also logged out while B taps **I've called** | C forgets the alert: logging in as rohit on C shows "Waiting" | |
 
 ## 6. Family phone (same phone)
 
