@@ -55,7 +55,7 @@
     <string name="ask_family">%1$s से कहें कि मुझे कॉल करें</string>
     <string name="asked_family">%1$s से कॉल करने को कहा गया है</string>
     <string name="next">आगे</string>
-    <string name="checked_on_phone">इस फ़ोन पर जाँचा गया · नियम पैक v0.3</string>
+    <string name="checked_on_phone">इस फ़ोन पर जाँचा गया · AI मॉडल %1$s</string>
 
     <!-- Critical Screen (SPEC.md Section 12) -->
     <string name="critical_title">रुकिए। यह एक आम धोखाधड़ी जैसा है।</string>

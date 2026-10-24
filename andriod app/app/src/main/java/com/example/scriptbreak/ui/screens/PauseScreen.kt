@@ -214,27 +214,11 @@ fun PauseScreen(
             containerColor = PauseOrange
         )
 
-        // Always available "Continue anyway" option per design rule
-        Button(
-            onClick = onNext,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MutedText
-            ),
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.critical_continue_now),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+        // No separate "Continue anyway" here: "Next" already continues to the PIN
+        // (or to the Critical screen if an answer raised the level).
 
         Text(
-            text = stringResource(R.string.checked_on_phone),
+            text = stringResource(R.string.checked_on_phone, state.modelVersion),
             fontSize = 14.sp,
             color = FaintText,
             textAlign = TextAlign.Center,

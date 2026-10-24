@@ -55,7 +55,7 @@
     <string name="ask_family">Ask %1$s to call me</string>
     <string name="asked_family">%1$s has been asked to call you</string>
     <string name="next">Next</string>
-    <string name="checked_on_phone">Checked on this phone · rule pack v0.3</string>
+    <string name="checked_on_phone">Checked on this phone · AI model %1$s</string>
 
     <!-- Critical Screen (SPEC.md Section 12) -->
     <string name="critical_title">Stop. This matches a common scam.</string>

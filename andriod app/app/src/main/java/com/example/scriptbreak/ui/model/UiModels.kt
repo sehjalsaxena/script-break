@@ -50,7 +50,8 @@ data class PauseUi(
     val q1: Boolean?,
     val q2: Boolean?,
     val contactName: String,
-    val askedFamily: Boolean
+    val askedFamily: Boolean,
+    val modelVersion: String = "" // shown in the footer: "Checked on this phone · AI model …"
 )
 
 data class CriticalUi(

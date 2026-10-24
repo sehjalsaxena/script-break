@@ -49,6 +49,8 @@ fun PayToUpiScreen(
     onPaste: () -> Unit,
     onContinue: () -> Unit,
     onBack: () -> Unit,
+    // Picking from the app's own recent list is not a paste (it changes the "pasted" signal)
+    onPickSuggestion: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -152,7 +154,7 @@ fun PayToUpiScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .clickable { onUpiIdChange(id) }
+                        .clickable { (onPickSuggestion ?: onUpiIdChange)(id) }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

@@ -2,6 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Android 15+: tells the app when ITS OWN screen is being recorded or shared (screen-share scams).
+         A normal permission: no popup, and it never gives access to screen contents. -->
+    <uses-permission android:name="android.permission.DETECT_SCREEN_RECORDING" />
+
+    <!-- Read-aloud on the Critical screen uses the phone's text-to-speech engine -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,6 +27,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ScriptBreak"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|locale|layoutDirection|density|fontScale"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
