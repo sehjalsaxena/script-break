@@ -213,8 +213,8 @@ class PaymentFlowTest {
         assertNull(f.account)
         assertTrue(f.login("judge", "0000")); assertEquals(Screen.Judge, f.screen); f.logout()
         assertTrue(f.login("analyst", "9999")); assertEquals(Screen.Analyst, f.screen); f.logout()
-        assertTrue(f.login("sehjal", "3333")); assertEquals(Screen.FamilyWaiting, f.screen)
-        assertTrue(f.back())                                        // Back on Sehjal's screen logs out
+        assertTrue(f.login("sehjal", "3333")); assertEquals(Screen.Home, f.screen)
+        assertTrue(f.back())                                        // Back on Sehjal's Home logs out
         assertEquals(Screen.Login, f.screen)
         assertFalse(f.back())                                       // on Login there is nothing to go back to
     }
@@ -264,12 +264,12 @@ class PaymentFlowTest {
     @Test
     fun familyAlertReachesRohitsPhoneAndHisAnswerComesBack() {
         val rohitPhone = PaymentFlow(model, FakeSignals(), { }).apply { login("sehjal", "3333") }
-        assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
+        assertEquals(Screen.Home, rohitPhone.screen)
         val sharmaPhone = newFlow(FakeSignals(call = true))
         sharmaPhone.payTyped("ramesh.k@demoupi", 20_000)
         sharmaPhone.askFamily()
         assertTrue("Sehjal's phone buzzes", rohitPhone.onIncomingAlert(sent.single()))
-        assertEquals("listed; opened from the notification or the list", Screen.FamilyWaiting, rohitPhone.screen)
+        assertEquals("listed; opened from the notification or the list", Screen.Home, rohitPhone.screen)
         rohitPhone.openAlertFromNotification()
         assertEquals(Screen.FamilyAlert, rohitPhone.screen)
         assertEquals("Sambhav", rohitPhone.lastAlert!!.fromName)
@@ -278,7 +278,7 @@ class PaymentFlowTest {
         sharmaPhone.onFamilyStatus("calling")
         assertEquals("Sehjal is calling you now", sharmaPhone.message)
         rohitPhone.familyDone()
-        assertEquals(Screen.FamilyWaiting, rohitPhone.screen)
+        assertEquals(Screen.Notifications, rohitPhone.screen)
     }
 
     @Test

@@ -92,7 +92,7 @@
     <!-- Family Alert Screen -->
     <string name="family_alert_title">%1$s शायद किसी फ़्रॉड कॉल पर हैं</string>
     <string name="family_alert_sub">%1$s, %3$s को %2$s भेजने की कोशिश कर रहे हैं।</string>
-    <string name="family_alert_disclaimer">सहजल के लिए खाता देखना या भुगतान रोकना संभव नहीं है।</string>
+    <string name="family_alert_disclaimer">आपके लिए उनका खाता देखना या भुगतान रोकना संभव नहीं है।</string>
     <string name="family_alert_call_now">%1$s को अभी कॉल करें</string>
     <string name="family_alert_called">मैंने कॉल कर लिया है</string>
 

@@ -99,7 +99,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 | `andriod app/app/src/main/java/com/example/scriptbreak/ml/` | `ScamModel.kt`: the on-phone scorer and safety layer |
 | `andriod app/app/src/main/java/com/example/scriptbreak/logic/` | Payment flow, phone signals, Judge mode, Analyst mode, family alert |
 | `andriod app/app/src/main/java/com/example/scriptbreak/ui/` | All screens |
-| `andriod app/app/src/test/` | 87 unit tests |
+| `andriod app/app/src/test/` | 90 unit tests |
 | [`ml/`](ml/) | Data generator, training, export, evaluation, analyst discovery, one-command test runner |
 | [`reference/`](reference/) | Round 1 Python code (rules engine, generator), reused as declared |
 | [`tests/cases.json`](tests/cases.json) | The 28 Round 1 behaviour stories (never used for training) |
@@ -117,18 +117,18 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 |---|---|---|---|
 | `sambhav` | 1111 | Sambhav Jain: the person paying (`sambhav.jain@demoupi`) | 4821 |
 | `deepak` | 2222 | Deepak Rawat: a second payer (`deepak.rawat@demoupi`) | 7316 |
-| `sehjal` | 3333 | Sehjal: the family phone that gets "Ask family" alerts | |
+| `sehjal` | 3333 | Sehjal Saxena: pays like the others (`sehjal.saxena@demoupi`), and is the trusted contact who gets Sambhav's and Deepak's "Ask family" alerts (in Notifications) | 2580 |
 | `judge` | 0000 | Judge mode: change any of the 16 inputs, the 28 stories, load a test file, results | |
 | `analyst` | 9999 | Analyst console: approve rules the AI proposes | |
 
 A demo to try on one phone: log in as judge, switch on "Simulate a phone call", log out, and log in as sambhav.
 Then Pay to UPI ID `ramesh.k@demoupi` ₹20,000 → Pause → answer Yes → Critical → Ask Sehjal.
-Then log out and log in as sehjal: the alert is there. For two or three phones, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+Then log out and log in as sehjal: the alert is in Notifications (the bell on Home); tap it. For two or three phones, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
 ## Run the tests
 
 ```bash
-# Android: 87 unit tests (needs a JDK, e.g. Android Studio's)
+# Android: 90 unit tests (needs a JDK, e.g. Android Studio's)
 cd "andriod app"
 gradlew.bat testDebugUnitTest
 

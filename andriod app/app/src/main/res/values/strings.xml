@@ -92,7 +92,7 @@
     <!-- Family Alert Screen -->
     <string name="family_alert_title">%1$s may be on a scam call</string>
     <string name="family_alert_sub">%1$s is trying to pay %2$s to %3$s.</string>
-    <string name="family_alert_disclaimer">Sehjal can\'t see the account or stop the payment.</string>
+    <string name="family_alert_disclaimer">You can\'t see their account or stop the payment.</string>
     <string name="family_alert_call_now">Call %1$s now</string>
     <string name="family_alert_called">I\'ve called</string>
 

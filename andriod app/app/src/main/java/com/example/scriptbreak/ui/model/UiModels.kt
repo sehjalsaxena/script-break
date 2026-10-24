@@ -86,4 +86,5 @@ data class FamilyAlertUi(
     val payeeName: String,
     val reasons: List<String>,
     val sentAtMs: Long? = null,   // when "Ask family" was tapped (shown as "Sent at 10:42 PM · 12 min ago")
+    val toProfile: String = "rohit", // whose phone it is for (the sender's trusted contact)
 )

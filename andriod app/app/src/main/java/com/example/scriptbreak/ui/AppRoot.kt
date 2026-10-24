@@ -98,6 +98,8 @@ import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
 import java.text.SimpleDateFormat
 import java.util.Date
+import com.example.scriptbreak.ui.theme.CritRed
+import com.example.scriptbreak.ui.theme.CritRedTint
 import java.util.Locale
 import kotlin.math.roundToLong
 
@@ -147,8 +149,9 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
     }
     // Sehjal's phone needs permission to show the alert as a notification (Android 13+)
     val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-    LaunchedEffect(flow.familyMode) {
-        if (flow.familyMode && Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+    LaunchedEffect(flow.account) {
+        // anyone can receive an "Ask family" alert (Sehjal from Sambhav and Deepak, Sambhav from Sehjal)
+        if (flow.account != null && Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
     // "Pay from a QR image": the Android photo picker shares only the one image chosen (no storage permission)
     // A QR from the camera or an image goes to the payment (Home) or to Judge mode's inputs. True = used.
@@ -410,7 +413,17 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() },
                     clearedIds = flow.clearedNoticeIds,
                     readIds = flow.readNoticeIds,
-                    extraItems = flow.received.map {
+                    extraItems = flow.myAlerts.map {
+                        val a = it.alert
+                        NotificationItem(
+                            id = "a-${it.key}", title = "${a.fromName} may be on a scam call",
+                            description = "${a.amountText} to ${a.payeeName}. " + if (it.done) "Answered." else "Tap to open: call now, or I've called.",
+                            time = "Sent at " + SimpleDateFormat("d MMM, h:mm a", Locale.ENGLISH).format(Date(it.key)),
+                            category = "Security", icon = AppIcons.Warning,
+                            iconTint = if (it.done) SafeGreen else CritRed, iconBg = if (it.done) SafeGreenTint else CritRedTint,
+                            unread = !it.read,
+                        )
+                    } + flow.received.map {
                         NotificationItem(
                             id = "r-${it.id}", title = "Received ${rupees(it.amount)}",
                             description = "From ${it.fromName} (${it.fromUpi}). UPI ref ${it.upiRef}.",
@@ -420,7 +433,8 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                         )
                     },
                     onClearAll = flow::clearNotices,
-                    onRead = flow::readNotice,
+                    // an alert opens "Call now / I've called"; anything else is just marked read
+                    onRead = { id -> if (id.startsWith("a-")) id.removePrefix("a-").toLongOrNull()?.let(flow::openAlert) else flow.readNotice(id) },
                 )
 
                 Screen.Account -> AccountScreen(

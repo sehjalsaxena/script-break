@@ -65,7 +65,7 @@ object DemoWorld {
     val accounts: List<Account> = listOf(
         Account("sambhav", "Sambhav Jain", mode = "sharma", loginPinHash = "ba9daeba79544e90605d91663f69a50ee8655080c1505c869f2bebcb7a2de7eb", upiPinHash = "3833b52b6eea3d8af29f5963cfba0d4d13c01165ce25fae17e75f968c491e9d8", demoLoginPin = "1111", demoUpiPin = "4821", upiId = "sambhav.jain@demoupi"),
         Account("deepak", "Deepak Rawat", mode = "priya", loginPinHash = "2fda858c3af4887cfb817e4937a32673b0746e4a9bd22dc123dc5c51efd00fc9", upiPinHash = "486eb1896cba6cdd1dd5beae845bca5a27fc1c810bafe162bc40b11beffa42d3", demoLoginPin = "2222", demoUpiPin = "7316", upiId = "deepak.rawat@demoupi"),
-        Account("sehjal", "Sehjal Saxena", mode = "rohit", loginPinHash = "241d05bd50b7bbb45b47bc989f746535fb7caa56109678ca7a82fe9167321cfa", upiPinHash = null, demoLoginPin = "3333", demoUpiPin = null, upiId = "sehjal.saxena@demoupi"),
+        Account("sehjal", "Sehjal Saxena", mode = "rohit", loginPinHash = "241d05bd50b7bbb45b47bc989f746535fb7caa56109678ca7a82fe9167321cfa", upiPinHash = "d9ffb2cad0ce93c67843b59297e8329c549836fa5142a2b89aa1162fa346ee26", demoLoginPin = "3333", demoUpiPin = "2580", upiId = "sehjal.saxena@demoupi"),
         Account("judge", "Judge", mode = "judge", loginPinHash = "72cdfeadb538864524a9e9a8641acf4a305c9b21d757a2c144de8c6744bb08c6", upiPinHash = null, demoLoginPin = "0000", demoUpiPin = null),
         Account("analyst", "Analyst", mode = "analyst", loginPinHash = "f1806240e1e119d841fdb68070019777d55c9e57d56d02f1bc2dbe28da141c9e", upiPinHash = null, demoLoginPin = "9999", demoUpiPin = null),
     )
@@ -77,6 +77,7 @@ object DemoWorld {
 
     val profiles: Map<String, Profile> = listOf(
         Profile("sharma", "Sambhav Jain", median90d = 650.0, payments90d = 42, contactName = "Sehjal", shownToFamilyAs = "Sambhav", openingBalance = 248_250),
+        Profile("rohit", "Sehjal Saxena", median90d = 800.0, payments90d = 48, contactName = "Sambhav", shownToFamilyAs = "Sehjal", openingBalance = 152_750),
         Profile("priya", "Deepak Rawat", median90d = 1200.0, payments90d = 60, contactName = "Sehjal", shownToFamilyAs = "Deepak", openingBalance = 186_400),
     ).associateBy { it.id }
 
@@ -97,6 +98,9 @@ object DemoWorld {
     )
 
     val homePeople: List<PayeeRecord> get() = payees.filter { it.status == "known" }
+
+    /** Whose phone gets this person's "Ask family" alert: Sehjal for Sambhav and Deepak, Sambhav for Sehjal. */
+    fun alertRecipient(profileId: String): String = if (profileId == "rohit") "sharma" else "rohit"
 
     /** This person's own demo UPI ID (null for Judge / Analyst). */
     fun ownUpi(profileId: String): String? = accounts.firstOrNull { it.mode == profileId }?.upiId
@@ -160,6 +164,10 @@ object DemoWorld {
 
     /** Earlier payments shown on Home (synthetic). */
     fun seededRecent(profileId: String): List<TxnUi> = when (profileId) {
+        "rohit" -> listOf(
+            TxnUi("s1", "Sunita Iyer", "Yesterday, 8:10 PM", "₹600"),
+            TxnUi("s2", "Sharma Kirana Store", "21 Oct, 5:40 PM", "₹740"),
+        )
         "priya" -> listOf(
             TxnUi("s1", "Sunita Iyer", "Yesterday, 7:40 PM", "₹1,200"),
             TxnUi("s2", "Sharma Kirana Store", "20 Oct, 6:15 PM", "₹860"),

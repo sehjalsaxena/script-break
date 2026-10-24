@@ -128,7 +128,8 @@ class PaymentFlow(
     private val handledAlerts = mutableSetOf<Long>()   // alerts Sehjal already answered on this phone
     /** Sehjal's alerts list: every alert this phone got, newest first. Tapping one opens "Call now / I've called". */
     val familyInbox = mutableStateListOf<FamilyInboxItem>()
-    private var openAlertAfterLogin = false            // the phone notification was tapped before Sehjal logged in
+    private var openAlertAfterLogin = false            // the phone notification was tapped before its person logged in
+    private var alertSentBy: String? = null            // who sent the last "Ask family" from this phone (gets the answers)
     /** In-app notifications (bell on Home) that this person cleared or read, kept as "profileId:noticeId". */
     private val clearedNotices = mutableStateListOf<String>()
     private val readNotices = mutableStateListOf<String>()
@@ -189,7 +190,6 @@ class PaymentFlow(
     var demoOtp by mutableStateOf<String?>(null); private set
 
     /** This phone is being used as the trusted contact's (Sehjal's) phone. */
-    var familyMode by mutableStateOf(false); private set
 
     private var pasted = false            // payee UPI ID pasted, not typed or picked
     private var prefillAmount = ""        // amount written in a scanned QR code (the person can change it)
@@ -264,7 +264,7 @@ class PaymentFlow(
     }
 
     fun logout() {
-        account = null; familyMode = false
+        account = null
         resetPayment()
         screen = Screen.Login
     }
@@ -272,18 +272,13 @@ class PaymentFlow(
     // ---- profiles and navigation ----------------------------------------------------------
     fun pickProfile(id: String) {
         when (id) {
-            "sharma", "priya" -> {
+            "sharma", "priya", "rohit" -> {   // Sambhav, Deepak and Sehjal: each pays, and gets alerts meant for them
                 profile = DemoWorld.profiles.getValue(id)
                 resetPayment()
                 screen = Screen.Home
-            }
-            "rohit" -> {
-                familyMode = true
-                if (freshAlert == null) lastAlert = null
                 familyInbox.removeAll { clock() - it.key >= KEEP_ALERT }
-                screen = Screen.FamilyWaiting   // Sehjal's alerts list; an alert opens when tapped
-                if (openAlertAfterLogin) familyInbox.firstOrNull { !it.done }?.let { openAlertAfterLogin = false; openAlert(it.key) }
-                onFamilyLogin()   // also ask Firebase, in case the alert came while this app was closed
+                if (openAlertAfterLogin) myAlerts.firstOrNull { !it.done }?.let { openAlertAfterLogin = false; openAlert(it.key) }
+                onFamilyLogin()   // also ask Firebase, in case an alert came while this app was closed
             }
             "judge" -> screen = Screen.Judge
             "analyst" -> screen = Screen.Analyst
@@ -296,7 +291,7 @@ class PaymentFlow(
         when (screen) {
             Screen.Login -> return false
             Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyWaiting -> logout()
-            Screen.FamilyAlert -> screen = Screen.FamilyWaiting
+            Screen.FamilyAlert -> screen = Screen.Notifications
             Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.History, Screen.BankSelf, Screen.CheckBalance,
             Screen.Notifications, Screen.Account, Screen.Settings, Screen.Payee, Screen.Waiting -> finish()
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
@@ -540,7 +535,9 @@ class PaymentFlow(
         val all = (criticalResult ?: pauseResult)?.reasons.orEmpty()
         val live = all.filter { it == CALL_NOW || it == SCREEN_SHARE }
         val reasons = (live + (all - live.toSet())).take(3)
-        val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock())
+        val alert = FamilyAlertUi(profile.shownToFamilyAs, rupees(amount), p.name, reasons, sentAtMs = clock(),
+            toProfile = DemoWorld.alertRecipient(profile.id))
+        alertSentBy = profile.id
         lastAlert = alert; lastAlertAt = clock()   // also kept here, for a one-phone demo (log in as Sehjal)
         addToInbox(alert)
         askedFamily = true
@@ -559,15 +556,18 @@ class PaymentFlow(
         lastAlert = alert; lastAlertAt = alert.sentAtMs ?: clock()
         addToInbox(alert)
         return when {
-            familyMode -> {
-                // never jumps to the alert by itself: the phone notification (or the alerts list) opens it
+            account?.mode == alert.toProfile -> {
+                // never jumps to the alert by itself: the phone notification (or the bell's Notifications) opens it
                 if (openAlertAfterLogin) { openAlertAfterLogin = false; openAlert(alert.sentAtMs ?: lastAlertAt) }
                 !same                                            // buzz once per alert, not again on login
             }
-            account == null -> !same && phoneOwner == "rohit"    // login screen of Sehjal's phone: buzz; other phones keep it quietly
+            account == null -> !same && phoneOwner == alert.toProfile   // login page of the recipient's phone: buzz
             else -> false                                        // someone else is using this phone: keep it quietly
         }
     }
+
+    /** The alerts meant for the person logged in (shown in their Notifications), newest first. */
+    val myAlerts: List<FamilyInboxItem> get() = familyInbox.filter { it.alert.toProfile == profile.id }
 
     private fun addToInbox(alert: FamilyAlertUi) {
         val key = alert.sentAtMs ?: clock()
@@ -585,10 +585,16 @@ class PaymentFlow(
 
     /** Sehjal tapped the phone notification: open the newest open alert (right after login, if needed). */
     fun openAlertFromNotification() {
+        val latest = familyInbox.firstOrNull { !it.done }
+        val me = account?.mode
         when {
-            familyMode -> familyInbox.firstOrNull { !it.done }?.let { openAlert(it.key) } ?: run { openAlertAfterLogin = true }
-            account == null -> openAlertAfterLogin = true
-            else -> message = "This alert is for Sehjal. Log in as sehjal to open it."
+            me == null -> openAlertAfterLogin = true
+            latest == null -> if (me in DemoWorld.profiles) openAlertAfterLogin = true   // still arriving from Firebase
+            latest.alert.toProfile == me -> openAlert(latest.key)
+            else -> {
+                val forWhom = DemoWorld.accounts.firstOrNull { it.mode == latest.alert.toProfile }
+                message = "This alert is for ${forWhom?.displayName ?: "someone else"}. Log in as ${forWhom?.username ?: "them"} to open it."
+            }
         }
     }
 
@@ -599,12 +605,9 @@ class PaymentFlow(
         familyInbox.indices.forEach { i -> if (!familyInbox[i].done) familyInbox[i] = familyInbox[i].copy(done = true) }
     }
 
-    /** A kept alert, if it is under 24 hours old (the same as Firebase keeps it). */
-    private val freshAlert: FamilyAlertUi? get() = lastAlert?.takeIf { clock() - lastAlertAt < KEEP_ALERT }
-
     /** Sehjal's answer reached the sender's phone. */
     fun onFamilyStatus(status: String) {
-        if (familyMode) return
+        if (account?.mode != alertSentBy) return   // only the person who asked sees the answer
         when (status) {
             "calling" -> message = "${contact.name} is calling you now"
             "called" -> message = "${contact.name} says they have called you"
@@ -618,7 +621,7 @@ class PaymentFlow(
             val i = familyInbox.indexOfFirst { it.key == k }
             if (i >= 0) familyInbox[i] = familyInbox[i].copy(read = true, done = true)
         }
-        lastAlert = null; screen = Screen.FamilyWaiting
+        lastAlert = null; screen = Screen.Notifications
     }
 
     // ---- in-app notifications (the bell on Home): Clear all and read are remembered, per person ----
@@ -881,6 +884,7 @@ class PaymentFlow(
         private val DEFAULT_CONTACTS = mapOf(
             "sharma" to TrustedContact("Sehjal", "friend", "9876543210"),
             "priya" to TrustedContact("Sehjal", "friend", "9876543210"),
+            "rohit" to TrustedContact("Sambhav", "friend", "9812345678"),
         )
 
         /** Median, the same way Python's statistics.median does it (mean of the middle two for an even count). */

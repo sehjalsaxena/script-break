@@ -69,7 +69,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                 "status" to "sent",
                 "sentAt" to now,
                 "fromDevice" to deviceId,
-                "to" to "rohit",            // the trusted contact's demo account
+                "to" to alert.toProfile,    // the trusted contact's demo account
             ))
         }
     }
@@ -138,6 +138,7 @@ class FamilyLink(context: Context) : FamilyAlertSender {
                 payeeName = s.child("payeeName").value as? String ?: "",
                 reasons = s.child("reasons").children.mapNotNull { it.value as? String },
                 sentAtMs = sentAt,
+                toProfile = s.child("to").value as? String ?: "rohit",
             ))
             mine && status != "sent" && !onLogin -> onStatus(id, status)       // Sehjal answered OUR alert
             !mine && status == "called" -> onCleared()                        // handled on Sehjal's phone
