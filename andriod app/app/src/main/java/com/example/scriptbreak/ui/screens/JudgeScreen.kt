@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,7 @@ import com.example.scriptbreak.logic.Rate
 import com.example.scriptbreak.logic.Story
 import com.example.scriptbreak.ml.Payment
 import com.example.scriptbreak.ml.Result
+import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.DemoSecondaryButton
@@ -79,11 +82,11 @@ import java.util.Locale
 
 /**
  * 1-Tap preset scenarios specifically designed for hackathon judges to evaluate
- * the on-device AI fraud detection model instantly without typing manual variables.
+ * the on-device AI fraud detection model instantly with vector icons and zero emojis.
  */
 private data class QuickScenario(
     val id: String,
-    val icon: String,
+    val icon: ImageVector,
     val title: String,
     val subtitle: String,
     val expectedBadge: String,
@@ -96,7 +99,7 @@ private data class QuickScenario(
 private val PRESET_SCENARIOS = listOf(
     QuickScenario(
         id = "digital_arrest",
-        icon = "🚨",
+        icon = AppIcons.Warning,
         title = "Digital Arrest",
         subtitle = "Fake police call demanding secret fine (₹50k)",
         expectedBadge = "CRITICAL",
@@ -114,7 +117,7 @@ private val PRESET_SCENARIOS = listOf(
     ),
     QuickScenario(
         id = "screen_share",
-        icon = "🛑",
+        icon = AppIcons.ScreenShare,
         title = "Remote Takeover",
         subtitle = "AnyDesk screen sharing to new payee (₹28k)",
         expectedBadge = "CRITICAL",
@@ -131,7 +134,7 @@ private val PRESET_SCENARIOS = listOf(
     ),
     QuickScenario(
         id = "reverse_refund",
-        icon = "⚠️",
+        icon = AppIcons.History,
         title = "Wrong Credit",
         subtitle = "Refund trap for stranger deposit (₹10k)",
         expectedBadge = "PAUSE",
@@ -147,7 +150,7 @@ private val PRESET_SCENARIOS = listOf(
     ),
     QuickScenario(
         id = "late_night",
-        icon = "🌙",
+        icon = AppIcons.DarkMode,
         title = "Late-Night Transfer",
         subtitle = "Unusual 2:00 AM transfer to new payee (₹8.5k)",
         expectedBadge = "NUDGE",
@@ -162,7 +165,7 @@ private val PRESET_SCENARIOS = listOf(
     ),
     QuickScenario(
         id = "normal_grocery",
-        icon = "🛡️",
+        icon = AppIcons.VerifiedUser,
         title = "Daily Grocery",
         subtitle = "Routine shopping to known merchant (₹350)",
         expectedBadge = "SAFE",
@@ -177,7 +180,7 @@ private val PRESET_SCENARIOS = listOf(
     ),
     QuickScenario(
         id = "sharma_demo",
-        icon = "🔄",
+        icon = AppIcons.Refresh,
         title = "Mr. Sharma Demo",
         subtitle = "Benchmark ₹20k on phone call to new payee",
         expectedBadge = "BENCHMARK",
@@ -216,7 +219,7 @@ fun JudgeScreen(
             modifier = Modifier.padding(horizontal = 8.dp)
         )
 
-        // Segmented Navigation Pill Control
+        // Segmented Navigation Pill Control with Vector Icons
         Surface(
             color = PanelBg,
             shape = RoundedCornerShape(14.dp),
@@ -230,13 +233,13 @@ fun JudgeScreen(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 val tabs = listOf(
-                    "🎮 Sandbox",
-                    "📖 Stories",
-                    "📁 Batch",
-                    "📊 Score"
+                    Triple("Sandbox", AppIcons.Tune, 0),
+                    Triple("Stories", AppIcons.MenuBook, 1),
+                    Triple("Batch", AppIcons.Folder, 2),
+                    Triple("Score", AppIcons.Assessment, 3)
                 )
-                tabs.forEachIndexed { i, title ->
-                    val isSelected = judge.tab == i
+                tabs.forEach { (title, icon, index) ->
+                    val isSelected = judge.tab == index
                     Surface(
                         color = if (isSelected) AppSurface else Color.Transparent,
                         shape = RoundedCornerShape(10.dp),
@@ -245,12 +248,20 @@ fun JudgeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(10.dp))
-                            .clickable { judge.tab = i }
+                            .clickable { judge.tab = index }
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(vertical = 8.dp)
                         ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                tint = if (isSelected) AppPurple else MutedText,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(Modifier.width(5.dp))
                             Text(
                                 text = title,
                                 fontSize = 12.sp,
@@ -329,11 +340,11 @@ private fun InputsTab(
             )
         }
 
-        // Card 1: 💳 Payment & Baseline Spending Profile
+        // Card 1: Payment & Baseline Spending Profile
         item {
             SectionCard(
                 title = "Payment & Spending Baseline",
-                icon = "💳",
+                icon = AppIcons.CreditCard,
                 subtitle = "How this transfer compares to the user's historical account behavior"
             ) {
                 JudgeNumberField(
@@ -356,11 +367,11 @@ private fun InputsTab(
             }
         }
 
-        // Card 2: 📡 Live Device & Sensor Telemetry
+        // Card 2: Live Device & Sensor Telemetry
         item {
             SectionCard(
                 title = "Real-Time Device Telemetry",
-                icon = "📡",
+                icon = AppIcons.Phone,
                 subtitle = "Live sensors detecting social engineering, coercion, or remote takeover"
             ) {
                 JudgeSwitchRow(
@@ -401,11 +412,11 @@ private fun InputsTab(
             }
         }
 
-        // Card 3: 👤 Payee Trust & Relationship Velocity
+        // Card 3: Payee Trust & Relationship Velocity
         item {
             SectionCard(
                 title = "Payee Trust & Relationship Velocity",
-                icon = "👤",
+                icon = AppIcons.Person,
                 subtitle = "Recipient familiarity, categorization, and rapid velocity spikes"
             ) {
                 JudgeChoiceRow(
@@ -454,11 +465,11 @@ private fun InputsTab(
             }
         }
 
-        // Card 4: ❓ Psychological Coercion Screening (Safety Guardrail Questions)
+        // Card 4: Psychological Coercion Screening (Safety Guardrail Questions)
         item {
             SectionCard(
                 title = "Psychological Coercion Screening",
-                icon = "❓",
+                icon = AppIcons.HelpOutline,
                 subtitle = "During a Pause reflection step, DemoPay prompts the user with these two questions:"
             ) {
                 JudgeAnswerRow(
@@ -475,11 +486,11 @@ private fun InputsTab(
             }
         }
 
-        // Card 5: 🧪 Demo Hardware Simulation (For Emulators & Hackathon Demos)
+        // Card 5: Demo Hardware Simulation (For Emulators & Hackathon Demos)
         item {
             SectionCard(
                 title = "Demo Hardware Simulation",
-                icon = "🧪",
+                icon = AppIcons.Science,
                 subtitle = "Inject simulated device states across the entire DemoPay app for live testing:"
             ) {
                 JudgeSwitchRow(
@@ -515,13 +526,13 @@ private fun QuickPresetsRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "⚡ 1-Tap Scam Scenarios for Judges",
+                text = "Quick Presets for Judges",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = InkDark
             )
             Text(
-                text = "Scroll for more ➔",
+                text = "Scroll for more",
                 fontSize = 12.sp,
                 color = FaintText
             )
@@ -564,7 +575,12 @@ private fun QuickPresetsRow(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(preset.icon, fontSize = 22.sp)
+                            Icon(
+                                imageVector = preset.icon,
+                                contentDescription = null,
+                                tint = if (isSelected) AppPurple else badgeFg,
+                                modifier = Modifier.size(24.dp)
+                            )
                             Surface(
                                 color = badgeBg,
                                 shape = RoundedCornerShape(6.dp)
@@ -597,7 +613,7 @@ private fun QuickPresetsRow(
                         }
 
                         Text(
-                            text = if (isSelected) "● Active scenario" else "Tap to test ➔",
+                            text = if (isSelected) "Active Preset" else "Tap to Select",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = if (isSelected) AppPurple else AppBlue
@@ -627,7 +643,16 @@ private fun ResultCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("⚠️ Model Offline", fontWeight = FontWeight.Bold, color = CritRed, fontSize = 16.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = AppIcons.Warning,
+                        contentDescription = null,
+                        tint = CritRed,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Model Offline", fontWeight = FontWeight.Bold, color = CritRed, fontSize = 16.sp)
+                }
                 Text("Fail-open protection active: payments are allowed through safely.", color = MutedText, fontSize = 14.sp)
             }
         }
@@ -642,10 +667,10 @@ private fun ResultCard(
         else -> "SAFE TO PROCEED"
     }
     val levelIcon = when (r.level) {
-        "CRITICAL" -> "🚨"
-        "PAUSE" -> "🟠"
-        "NUDGE" -> "🟡"
-        else -> "🟢"
+        "CRITICAL" -> AppIcons.Warning
+        "PAUSE" -> AppIcons.HourglassEmpty
+        "NUDGE" -> AppIcons.Info
+        else -> AppIcons.VerifiedUser
     }
     val levelDesc = when (r.level) {
         "CRITICAL" -> "Transaction blocked by safety policies. Immediate intervention triggered."
@@ -669,12 +694,23 @@ private fun ResultCard(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "📖 $story",
-                        fontSize = 12.sp,
-                        color = MutedText,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = AppIcons.MenuBook,
+                            contentDescription = null,
+                            tint = MutedText,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = story,
+                            fontSize = 12.sp,
+                            color = MutedText
+                        )
+                    }
                 }
             }
 
@@ -693,7 +729,12 @@ private fun ResultCard(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(levelIcon, fontSize = 16.sp)
+                        Icon(
+                            imageVector = levelIcon,
+                            contentDescription = null,
+                            tint = fg,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = levelTitle,
@@ -781,7 +822,12 @@ private fun ResultCard(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("🛡️", fontSize = 15.sp)
+                            Icon(
+                                imageVector = AppIcons.VerifiedUser,
+                                contentDescription = null,
+                                tint = SafeGreen,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "Zero risk signals triggered. Transaction matches normal spending behavior.",
@@ -803,7 +849,12 @@ private fun ResultCard(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(reasonIcon(reason), fontSize = 15.sp)
+                                Icon(
+                                    imageVector = reasonIcon(reason),
+                                    contentDescription = null,
+                                    tint = AppPurple,
+                                    modifier = Modifier.size(18.dp)
+                                )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     text = reason,
@@ -827,7 +878,12 @@ private fun ResultCard(
                 ) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("🛡️", fontSize = 14.sp)
+                            Icon(
+                                imageVector = AppIcons.Security,
+                                contentDescription = null,
+                                tint = CritRed,
+                                modifier = Modifier.size(16.dp)
+                            )
                             Spacer(Modifier.width(6.dp))
                             Text(
                                 text = "Deterministic Safety Rule Override Active",
@@ -857,13 +913,13 @@ private fun ResultCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DemoPrimaryButton(
-                    text = "▶ Run in Real App Checkout",
+                    text = "Run in Real App Checkout",
                     onClick = onRunInApp,
                     modifier = Modifier.weight(1.3f),
                     enabled = canRun
                 )
                 DemoSecondaryButton(
-                    text = "↺ Reset",
+                    text = "Reset",
                     onClick = onReset,
                     modifier = Modifier.weight(0.7f)
                 )
@@ -872,17 +928,17 @@ private fun ResultCard(
     }
 }
 
-private fun reasonIcon(text: String): String = when {
-    text.contains("call", ignoreCase = true) -> "📞"
-    text.contains("screen", ignoreCase = true) -> "📱"
-    text.contains("amount", ignoreCase = true) || text.contains("higher", ignoreCase = true) -> "📈"
-    text.contains("payee", ignoreCase = true) || text.contains("new", ignoreCase = true) -> "👤"
-    text.contains("secret", ignoreCase = true) -> "🤫"
-    text.contains("verify", ignoreCase = true) || text.contains("protect", ignoreCase = true) -> "⚠️"
-    text.contains("night", ignoreCase = true) -> "🌙"
-    text.contains("pasted", ignoreCase = true) -> "📋"
-    text.contains("switch", ignoreCase = true) -> "🔄"
-    else -> "⚡"
+private fun reasonIcon(text: String): ImageVector = when {
+    text.contains("call", ignoreCase = true) -> AppIcons.Phone
+    text.contains("screen", ignoreCase = true) -> AppIcons.ScreenShare
+    text.contains("amount", ignoreCase = true) || text.contains("higher", ignoreCase = true) -> AppIcons.TrendingUp
+    text.contains("payee", ignoreCase = true) || text.contains("new", ignoreCase = true) -> AppIcons.Person
+    text.contains("secret", ignoreCase = true) -> AppIcons.Lock
+    text.contains("verify", ignoreCase = true) || text.contains("protect", ignoreCase = true) -> AppIcons.Warning
+    text.contains("night", ignoreCase = true) -> AppIcons.DarkMode
+    text.contains("pasted", ignoreCase = true) -> AppIcons.ContentPaste
+    text.contains("switch", ignoreCase = true) -> AppIcons.SwapHoriz
+    else -> AppIcons.Info
 }
 
 @Composable
@@ -897,7 +953,7 @@ private fun levelColors(level: String): Pair<Color, Color> = when (level.upperca
 @Composable
 private fun SectionCard(
     title: String,
-    icon: String,
+    icon: ImageVector,
     subtitle: String? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -914,7 +970,12 @@ private fun SectionCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(icon, fontSize = 18.sp)
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = AppPurple,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = title,
@@ -1155,7 +1216,12 @@ private fun StoriesTab(judge: JudgeMode) {
             ) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("📖", fontSize = 18.sp)
+                        Icon(
+                            imageVector = AppIcons.MenuBook,
+                            contentDescription = null,
+                            tint = AppPurple,
+                            modifier = Modifier.size(20.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "28 Behavioral Scam Test Stories",
@@ -1182,9 +1248,9 @@ private fun StoriesTab(judge: JudgeMode) {
             ) {
                 listOf(
                     "all" to "All (${judge.stories.size})",
-                    "scam" to "🚨 Scams (${judge.stories.count { it.kind == "scam" }})",
-                    "boundary" to "⚠️ Edge Cases (${judge.stories.count { it.kind == "boundary" }})",
-                    "legit" to "🛡️ Genuine (${judge.stories.count { it.kind == "legit" }})"
+                    "scam" to "Scams (${judge.stories.count { it.kind == "scam" }})",
+                    "boundary" to "Edge Cases (${judge.stories.count { it.kind == "boundary" }})",
+                    "legit" to "Genuine (${judge.stories.count { it.kind == "legit" }})"
                 ).forEach { (kind, label) ->
                     val isSelected = selectedKind == kind
                     FilterChip(
@@ -1287,12 +1353,35 @@ private fun StoriesTab(judge: JudgeMode) {
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (isMatch) {
-                                Text("✓ Exact Match", fontSize = 12.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
+                                Icon(
+                                    imageVector = AppIcons.Check,
+                                    contentDescription = null,
+                                    tint = SafeGreen,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text("Matches Target", fontSize = 12.sp, color = SafeGreen, fontWeight = FontWeight.SemiBold)
                             } else {
-                                Text("⚡ AI Adjusted", fontSize = 12.sp, color = NudgeAmber, fontWeight = FontWeight.SemiBold)
+                                Icon(
+                                    imageVector = AppIcons.Warning,
+                                    contentDescription = null,
+                                    tint = NudgeAmber,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text("AI Adjusted", fontSize = 12.sp, color = NudgeAmber, fontWeight = FontWeight.SemiBold)
                             }
-                            Spacer(Modifier.width(8.dp))
-                            Text("Test ➔", fontSize = 12.sp, color = AppPurple, fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.width(10.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Test", fontSize = 12.sp, color = AppPurple, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.width(2.dp))
+                                Icon(
+                                    imageVector = AppIcons.ChevronRight,
+                                    contentDescription = null,
+                                    tint = AppPurple,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -1307,7 +1396,7 @@ private fun StoriesTab(judge: JudgeMode) {
 @Composable
 private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -> Unit) {
     val kit = judge.kit
-    var filterTab by remember { mutableIntStateOf(0) } // 0: All, 1: Missed, 2: False Alarms
+    var filterTab by remember { mutableIntStateOf(0) }
 
     LazyColumn(
         modifier = Modifier
@@ -1327,7 +1416,12 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("📁", fontSize = 20.sp)
+                        Icon(
+                            imageVector = AppIcons.Folder,
+                            contentDescription = null,
+                            tint = AppPurple,
+                            modifier = Modifier.size(22.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Offline Batch Benchmark Evaluator",
@@ -1353,13 +1447,13 @@ private fun FileTab(judge: JudgeMode, onPickFile: () -> Unit, onLoadSample: () -
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DemoPrimaryButton(
-                    text = "⚡ Run 400-Test Benchmark",
+                    text = "Run 400-Payment Benchmark",
                     onClick = onLoadSample,
                     modifier = Modifier.weight(1.2f),
                     enabled = !judge.kitLoading
                 )
                 DemoSecondaryButton(
-                    text = "📂 Custom File",
+                    text = "Upload Custom File",
                     onClick = onPickFile,
                     modifier = Modifier.weight(0.8f),
                     enabled = !judge.kitLoading
@@ -1483,7 +1577,24 @@ private fun KitSummaryCard(k: KitResult) {
                     Text("${k.rows.size} payments evaluated offline", fontSize = 12.sp, color = MutedText)
                 }
                 Surface(color = SafeGreenTint, shape = RoundedCornerShape(8.dp)) {
-                    Text("✓ Complete", color = SafeGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = AppIcons.Check,
+                            contentDescription = null,
+                            tint = SafeGreen,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "Completed",
+                            color = SafeGreen,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
@@ -1607,7 +1718,7 @@ private fun RowLine(r: KitRow) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = when (r.label) { 1 -> "🚨 Scam"; 0 -> "🛡️ Genuine"; else -> "Unknown" } + (r.workflow?.let { " · $it" } ?: ""),
+                    text = when (r.label) { 1 -> "Scam"; 0 -> "Genuine"; else -> "Unlabeled" } + (r.workflow?.let { " · $it" } ?: ""),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = InkDark
