@@ -1,0 +1,375 @@
+[
+ {
+  "id": "S01",
+  "kind": "scam",
+  "title": "Digital arrest; victim confirms the 'verification' story",
+  "session": {
+   "amount": 48000,
+   "median_90d": 650,
+   "call_now": true,
+   "payee_status": "new",
+   "q1": true
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S02",
+  "kind": "scam",
+  "title": "Digital arrest; coached victim answers 'No' to both questions",
+  "session": {
+   "amount": 48000,
+   "median_90d": 650,
+   "call_now": true,
+   "payee_status": "new",
+   "q1": false,
+   "q2": false
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S03",
+  "kind": "scam",
+  "title": "Digital arrest, day 2: same account again after a warning",
+  "session": {
+   "amount": 150000,
+   "median_90d": 650,
+   "call_now": true,
+   "payee_status": "warned"
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S04",
+  "kind": "scam",
+  "title": "Fake customer care: pay Rs 4,000 to 'release' a refund",
+  "session": {
+   "amount": 4000,
+   "median_90d": 380,
+   "call_now": true,
+   "payee_status": "new",
+   "q1": true
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S05",
+  "kind": "scam",
+  "title": "Fake KYC update on screen-share; Rs 9,999 kept under Rs 10,000",
+  "session": {
+   "amount": 9999,
+   "median_90d": 800,
+   "call_now": true,
+   "screen_share": true,
+   "payee_status": "new"
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S06",
+  "kind": "scam",
+  "title": "Split payments: 3rd Rs 1,900 transfer to new accounts in an hour",
+  "session": {
+   "amount": 1900,
+   "median_90d": 1200,
+   "call_now": true,
+   "payee_status": "new",
+   "new_payees_60m": 2
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S07",
+  "kind": "scam",
+  "title": "'Parcel with drugs' courier call; told to keep it secret",
+  "session": {
+   "amount": 25000,
+   "median_90d": 2000,
+   "call_now": true,
+   "payee_status": "new",
+   "q2": true
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S08",
+  "kind": "scam",
+  "title": "Fake bank official: first Rs 3,500 'to secure your account'",
+  "session": {
+   "amount": 3500,
+   "median_90d": 1500,
+   "call_now": true,
+   "payee_status": "new"
+  },
+  "expected": "NUDGE",
+  "note": "Known limit: ordinary-sized first payment"
+ },
+ {
+  "id": "S09",
+  "kind": "scam",
+  "title": "Same official asks for a third Rs 3,500 to the same account",
+  "session": {
+   "amount": 3500,
+   "median_90d": 1500,
+   "call_now": true,
+   "payee_status": "new",
+   "same_payee_24h": 2,
+   "sent_new_24h": 7000
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S10",
+  "kind": "scam",
+  "title": "Rs 1,999 sent a 5th time to one account; the 4th was paused",
+  "session": {
+   "amount": 1999,
+   "median_90d": 1200,
+   "call_now": true,
+   "payee_status": "warned",
+   "same_payee_24h": 4,
+   "sent_new_24h": 7996
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "S11",
+  "kind": "scam",
+  "title": "Told to hang up and pay; had checked balance during the call",
+  "session": {
+   "amount": 48000,
+   "median_90d": 650,
+   "call_seen_30m": true,
+   "payee_status": "new",
+   "payee_pasted": true
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S12",
+  "kind": "scam",
+  "title": "Told to hang up and pay; whole payment made after the call",
+  "session": {
+   "amount": 48000,
+   "median_90d": 650,
+   "payee_status": "new",
+   "payee_pasted": true,
+   "app_switch": true
+  },
+  "expected": "NUDGE",
+  "note": "Known limit: no live-guidance signal"
+ },
+ {
+  "id": "S13",
+  "kind": "scam",
+  "title": "First-time digital user (no history) in a digital-arrest call",
+  "session": {
+   "amount": 20000,
+   "median_90d": 0,
+   "payments_90d": 3,
+   "call_now": true,
+   "payee_status": "new"
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S14",
+  "kind": "scam",
+  "title": "Scammer collects through a merchant account during the call",
+  "session": {
+   "amount": 30000,
+   "median_90d": 900,
+   "call_now": true,
+   "payee_status": "new",
+   "payee_kind": "merchant"
+  },
+  "expected": "PAUSE"
+ },
+ {
+  "id": "S15",
+  "kind": "scam",
+  "title": "'Sent by mistake' scam: return Rs 5,000 to a different account",
+  "session": {
+   "amount": 5000,
+   "median_90d": 2500,
+   "call_now": true,
+   "payee_status": "new",
+   "credit_unknown_48h": 5000
+  },
+  "expected": "PAUSE",
+  "expected_v02": "NUDGE",
+  "note": "Caught only after the learned rule"
+ },
+ {
+  "id": "S16",
+  "kind": "scam",
+  "title": "AI voice clone of a son: 'Rs 30,000 now, don't tell Dad'",
+  "session": {
+   "amount": 30000,
+   "median_90d": 1500,
+   "call_now": true,
+   "payee_status": "new",
+   "q1": false,
+   "q2": true
+  },
+  "expected": "CRITICAL"
+ },
+ {
+  "id": "B01",
+  "kind": "boundary",
+  "title": "Task scam coached over chat only, no call",
+  "session": {
+   "amount": 5000,
+   "median_90d": 500,
+   "payee_status": "new",
+   "new_payees_60m": 1,
+   "payee_pasted": true
+  },
+  "expected": "NUDGE"
+ },
+ {
+  "id": "B02",
+  "kind": "boundary",
+  "title": "Task scam over chat: 3rd new account within an hour",
+  "session": {
+   "amount": 3000,
+   "median_90d": 600,
+   "payee_status": "new",
+   "new_payees_60m": 2,
+   "sent_new_24h": 2500,
+   "payee_pasted": true,
+   "app_switch": true
+  },
+  "expected": "PAUSE",
+  "expected_v02": "NUDGE",
+  "note": "Caught only after the learned rule"
+ },
+ {
+  "id": "L01",
+  "kind": "legit",
+  "title": "Rs 350 at the usual kirana store",
+  "session": {
+   "amount": 350,
+   "median_90d": 650,
+   "payee_status": "known",
+   "payee_kind": "merchant"
+  },
+  "expected": "NONE"
+ },
+ {
+  "id": "L02",
+  "kind": "legit",
+  "title": "Monthly rent Rs 18,000 to the usual landlord",
+  "session": {
+   "amount": 18000,
+   "median_90d": 900,
+   "payee_status": "known"
+  },
+  "expected": "NONE"
+ },
+ {
+  "id": "L03",
+  "kind": "legit",
+  "title": "First bill to an allow-listed electricity biller",
+  "session": {
+   "amount": 2450,
+   "median_90d": 900,
+   "payee_status": "new",
+   "payee_kind": "biller"
+  },
+  "expected": "NONE"
+ },
+ {
+  "id": "L04",
+  "kind": "legit",
+  "title": "Rs 40,000 deposit to a new landlord, no call",
+  "session": {
+   "amount": 40000,
+   "median_90d": 900,
+   "payee_status": "new",
+   "payee_pasted": true
+  },
+  "expected": "NUDGE"
+ },
+ {
+  "id": "L05",
+  "kind": "legit",
+  "title": "Father on a call with his son sends Rs 500 to son's friend",
+  "session": {
+   "amount": 500,
+   "median_90d": 650,
+   "call_now": true,
+   "payee_status": "new"
+  },
+  "expected": "NONE"
+ },
+ {
+  "id": "L06",
+  "kind": "legit",
+  "title": "Rs 25,000 first purchase at a new shop, during a call",
+  "session": {
+   "amount": 25000,
+   "median_90d": 1200,
+   "call_now": true,
+   "payee_status": "new",
+   "payee_kind": "merchant",
+   "q1": false,
+   "q2": false
+  },
+  "expected": "PAUSE",
+  "note": "Accepted false alarm"
+ },
+ {
+  "id": "L07",
+  "kind": "legit",
+  "title": "Rs 30,000 to sister (paid before) while on a call with her",
+  "session": {
+   "amount": 30000,
+   "median_90d": 1200,
+   "call_now": true,
+   "payee_status": "known"
+  },
+  "expected": "NONE"
+ },
+ {
+  "id": "L08",
+  "kind": "legit",
+  "title": "New electrician guides a Rs 6,000 payment on a call",
+  "session": {
+   "amount": 6000,
+   "median_90d": 1200,
+   "call_now": true,
+   "payee_status": "new",
+   "q1": false,
+   "q2": false
+  },
+  "expected": "PAUSE",
+  "note": "Accepted false alarm"
+ },
+ {
+  "id": "L09",
+  "kind": "legit",
+  "title": "Returns Rs 2,000 sent by mistake to the person who sent it",
+  "session": {
+   "amount": 2000,
+   "median_90d": 700,
+   "call_now": true,
+   "payee_status": "new",
+   "credit_unknown_48h": 2000,
+   "payee_is_sender": true
+  },
+  "expected": "NUDGE"
+ },
+ {
+  "id": "L10",
+  "kind": "legit",
+  "title": "First-time digital user: Rs 1,200 at a new shop",
+  "session": {
+   "amount": 1200,
+   "median_90d": 0,
+   "payments_90d": 2,
+   "payee_status": "new",
+   "payee_kind": "merchant"
+  },
+  "expected": "NONE"
+ }
+]

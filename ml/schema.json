@@ -1,0 +1,54 @@
+{
+ "title": "ScriptBreak payment record",
+ "description": "One payment session. 'features' go into the model; scenario_id, workflow and label never do.",
+ "record": {
+  "scenario_id": "string, e.g. train_digital_arrest_00042 (organising only)",
+  "workflow": "genuine | genuine_lookalike | digital_arrest | customer_care | kyc_official | courier | voice_clone | hang_up_and_pay | sent_by_mistake | chat_task (evaluation only)",
+  "label": "1 = scam scenario, 0 = genuine (from the generated scenario, never from rules)",
+  "features": {
+   "amount": "int, rupees, this payment",
+   "median_90d": "int, user's median payment over 90 days (0 = no history)",
+   "payments_90d": "int, number of payments in 90 days",
+   "call_now": "bool, a phone/internet call is active during this payment",
+   "call_seen_30m": "bool, a call was active while the app was open in the last 30 min",
+   "screen_share": "bool, screen sharing/recording or a remote-access app is active",
+   "payee_status": "known | new | recent (first paid < 7 days ago) | warned (paid after an earlier Pause/Critical) | flagged (bank fraud report)",
+   "payee_kind": "person | merchant | biller (allow-listed large biller)",
+   "same_payee_24h": "int, earlier payments to this new/recent payee in 24 h",
+   "new_payees_60m": "int, earlier payments to OTHER new payees in 60 min",
+   "sent_new_24h": "int, rupees already sent to new/recent payees in 24 h",
+   "credit_unknown_48h": "int, rupees received from a never-transacted sender in 48 h (0 = none)",
+   "payee_is_sender": "bool, this payee is the person who sent that money",
+   "payee_pasted": "bool, payee UPI ID was pasted, not picked",
+   "app_switch": "bool, user left the app and came back during the payment",
+   "night": "bool, 23:00 to 06:00"
+  }
+ },
+ "not_model_inputs": {
+  "q1": "answer to 'Were you told this payment is needed to verify, protect or release your money?' (safety layer only)",
+  "q2": "answer to 'Has anyone asked you to keep this payment secret from your family or bank?' (safety layer only)"
+ },
+ "example": {
+  "scenario_id": "scenario_00842",
+  "workflow": "digital_arrest",
+  "features": {
+   "amount": 48000,
+   "median_90d": 650,
+   "payments_90d": 42,
+   "call_now": true,
+   "call_seen_30m": false,
+   "screen_share": false,
+   "payee_status": "new",
+   "payee_kind": "person",
+   "same_payee_24h": 0,
+   "new_payees_60m": 0,
+   "sent_new_24h": 0,
+   "credit_unknown_48h": 0,
+   "payee_is_sender": false,
+   "payee_pasted": true,
+   "app_switch": true,
+   "night": false
+  },
+  "label": 1
+ }
+}

@@ -1,0 +1,918 @@
+{
+ "model_type": "gradient_boosting",
+ "model_version": "20261024-0637",
+ "thresholds": {
+  "nudge": 0.07086418758277964,
+  "pause": 0.48645956275991725,
+  "critical": 0.941773364674707
+ },
+ "test_set": {
+  "genuine": 30000,
+  "scams": 3600,
+  "note": "shifted settings, never used in training or selection"
+ },
+ "model": {
+  "scams_flagged_all8": 0.8033333333333333,
+  "scams_flagged_in_scope6": 0.797037037037037,
+  "genuine_interrupted_per_1000": 7.3,
+  "genuine_nudged_per_1000": 20.2,
+  "precision_on_this_test_mix": 0.9296046287367405,
+  "roc_auc": 0.9941315092592594,
+  "brier": 0.019708309716146885,
+  "by_workflow": {
+   "digital_arrest": {
+    "label": "Digital arrest",
+    "n": 450,
+    "flagged": 0.8866666666666667,
+    "critical_by_score": 0.5355555555555556,
+    "nudge_only": 0.08888888888888889,
+    "nothing": 0.024444444444444446
+   },
+   "customer_care": {
+    "label": "Fake customer care / refund",
+    "n": 450,
+    "flagged": 0.7444444444444445,
+    "critical_by_score": 0.3688888888888889,
+    "nudge_only": 0.14222222222222222,
+    "nothing": 0.11333333333333333
+   },
+   "kyc_official": {
+    "label": "Fake KYC / bank official",
+    "n": 450,
+    "flagged": 0.7288888888888889,
+    "critical_by_score": 0.44,
+    "nudge_only": 0.10888888888888888,
+    "nothing": 0.1622222222222222
+   },
+   "courier": {
+    "label": "Courier / customs",
+    "n": 450,
+    "flagged": 0.8222222222222222,
+    "critical_by_score": 0.43555555555555553,
+    "nudge_only": 0.10666666666666667,
+    "nothing": 0.07111111111111111
+   },
+   "voice_clone": {
+    "label": "AI voice clone of a relative",
+    "n": 450,
+    "flagged": 0.8088888888888889,
+    "critical_by_score": 0.3333333333333333,
+    "nudge_only": 0.13555555555555557,
+    "nothing": 0.05555555555555555
+   },
+   "hang_up_and_pay": {
+    "label": "Hang up, then pay",
+    "n": 450,
+    "flagged": 0.7911111111111111,
+    "critical_by_score": 0.37777777777777777,
+    "nudge_only": 0.14222222222222222,
+    "nothing": 0.06666666666666667
+   },
+   "sent_by_mistake": {
+    "label": "'Sent by mistake' return",
+    "n": 450,
+    "flagged": 1.0,
+    "critical_by_score": 0.9355555555555556,
+    "nudge_only": 0.0,
+    "nothing": 0.0
+   },
+   "chat_task": {
+    "label": "Task scam over chat",
+    "n": 450,
+    "flagged": 0.6444444444444445,
+    "critical_by_score": 0.3288888888888889,
+    "nudge_only": 0.13111111111111112,
+    "nothing": 0.22444444444444445
+   }
+  },
+  "calibration": [
+   {
+    "bin": "0.0-0.1",
+    "n": 29311,
+    "mean_score": 0.0037075674779603754,
+    "share_scam": 0.0062433898536385654
+   },
+   {
+    "bin": "0.1-0.2",
+    "n": 437,
+    "mean_score": 0.14374057872949897,
+    "share_scam": 0.2540045766590389
+   },
+   {
+    "bin": "0.2-0.3",
+    "n": 286,
+    "mean_score": 0.24538608003325624,
+    "share_scam": 0.4195804195804196
+   },
+   {
+    "bin": "0.3-0.4",
+    "n": 259,
+    "mean_score": 0.35093883849498547,
+    "share_scam": 0.61003861003861
+   },
+   {
+    "bin": "0.4-0.5",
+    "n": 229,
+    "mean_score": 0.45184666376391175,
+    "share_scam": 0.6681222707423581
+   },
+   {
+    "bin": "0.5-0.6",
+    "n": 173,
+    "mean_score": 0.54902397236588,
+    "share_scam": 0.7687861271676301
+   },
+   {
+    "bin": "0.6-0.7",
+    "n": 212,
+    "mean_score": 0.6516533179386271,
+    "share_scam": 0.7971698113207547
+   },
+   {
+    "bin": "0.7-0.8",
+    "n": 267,
+    "mean_score": 0.7497977588968594,
+    "share_scam": 0.8239700374531835
+   },
+   {
+    "bin": "0.8-0.9",
+    "n": 379,
+    "mean_score": 0.8529272020031546,
+    "share_scam": 0.8970976253298153
+   },
+   {
+    "bin": "0.9-1.0",
+    "n": 2047,
+    "mean_score": 0.9727779088870034,
+    "share_scam": 0.9833903273082559
+   }
+  ]
+ },
+ "comparison": {
+  "ai_model": {
+   "scams_flagged_all8": 0.8033333333333333,
+   "scams_flagged_in_scope6": 0.797037037037037,
+   "genuine_interrupted_per_1000": 7.3,
+   "by_workflow": {
+    "digital_arrest": 0.8866666666666667,
+    "customer_care": 0.7444444444444445,
+    "kyc_official": 0.7288888888888889,
+    "courier": 0.8222222222222222,
+    "voice_clone": 0.8088888888888889,
+    "hang_up_and_pay": 0.7911111111111111,
+    "sent_by_mistake": 1.0,
+    "chat_task": 0.6444444444444445
+   }
+  },
+  "round1_rules_v0.3": {
+   "scams_flagged_all8": 0.6127777777777778,
+   "scams_flagged_in_scope6": 0.5988888888888889,
+   "genuine_interrupted_per_1000": 7.733333333333333,
+   "by_workflow": {
+    "digital_arrest": 0.8177777777777778,
+    "customer_care": 0.5888888888888889,
+    "kyc_official": 0.6333333333333333,
+    "courier": 0.6866666666666666,
+    "voice_clone": 0.64,
+    "hang_up_and_pay": 0.22666666666666666,
+    "sent_by_mistake": 1.0,
+    "chat_task": 0.3088888888888889
+   }
+  },
+  "bank_amount_rule_10k": {
+   "scams_flagged_all8": 0.19972222222222222,
+   "scams_flagged_in_scope6": 0.24185185185185187,
+   "genuine_interrupted_per_1000": 3.6333333333333333,
+   "by_workflow": {
+    "digital_arrest": 0.32,
+    "customer_care": 0.11777777777777777,
+    "kyc_official": 0.08444444444444445,
+    "courier": 0.2644444444444444,
+    "voice_clone": 0.26222222222222225,
+    "hang_up_and_pay": 0.4022222222222222,
+    "sent_by_mistake": 0.09777777777777778,
+    "chat_task": 0.04888888888888889
+   }
+  }
+ },
+ "hidden_scam_type": {
+  "digital_arrest": {
+   "label": "Digital arrest",
+   "flagged_when_never_seen": 0.8266666666666667,
+   "flagged_when_seen": 0.8866666666666667
+  },
+  "customer_care": {
+   "label": "Fake customer care / refund",
+   "flagged_when_never_seen": 0.7155555555555555,
+   "flagged_when_seen": 0.7444444444444445
+  },
+  "kyc_official": {
+   "label": "Fake KYC / bank official",
+   "flagged_when_never_seen": 0.6688888888888889,
+   "flagged_when_seen": 0.7288888888888889
+  },
+  "courier": {
+   "label": "Courier / customs",
+   "flagged_when_never_seen": 0.8133333333333334,
+   "flagged_when_seen": 0.8222222222222222
+  },
+  "voice_clone": {
+   "label": "AI voice clone of a relative",
+   "flagged_when_never_seen": 0.7822222222222223,
+   "flagged_when_seen": 0.8088888888888889
+  },
+  "hang_up_and_pay": {
+   "label": "Hang up, then pay",
+   "flagged_when_never_seen": 0.7044444444444444,
+   "flagged_when_seen": 0.7911111111111111
+  },
+  "sent_by_mistake": {
+   "label": "'Sent by mistake' return",
+   "flagged_when_never_seen": 0.10666666666666667,
+   "flagged_when_seen": 1.0
+  },
+  "chat_task": {
+   "label": "Task scam over chat",
+   "flagged_when_never_seen": 0.38,
+   "flagged_when_seen": 0.6444444444444445
+  }
+ },
+ "stories_28": {
+  "summary": {
+   "same_level_as_round1": 18,
+   "scams_flagged": 14,
+   "scams": 16,
+   "genuine_interrupted": 2,
+   "genuine": 10
+  },
+  "rows": [
+   {
+    "id": "S01",
+    "kind": "scam",
+    "title": "Digital arrest; victim confirms the 'verification' story",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.961,
+    "reasons": [
+     "You are on a call right now",
+     "The amount is 74 times your usual payment",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S02",
+    "kind": "scam",
+    "title": "Digital arrest; coached victim answers 'No' to both questions",
+    "round1_expected": "PAUSE",
+    "ai_level": "CRITICAL",
+    "score": 0.961,
+    "reasons": [
+     "You are on a call right now",
+     "The amount is 74 times your usual payment",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S03",
+    "kind": "scam",
+    "title": "Digital arrest, day 2: same account again after a warning",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.994,
+    "reasons": [
+     "The amount is 231 times your usual payment",
+     "You paid this payee after an earlier warning",
+     "You are on a call right now"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S04",
+    "kind": "scam",
+    "title": "Fake customer care: pay Rs 4,000 to 'release' a refund",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.631,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before",
+     "The amount is 11 times your usual payment"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S05",
+    "kind": "scam",
+    "title": "Fake KYC update on screen-share; Rs 9,999 kept under Rs 10,000",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.988,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before",
+     "Your screen is being shared or a remote-access app is active"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S06",
+    "kind": "scam",
+    "title": "Split payments: 3rd Rs 1,900 transfer to new accounts in an hour",
+    "round1_expected": "PAUSE",
+    "ai_level": "NONE",
+    "score": 0.061,
+    "reasons": [
+     "You have never paid this payee before",
+     "You paid several new accounts in the last hour",
+     "You are on a call right now"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S07",
+    "kind": "scam",
+    "title": "'Parcel with drugs' courier call; told to keep it secret",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.725,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before",
+     "The amount is 12 times your usual payment"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S08",
+    "kind": "scam",
+    "title": "Fake bank official: first Rs 3,500 'to secure your account'",
+    "round1_expected": "NUDGE",
+    "ai_level": "NUDGE",
+    "score": 0.179,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S09",
+    "kind": "scam",
+    "title": "Same official asks for a third Rs 3,500 to the same account",
+    "round1_expected": "PAUSE",
+    "ai_level": "PAUSE",
+    "score": 0.539,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before",
+     "Together with today's payments to new payees, this is unusually large"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S10",
+    "kind": "scam",
+    "title": "Rs 1,999 sent a 5th time to one account; the 4th was paused",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.583,
+    "reasons": [
+     "You paid this payee after an earlier warning",
+     "Together with today's payments to new payees, this is unusually large",
+     "You are on a call right now"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S11",
+    "kind": "scam",
+    "title": "Told to hang up and pay; had checked balance during the call",
+    "round1_expected": "PAUSE",
+    "ai_level": "CRITICAL",
+    "score": 0.96,
+    "reasons": [
+     "The amount is 74 times your usual payment",
+     "You were on a call in the last 30 minutes",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S12",
+    "kind": "scam",
+    "title": "Told to hang up and pay; whole payment made after the call",
+    "round1_expected": "NUDGE",
+    "ai_level": "CRITICAL",
+    "score": 0.984,
+    "reasons": [
+     "The amount is 74 times your usual payment",
+     "You have never paid this payee before",
+     "The payee's UPI ID was pasted from another app"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S13",
+    "kind": "scam",
+    "title": "First-time digital user (no history) in a digital-arrest call",
+    "round1_expected": "PAUSE",
+    "ai_level": "CRITICAL",
+    "score": 0.978,
+    "reasons": [
+     "This is a large payment and you have little payment history",
+     "You have never paid this payee before",
+     "You are on a call right now"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S14",
+    "kind": "scam",
+    "title": "Scammer collects through a merchant account during the call",
+    "round1_expected": "PAUSE",
+    "ai_level": "PAUSE",
+    "score": 0.793,
+    "reasons": [
+     "You are on a call right now",
+     "The amount is 33 times your usual payment",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "S15",
+    "kind": "scam",
+    "title": "'Sent by mistake' scam: return Rs 5,000 to a different account",
+    "round1_expected": "PAUSE",
+    "ai_level": "CRITICAL",
+    "score": 0.994,
+    "reasons": [
+     "This sends back the same amount you received from a stranger",
+     "You have never paid this payee before",
+     "You are on a call right now"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "S16",
+    "kind": "scam",
+    "title": "AI voice clone of a son: 'Rs 30,000 now, don't tell Dad'",
+    "round1_expected": "CRITICAL",
+    "ai_level": "CRITICAL",
+    "score": 0.84,
+    "reasons": [
+     "You are on a call right now",
+     "The amount is 20 times your usual payment",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "B01",
+    "kind": "boundary",
+    "title": "Task scam coached over chat only, no call",
+    "round1_expected": "NUDGE",
+    "ai_level": "NUDGE",
+    "score": 0.137,
+    "reasons": [
+     "The amount is 10 times your usual payment",
+     "The payee's UPI ID was pasted from another app",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "B02",
+    "kind": "boundary",
+    "title": "Task scam over chat: 3rd new account within an hour",
+    "round1_expected": "PAUSE",
+    "ai_level": "CRITICAL",
+    "score": 0.996,
+    "reasons": [
+     "The amount is 5 times your usual payment",
+     "You paid several new accounts in the last hour",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "L01",
+    "kind": "legit",
+    "title": "Rs 350 at the usual kirana store",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.0,
+    "reasons": [],
+    "same_as_round1": true
+   },
+   {
+    "id": "L02",
+    "kind": "legit",
+    "title": "Monthly rent Rs 18,000 to the usual landlord",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.002,
+    "reasons": [
+     "The amount is 20 times your usual payment"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "L03",
+    "kind": "legit",
+    "title": "First bill to an allow-listed electricity biller",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.004,
+    "reasons": [],
+    "same_as_round1": true
+   },
+   {
+    "id": "L04",
+    "kind": "legit",
+    "title": "Rs 40,000 deposit to a new landlord, no call",
+    "round1_expected": "NUDGE",
+    "ai_level": "PAUSE",
+    "score": 0.627,
+    "reasons": [
+     "The amount is 44 times your usual payment",
+     "The payee's UPI ID was pasted from another app",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "L05",
+    "kind": "legit",
+    "title": "Father on a call with his son sends Rs 500 to son's friend",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.028,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "L06",
+    "kind": "legit",
+    "title": "Rs 25,000 first purchase at a new shop, during a call",
+    "round1_expected": "PAUSE",
+    "ai_level": "PAUSE",
+    "score": 0.697,
+    "reasons": [
+     "You are on a call right now",
+     "The amount is 21 times your usual payment",
+     "You have never paid this payee before"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "L07",
+    "kind": "legit",
+    "title": "Rs 30,000 to sister (paid before) while on a call with her",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.006,
+    "reasons": [
+     "The amount is 25 times your usual payment",
+     "You are on a call right now"
+    ],
+    "same_as_round1": true
+   },
+   {
+    "id": "L08",
+    "kind": "legit",
+    "title": "New electrician guides a Rs 6,000 payment on a call",
+    "round1_expected": "PAUSE",
+    "ai_level": "NUDGE",
+    "score": 0.337,
+    "reasons": [
+     "You are on a call right now",
+     "You have never paid this payee before",
+     "The amount is 5 times your usual payment"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "L09",
+    "kind": "legit",
+    "title": "Returns Rs 2,000 sent by mistake to the person who sent it",
+    "round1_expected": "NUDGE",
+    "ai_level": "NONE",
+    "score": 0.042,
+    "reasons": [
+     "You have never paid this payee before",
+     "You are on a call right now"
+    ],
+    "same_as_round1": false
+   },
+   {
+    "id": "L10",
+    "kind": "legit",
+    "title": "First-time digital user: Rs 1,200 at a new shop",
+    "round1_expected": "NONE",
+    "ai_level": "NONE",
+    "score": 0.008,
+    "reasons": [],
+    "same_as_round1": true
+   }
+  ]
+ },
+ "failures": {
+  "missed_scams_by_type": {
+   "hang_up_and_pay": 94,
+   "customer_care": 115,
+   "courier": 80,
+   "kyc_official": 122,
+   "chat_task": 160,
+   "voice_clone": 86,
+   "digital_arrest": 51
+  },
+  "missed_examples": [
+   {
+    "workflow": "hang_up_and_pay",
+    "score": 0.179,
+    "amount": 10590,
+    "median_90d": 880,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "customer_care",
+    "score": 0.305,
+    "amount": 1540,
+    "median_90d": 330,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": false
+   },
+   {
+    "workflow": "courier",
+    "score": 0.365,
+    "amount": 2180,
+    "median_90d": 390,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": false
+   },
+   {
+    "workflow": "hang_up_and_pay",
+    "score": 0.118,
+    "amount": 8990,
+    "median_90d": 1250,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "kyc_official",
+    "score": 0.355,
+    "amount": 2820,
+    "median_90d": 930,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "chat_task",
+    "score": 0.341,
+    "amount": 1240,
+    "median_90d": 990,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "chat_task",
+    "score": 0.386,
+    "amount": 630,
+    "median_90d": 470,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "merchant",
+    "pasted": true
+   },
+   {
+    "workflow": "kyc_official",
+    "score": 0.044,
+    "amount": 990,
+    "median_90d": 570,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "merchant",
+    "pasted": false
+   },
+   {
+    "workflow": "kyc_official",
+    "score": 0.012,
+    "amount": 510,
+    "median_90d": 760,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "hang_up_and_pay",
+    "score": 0.045,
+    "amount": 6290,
+    "median_90d": 810,
+    "call_now": false,
+    "call_seen_30m": true,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": false
+   },
+   {
+    "workflow": "chat_task",
+    "score": 0.355,
+    "amount": 90,
+    "median_90d": 250,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "kyc_official",
+    "score": 0.054,
+    "amount": 1090,
+    "median_90d": 210,
+    "call_now": false,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   }
+  ],
+  "false_alarm_patterns": [
+   {
+    "payee": "new",
+    "kind": "person",
+    "call": "on call",
+    "count": 126
+   },
+   {
+    "payee": "new",
+    "kind": "person",
+    "call": "no call",
+    "count": 52
+   },
+   {
+    "payee": "new",
+    "kind": "merchant",
+    "call": "on call",
+    "count": 19
+   },
+   {
+    "payee": "new",
+    "kind": "merchant",
+    "call": "no call",
+    "count": 10
+   },
+   {
+    "payee": "recent",
+    "kind": "person",
+    "call": "on call",
+    "count": 3
+   },
+   {
+    "payee": "warned",
+    "kind": "person",
+    "call": "on call",
+    "count": 3
+   }
+  ],
+  "false_alarm_examples": [
+   {
+    "workflow": "genuine",
+    "score": 0.994,
+    "amount": 3010,
+    "median_90d": 0,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.994,
+    "amount": 4670,
+    "median_90d": 0,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.992,
+    "amount": 10450,
+    "median_90d": 0,
+    "call_now": false,
+    "call_seen_30m": true,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.99,
+    "amount": 30710,
+    "median_90d": 560,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.987,
+    "amount": 5510,
+    "median_90d": 310,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.983,
+    "amount": 10270,
+    "median_90d": 710,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.982,
+    "amount": 1870,
+    "median_90d": 0,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": true
+   },
+   {
+    "workflow": "genuine",
+    "score": 0.979,
+    "amount": 14330,
+    "median_90d": 330,
+    "call_now": true,
+    "call_seen_30m": false,
+    "screen_share": false,
+    "payee_status": "new",
+    "payee_kind": "person",
+    "pasted": false
+   }
+  ]
+ }
+}
