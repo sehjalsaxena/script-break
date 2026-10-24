@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.scriptbreak.ui.theme.AppBlue
+import com.example.scriptbreak.ui.theme.AppOrange
 import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.CallGreen
 import com.example.scriptbreak.ui.theme.CallGreenTint
@@ -39,6 +41,28 @@ import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
 import com.example.scriptbreak.ui.theme.SafeGreenTint
+
+@Composable
+fun DemoPayLogoText(
+    modifier: Modifier = Modifier,
+    fontSize: androidx.compose.ui.unit.TextUnit = 22.sp,
+    fontWeight: FontWeight = FontWeight.Bold
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        Text(
+            text = "Demo",
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            color = AppBlue
+        )
+        Text(
+            text = "Pay",
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            color = AppOrange
+        )
+    }
+}
 
 @Composable
 fun AppTopBar(

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.CallStatusBanner
+import com.example.scriptbreak.ui.components.DemoPayLogoText
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.model.HomeUi
 import com.example.scriptbreak.ui.model.PersonUi
@@ -67,6 +68,8 @@ fun HomeScreen(
     onHistory: () -> Unit,
     onBankSelf: () -> Unit = {},
     onBalance: () -> Unit,
+    onNotifications: () -> Unit = {},
+    onAccount: () -> Unit = {},
     // Settings (trusted contact). Optional so older callers still compile.
     onSettings: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -83,21 +86,8 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            Image(
-                painter = painterResource(R.drawable.app_logo),
-                contentDescription = "DemoPay Logo",
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
-            Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkDark
-                )
+                DemoPayLogoText(fontSize = 24.sp)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = AppIcons.Security,
@@ -108,7 +98,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.app_subtitle),
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         color = SafeGreen,
                         fontWeight = FontWeight.Medium
                     )
@@ -117,7 +107,7 @@ fun HomeScreen(
 
             // Bell icon with notification badge dot
             Box {
-                IconButton(onClick = onHistory) {
+                IconButton(onClick = onNotifications) {
                     Icon(
                         imageVector = AppIcons.Notifications,
                         contentDescription = "Notifications",
@@ -135,7 +125,7 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
             val userInitials = state.userName.split(" ")
                 .mapNotNull { it.firstOrNull()?.toString() }
@@ -143,11 +133,17 @@ fun HomeScreen(
                 .joinToString("")
                 .ifEmpty { "MS" }
 
-            UserAvatar(
-                initials = userInitials,
-                size = 40.dp,
-                backgroundColor = Color(0xFFE88A3C)
-            )
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { onAccount() }
+            ) {
+                UserAvatar(
+                    initials = userInitials,
+                    size = 40.dp,
+                    backgroundColor = Color(0xFFE88A3C)
+                )
+            }
         }
 
         LazyColumn(

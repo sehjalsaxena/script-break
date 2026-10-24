@@ -13,7 +13,17 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -46,6 +56,7 @@ import com.example.scriptbreak.ui.model.PauseUi
 import com.example.scriptbreak.ui.model.PayeeUi
 import com.example.scriptbreak.ui.model.PersonUi
 import com.example.scriptbreak.ui.model.TxnUi
+import com.example.scriptbreak.ui.screens.AccountScreen
 import com.example.scriptbreak.ui.screens.AllPeopleScreen
 import com.example.scriptbreak.ui.screens.AmountScreen
 import com.example.scriptbreak.ui.screens.AnalystScreen
@@ -60,8 +71,10 @@ import com.example.scriptbreak.ui.screens.HomeScreen
 import com.example.scriptbreak.ui.screens.JudgeScreen
 import com.example.scriptbreak.ui.screens.LiveCheck
 import com.example.scriptbreak.ui.screens.LoginScreen
+import com.example.scriptbreak.ui.screens.NotificationsScreen
 import com.example.scriptbreak.ui.screens.ReportPacketScreen
 import com.example.scriptbreak.ui.screens.ResultsTab
+import com.example.scriptbreak.ui.screens.SettingsScreen
 import com.example.scriptbreak.ui.screens.TrustedContactScreen
 import com.example.scriptbreak.ui.screens.PauseScreen
 import com.example.scriptbreak.ui.screens.PayToUpiScreen
@@ -157,7 +170,26 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
     val tts = rememberTextToSpeech(context)
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        Crossfade(targetState = flow.screen, label = "screens") { screen ->
+        AnimatedContent(
+            targetState = flow.screen,
+            label = "water_drop_screens",
+            transitionSpec = {
+                (scaleIn(
+                    initialScale = 0.84f,
+                    transformOrigin = TransformOrigin(0.5f, 0.4f),
+                    animationSpec = spring(
+                        dampingRatio = 0.72f,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) + fadeIn(animationSpec = tween(240, easing = FastOutSlowInEasing)))
+                .togetherWith(
+                    scaleOut(
+                        targetScale = 1.08f,
+                        animationSpec = tween(180, easing = FastOutSlowInEasing)
+                    ) + fadeOut(animationSpec = tween(140))
+                )
+            }
+        ) { screen ->
             when (screen) {
                 Screen.Login -> LoginScreen(accounts = DemoWorld.accounts, onLogin = { u, p -> flow.login(u, p) })
 
@@ -179,7 +211,9 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onHistory = flow::startHistory,
                     onBankSelf = flow::startBankSelf,
                     onBalance = flow::startCheckBalance,
-                    onSettings = flow::openTrustedContact,
+                    onNotifications = flow::startNotifications,
+                    onAccount = flow::startAccount,
+                    onSettings = flow::startSettings,
                 )
 
                 Screen.Contacts -> ContactsScreen(
@@ -345,6 +379,33 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
                     onBack = { flow.back() },
                     usualPaymentText = "${rupees(flow.usualPayment.roundToLong())} (median of ${flow.paymentsLast90d().size} payments in 90 days)",
                     onResetDemo = flow::resetDemo,
+                )
+
+                Screen.Notifications -> NotificationsScreen(
+                    onBack = { flow.back() }
+                )
+
+                Screen.Account -> AccountScreen(
+                    userName = flow.profile.displayName,
+                    upiId = "${flow.account?.username ?: flow.profile.id}@demoupi",
+                    phoneNumber = "+91 98765 43210",
+                    trustedContactName = flow.contact.name,
+                    onCheckBalance = flow::startCheckBalance,
+                    onTrustedContact = flow::openTrustedContact,
+                    onSwitchProfile = flow::startUserPicker,
+                    onLogout = flow::logout,
+                    onBack = { flow.back() }
+                )
+
+                Screen.Settings -> SettingsScreen(
+                    trustedContactName = flow.contact.name,
+                    modelVersion = flow.modelVersion,
+                    onTrustedContact = flow::openTrustedContact,
+                    onCheckBalance = flow::startCheckBalance,
+                    onAccount = flow::startAccount,
+                    onResetDemo = flow::resetDemo,
+                    onLogout = flow::logout,
+                    onBack = { flow.back() }
                 )
 
                 Screen.Judge -> JudgeScreen(

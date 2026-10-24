@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.components.AppIcons
+import com.example.scriptbreak.ui.components.DemoPayLogoText
 import com.example.scriptbreak.ui.components.UserAvatar
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.BodyDark
@@ -102,32 +103,15 @@ fun UserPickerScreen(
     ) {
         Spacer(modifier = Modifier.height(20.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(R.drawable.app_logo),
-                contentDescription = "DemoPay Logo",
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
-            Spacer(modifier = Modifier.width(14.dp))
-            Column {
-                Text(
-                    text = stringResource(R.string.user_picker_title),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkDark
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.user_picker_subtitle),
-                    fontSize = 15.sp,
-                    color = MutedText
-                )
-            }
-        }
+        DemoPayLogoText(fontSize = 28.sp)
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = stringResource(R.string.user_picker_subtitle),
+            fontSize = 15.sp,
+            color = MutedText
+        )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         LazyColumn(
             modifier = Modifier.weight(1f)

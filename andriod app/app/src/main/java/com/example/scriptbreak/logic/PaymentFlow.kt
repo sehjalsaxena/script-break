@@ -20,7 +20,7 @@ import kotlin.math.roundToLong
 enum class Screen {
     Login, UserPicker, Home, PayToUpi, Contacts, AllPeople, History, BankSelf, CheckBalance,
     Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, FamilyWaiting, Judge, Analyst,
-    Report, TrustedContact
+    Report, TrustedContact, Notifications, Account, Settings
 }
 
 /** A payment made during this demo session (the app's own payment record). */
@@ -233,12 +233,13 @@ class PaymentFlow(
         when (screen) {
             Screen.Login -> return false
             Screen.UserPicker, Screen.Home, Screen.Judge, Screen.Analyst, Screen.FamilyAlert, Screen.FamilyWaiting -> logout()
-            Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.History, Screen.BankSelf, Screen.CheckBalance, Screen.Payee, Screen.Waiting -> finish()
+            Screen.PayToUpi, Screen.Contacts, Screen.AllPeople, Screen.History, Screen.BankSelf, Screen.CheckBalance,
+            Screen.Notifications, Screen.Account, Screen.Settings, Screen.Payee, Screen.Waiting -> finish()
             Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
             Screen.Pause, Screen.Critical, Screen.Pin -> backToAmount()
             Screen.Success -> done()
             Screen.Report -> screen = Screen.Success
-            Screen.TrustedContact -> screen = Screen.Home
+            Screen.TrustedContact -> screen = Screen.Settings
         }
         return true
     }
@@ -272,6 +273,10 @@ class PaymentFlow(
     fun startHistory() { screen = Screen.History }
     fun startBankSelf() { screen = Screen.BankSelf }
     fun startCheckBalance() { screen = Screen.CheckBalance }
+    fun startNotifications() { screen = Screen.Notifications }
+    fun startAccount() { screen = Screen.Account }
+    fun startSettings() { screen = Screen.Settings }
+    fun startUserPicker() { screen = Screen.UserPicker }
 
     /** Typing in the UPI ID field. A jump of 5+ characters at once is a paste from the keyboard. */
     fun upiChanged(text: String) {

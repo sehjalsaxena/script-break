@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.R
 import com.example.scriptbreak.logic.Account
+import com.example.scriptbreak.ui.components.DemoPayLogoText
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppPurple
@@ -62,7 +63,7 @@ fun LoginScreen(accounts: List<Account>, onLogin: (username: String, pin: String
                 .size(72.dp)
                 .clip(RoundedCornerShape(16.dp))
         )
-        Text("DemoPay", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = AppPurple)
+        DemoPayLogoText(fontSize = 32.sp)
         Text("protected by ScriptBreak", fontSize = 16.sp, color = MutedText)
         Text("Demo app – no real money or bank accounts are used", fontSize = 14.sp, color = FaintText)
         Spacer(Modifier.height(8.dp))
