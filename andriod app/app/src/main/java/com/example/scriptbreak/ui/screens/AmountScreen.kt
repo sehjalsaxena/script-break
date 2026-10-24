@@ -67,7 +67,7 @@ fun AmountScreen(
             showScriptBreakBadge = true
         )
 
-        // Payee header preview
+        // Payee header preview (Avatar + Name + UPI ID)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -82,7 +82,7 @@ fun AmountScreen(
 
             UserAvatar(
                 initials = initials,
-                size = 40.dp,
+                size = 46.dp,
                 backgroundColor = Color(0xFF6B74D6)
             )
 
@@ -94,6 +94,11 @@ fun AmountScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = InkDark
+                )
+                Text(
+                    text = "ramesh.k@demoupi",
+                    fontSize = 14.sp,
+                    color = MutedText
                 )
             }
         }
@@ -129,7 +134,7 @@ fun AmountScreen(
             ) {
                 Row(
                     verticalAlignment = Alignment.Top,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(14.dp)
                 ) {
                     Icon(
                         imageVector = AppIcons.Warning,
@@ -200,9 +205,9 @@ fun AmountScreenPreview() {
         AmountScreen(
             state = AmountUi(
                 payeeName = "Ramesh K.",
-                amountText = "20000",
+                amountText = "48000",
                 note = "Verification deposit",
-                nudge = "First payment to Ramesh K. ₹20,000 is 10× your usual payment. Check you know who this is.",
+                nudge = "First payment to Ramesh K. ₹48,000 is 10× your usual payment. Check you know who this is.",
                 payEnabled = true
             ),
             onDigit = {},

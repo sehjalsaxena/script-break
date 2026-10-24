@@ -60,7 +60,7 @@ fun PinScreen(
             showScriptBreakBadge = true
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -74,27 +74,27 @@ fun PinScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Text(
                 text = stringResource(R.string.enter_upi_pin),
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = InkDark
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // 4 Pin dots
             Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(22.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(4) { index ->
                     val isFilled = index < pinDigits
                     Box(
                         modifier = Modifier
-                            .size(18.dp)
+                            .size(20.dp)
                             .clip(CircleShape)
                             .background(if (isFilled) AppPurple else Color.Transparent)
                             .border(
@@ -111,9 +111,10 @@ fun PinScreen(
 
         Text(
             text = stringResource(R.string.pin_security_note),
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             color = MutedText,
             textAlign = TextAlign.Center,
+            lineHeight = 22.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -141,7 +142,7 @@ fun PinScreen(
 fun PinScreenPreview() {
     ScriptBreakTheme {
         PinScreen(
-            amountText = "₹20,000",
+            amountText = "₹48,000",
             payeeName = "Ramesh K.",
             pinDigits = 3,
             onDigit = {},

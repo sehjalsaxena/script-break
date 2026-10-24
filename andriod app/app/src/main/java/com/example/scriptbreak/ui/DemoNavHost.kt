@@ -249,7 +249,8 @@ fun DemoNavHost(
                             continueSecondsLeft = 5
                             currentScreen = DemoScreen.Critical
                         },
-                        onBack = { currentScreen = DemoScreen.Amount }
+                        onBack = { currentScreen = DemoScreen.Amount },
+                        onWait = { currentScreen = DemoScreen.Waiting }
                     )
                 }
 
@@ -283,7 +284,8 @@ fun DemoNavHost(
                         onToggleLanguage = {
                             criticalHindi = !criticalHindi
                         },
-                        onReadAloud = {}
+                        onReadAloud = {},
+                        onBack = { currentScreen = DemoScreen.Pause }
                     )
                 }
 
@@ -348,6 +350,9 @@ fun DemoNavHost(
                             currentScreen = DemoScreen.UserPicker
                         },
                         onCalled = {
+                            currentScreen = DemoScreen.UserPicker
+                        },
+                        onBack = {
                             currentScreen = DemoScreen.UserPicker
                         }
                     )

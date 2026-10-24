@@ -101,12 +101,12 @@ fun PayToUpiScreen(
                                 imageVector = AppIcons.ContentPaste,
                                 contentDescription = null,
                                 tint = AppPurple,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = stringResource(R.string.paste),
-                                fontSize = 14.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = AppPurple
                             )
@@ -142,37 +142,37 @@ fun PayToUpiScreen(
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             suggestions.forEach { (id, name) ->
                 Surface(
                     color = Color.White,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(14.dp),
                     shadowElevation = 0.5.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(14.dp))
                         .clickable { onUpiIdChange(id) }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(40.dp)
                                 .clip(CircleShape)
                                 .background(AppPurpleLight)
                         ) {
                             Text(
                                 text = name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.joinToString(""),
-                                fontSize = 14.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = AppPurple
                             )
                         }
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(14.dp))
                         Column {
                             Text(
                                 text = name,
@@ -180,6 +180,7 @@ fun PayToUpiScreen(
                                 fontWeight = FontWeight.SemiBold,
                                 color = InkDark
                             )
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = id,
                                 fontSize = 14.sp,

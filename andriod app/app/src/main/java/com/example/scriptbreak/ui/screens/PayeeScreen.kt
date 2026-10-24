@@ -57,7 +57,7 @@ fun PayeeScreen(
             showScriptBreakBadge = true
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,7 +73,7 @@ fun PayeeScreen(
 
             UserAvatar(
                 initials = initials,
-                size = 76.dp,
+                size = 78.dp,
                 backgroundColor = Color(0xFF6B74D6)
             )
 
@@ -94,7 +94,7 @@ fun PayeeScreen(
                 color = MutedText
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // History line pill badge
             Surface(
@@ -103,7 +103,7 @@ fun PayeeScreen(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
                     Icon(
                         imageVector = AppIcons.Check,
@@ -114,7 +114,7 @@ fun PayeeScreen(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = state.historyLine,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = SafeGreen
                     )
@@ -137,7 +137,7 @@ fun PayeeScreen(
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .size(44.dp)
+                            .size(46.dp)
                             .clip(CircleShape)
                             .background(SafeGreenTint)
                     ) {
@@ -145,7 +145,7 @@ fun PayeeScreen(
                             imageVector = AppIcons.VerifiedUser,
                             contentDescription = null,
                             tint = SafeGreen,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(26.dp)
                         )
                     }
 
@@ -154,9 +154,10 @@ fun PayeeScreen(
                     Column {
                         Text(
                             text = stringResource(R.string.verified_banking_name),
-                            fontSize = 14.sp,
+                            fontSize = 16.sp,
                             color = MutedText
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = state.bankingName,
                             fontSize = 18.sp,

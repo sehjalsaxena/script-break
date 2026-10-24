@@ -49,7 +49,7 @@ import com.example.scriptbreak.ui.model.TxnUi
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppPurple
 import com.example.scriptbreak.ui.theme.AppPurpleLight
-import com.example.scriptbreak.ui.theme.BodyDark
+import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.InkDark
 import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.SafeGreen
@@ -88,25 +88,39 @@ fun HomeScreen(
                         imageVector = AppIcons.Security,
                         contentDescription = null,
                         tint = SafeGreen,
-                        modifier = Modifier.size(13.dp)
+                        modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.app_subtitle),
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         color = SafeGreen,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
 
-            IconButton(onClick = onHistory) {
-                Icon(
-                    imageVector = AppIcons.Notifications,
-                    contentDescription = "Notifications",
-                    tint = InkDark
+            // Bell icon with notification badge dot
+            Box {
+                IconButton(onClick = onHistory) {
+                    Icon(
+                        imageVector = AppIcons.Notifications,
+                        contentDescription = "Notifications",
+                        tint = InkDark,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(CritRed)
+                        .align(Alignment.TopEnd)
+                        .padding(2.dp)
                 )
             }
+
+            Spacer(modifier = Modifier.width(4.dp))
 
             val userInitials = state.userName.split(" ")
                 .mapNotNull { it.firstOrNull()?.toString() }
@@ -116,7 +130,7 @@ fun HomeScreen(
 
             UserAvatar(
                 initials = userInitials,
-                size = 38.dp,
+                size = 40.dp,
                 backgroundColor = Color(0xFFE88A3C)
             )
         }
@@ -146,18 +160,18 @@ fun HomeScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
                     ) {
                         Icon(
                             imageVector = AppIcons.Search,
                             contentDescription = "Search",
                             tint = MutedText,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = stringResource(R.string.search_hint),
-                            fontSize = 14.sp,
+                            fontSize = 16.sp,
                             color = MutedText
                         )
                     }
@@ -201,7 +215,7 @@ fun HomeScreen(
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
@@ -215,24 +229,25 @@ fun HomeScreen(
                             )
                             Text(
                                 text = stringResource(R.string.view_all),
-                                fontSize = 14.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = AppPurple,
                                 modifier = Modifier.clickable { onPayUpiId() }
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            contentPadding = PaddingValues(horizontal = 4.dp)
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             items(state.people) { person ->
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
-                                        .width(68.dp)
+                                        .width(72.dp)
                                         .clickable { onPerson(person.id) }
                                 ) {
                                     val bg = try {
@@ -242,18 +257,48 @@ fun HomeScreen(
                                     }
                                     UserAvatar(
                                         initials = person.initials,
-                                        size = 52.dp,
+                                        size = 54.dp,
                                         backgroundColor = bg
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = person.name.split(" ").firstOrNull() ?: person.name,
-                                        fontSize = 13.sp,
+                                        fontSize = 14.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = InkDark,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+
+                            // Trailing chevron circular button (as in Figma image 3)
+                            item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .width(54.dp)
+                                        .clickable { onPayUpiId() }
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .size(54.dp)
+                                            .clip(CircleShape)
+                                            .background(AppPurpleLight)
+                                    ) {
+                                        Icon(
+                                            imageVector = AppIcons.ChevronRight,
+                                            contentDescription = "More",
+                                            tint = AppPurple,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = "",
+                                        fontSize = 14.sp
                                     )
                                 }
                             }
@@ -270,7 +315,7 @@ fun HomeScreen(
                     shadowElevation = 1.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = stringResource(R.string.recent_payments),
                             fontSize = 18.sp,
@@ -278,14 +323,14 @@ fun HomeScreen(
                             color = InkDark
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         state.recent.forEach { txn ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
+                                    .padding(vertical = 10.dp)
                                     .clickable { onHistory() }
                             ) {
                                 val txnInitials = txn.name.split(" ")
@@ -296,12 +341,12 @@ fun HomeScreen(
 
                                 UserAvatar(
                                     initials = txnInitials,
-                                    size = 42.dp,
+                                    size = 44.dp,
                                     backgroundColor = AppPurpleLight,
                                     textColor = AppPurple
                                 )
 
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.width(14.dp))
 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
@@ -310,9 +355,10 @@ fun HomeScreen(
                                         fontWeight = FontWeight.SemiBold,
                                         color = InkDark
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         text = txn.time,
-                                        fontSize = 13.sp,
+                                        fontSize = 14.sp,
                                         color = MutedText
                                     )
                                 }
@@ -343,7 +389,7 @@ fun HomeScreen(
                 selected = true,
                 onClick = {},
                 icon = { Icon(AppIcons.Home, contentDescription = "Home") },
-                label = { Text(stringResource(R.string.nav_home), fontSize = 12.sp) },
+                label = { Text(stringResource(R.string.nav_home), fontSize = 14.sp, fontWeight = FontWeight.SemiBold) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = AppPurple,
                     selectedTextColor = AppPurple,
@@ -354,13 +400,13 @@ fun HomeScreen(
                 selected = false,
                 onClick = onHistory,
                 icon = { Icon(AppIcons.History, contentDescription = "History") },
-                label = { Text(stringResource(R.string.nav_history), fontSize = 12.sp) }
+                label = { Text(stringResource(R.string.nav_history), fontSize = 14.sp) }
             )
             NavigationBarItem(
                 selected = false,
                 onClick = onHistory,
                 icon = { Icon(AppIcons.Settings, contentDescription = "Settings") },
-                label = { Text(stringResource(R.string.nav_settings), fontSize = 12.sp) }
+                label = { Text(stringResource(R.string.nav_settings), fontSize = 14.sp) }
             )
         }
     }
@@ -376,13 +422,13 @@ private fun QuickActionTile(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .width(76.dp)
+            .width(80.dp)
             .clickable { onClick() }
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(52.dp)
+                .size(54.dp)
                 .clip(CircleShape)
                 .background(AppPurpleLight)
         ) {
@@ -396,11 +442,11 @@ private fun QuickActionTile(
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
-            fontSize = 12.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             color = InkDark,
             textAlign = TextAlign.Center,
-            lineHeight = 15.sp
+            lineHeight = 16.sp
         )
     }
 }

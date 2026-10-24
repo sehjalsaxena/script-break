@@ -107,7 +107,7 @@ fun UserPickerScreen(
             color = InkDark
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = stringResource(R.string.user_picker_subtitle),
@@ -144,16 +144,16 @@ fun UserPickerScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
+                        .size(10.dp)
                         .clip(CircleShape)
                         .background(NudgeAmber)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = stringResource(R.string.demo_banner),
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = BodyDark,
-                    lineHeight = 18.sp
+                    lineHeight = 20.sp
                 )
             }
         }
@@ -183,13 +183,13 @@ private fun ProfileCard(
                 UserAvatar(
                     initials = profile.initials,
                     backgroundColor = profile.avatarBg,
-                    size = 46.dp
+                    size = 50.dp
                 )
             } else if (profile.icon != null) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(46.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
                         .background(profile.avatarBg)
                 ) {
@@ -197,7 +197,7 @@ private fun ProfileCard(
                         imageVector = profile.icon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(26.dp)
                     )
                 }
             }
@@ -213,11 +213,12 @@ private fun ProfileCard(
                     fontWeight = FontWeight.Bold,
                     color = InkDark
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = profile.subtitle,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = MutedText,
-                    lineHeight = 18.sp
+                    lineHeight = 20.sp
                 )
             }
 

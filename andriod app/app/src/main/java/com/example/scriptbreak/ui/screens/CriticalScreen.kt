@@ -53,6 +53,7 @@ fun CriticalScreen(
     onContinue: () -> Unit,
     onToggleLanguage: () -> Unit,
     onReadAloud: () -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val h = state.hindi
@@ -85,105 +86,141 @@ fun CriticalScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Full width Red Header (CritRed)
-        Box(
+        // Top Navigation Bar
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CritRed)
-                .padding(horizontal = 16.dp, vertical = 18.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = titleText,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        lineHeight = 28.sp,
-                        modifier = Modifier.weight(1f)
-                    )
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = AppIcons.ArrowBack,
+                    contentDescription = "Back",
+                    tint = InkDark,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
-                    // Language toggle pill
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(1.dp, Color.White.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
-                            .clickable { onToggleLanguage() }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "EN",
-                                fontSize = 12.sp,
-                                fontWeight = if (!h) FontWeight.Bold else FontWeight.Normal,
-                                color = if (!h) Color.White else Color.White.copy(alpha = 0.7f)
-                            )
-                            Text(
-                                text = " | ",
-                                fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                text = "हिंदी",
-                                fontSize = 12.sp,
-                                fontWeight = if (h) FontWeight.Bold else FontWeight.Normal,
-                                color = if (h) Color.White else Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-
-                    // Read aloud speaker button
-                    IconButton(
-                        onClick = onReadAloud,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = AppIcons.VolumeUp,
-                            contentDescription = "Read aloud",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = calmText,
-                    fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.95f),
-                    lineHeight = 22.sp
+                    text = "ScriptBreak",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = InkDark
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Language toggle pill
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, Color(0xFFE2E4E8), RoundedCornerShape(8.dp))
+                    .clickable { onToggleLanguage() }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "EN",
+                        fontSize = 12.sp,
+                        fontWeight = if (!h) FontWeight.Bold else FontWeight.Normal,
+                        color = if (!h) InkDark else MutedText
+                    )
+                    Text(
+                        text = " | ",
+                        fontSize = 12.sp,
+                        color = Color(0xFFCCCCCC)
+                    )
+                    Text(
+                        text = "हिंदी",
+                        fontSize = 12.sp,
+                        fontWeight = if (h) FontWeight.Bold else FontWeight.Normal,
+                        color = if (h) InkDark else MutedText
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            // Read aloud speaker button
+            IconButton(
+                onClick = onReadAloud,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = AppIcons.VolumeUp,
+                    contentDescription = "Read aloud",
+                    tint = InkDark,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
 
-        // Body content
+        // Scrollable body content
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Red Warning Badge with !
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(CritRed)
+            ) {
+                Text(
+                    text = "!",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+            }
+
+            Text(
+                text = titleText,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = InkDark,
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = calmText,
+                fontSize = 16.sp,
+                color = MutedText,
+                textAlign = TextAlign.Center,
+                lineHeight = 22.sp
+            )
+
             // Police / CBI reassurance line
             Text(
                 text = neverText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = InkDark,
+                textAlign = TextAlign.Center,
                 lineHeight = 22.sp
             )
 
             // Amount & reasons box
             Surface(
                 color = CritRedTint,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, CritRed.copy(alpha = 0.3f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -199,15 +236,24 @@ fun CriticalScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         state.reasons.forEach { reason ->
                             Row(
-                                modifier = Modifier.padding(vertical = 2.dp),
-                                verticalAlignment = Alignment.Top
+                                modifier = Modifier.padding(vertical = 3.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "• ",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = InkDark
-                                )
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .clip(androidx.compose.foundation.shape.CircleShape)
+                                        .background(CritRed)
+                                ) {
+                                    Icon(
+                                        imageVector = AppIcons.Check,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = reason,
                                     fontSize = 16.sp,
@@ -236,6 +282,8 @@ fun CriticalScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             // Buttons
             // 1. Wait 30 minutes
             DemoPrimaryButton(
@@ -252,12 +300,31 @@ fun CriticalScreen(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
             ) {
-                Text(
-                    text = if (state.askedFamily) "✓ $askFamilyBtnText" else askFamilyBtnText,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (state.askedFamily) SafeGreen else InkDark
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (state.askedFamily) {
+                        Icon(
+                            imageVector = AppIcons.Check,
+                            contentDescription = null,
+                            tint = SafeGreen,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    } else {
+                        Icon(
+                            imageVector = AppIcons.Person,
+                            contentDescription = null,
+                            tint = InkDark,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
+                    Text(
+                        text = askFamilyBtnText,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (state.askedFamily) SafeGreen else InkDark
+                    )
+                }
             }
 
             // 3. Continue anyway (countdown delay)
@@ -291,7 +358,7 @@ fun CriticalScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp)
+                .padding(vertical = 10.dp)
         )
     }
 }

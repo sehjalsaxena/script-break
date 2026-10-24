@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,6 +58,7 @@ fun PauseScreen(
     onAskFamily: () -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
+    onWait: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -192,7 +196,16 @@ fun PauseScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (onWait != null) {
+            DemoPrimaryButton(
+                text = stringResource(R.string.critical_wait),
+                onClick = onWait,
+                containerColor = SafeGreen
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         // Next Button
         DemoPrimaryButton(
@@ -201,11 +214,28 @@ fun PauseScreen(
             containerColor = PauseOrange
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        // Always available "Continue anyway" option per design rule
+        Button(
+            onClick = onNext,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = MutedText
+            ),
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.critical_continue_now),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
 
         Text(
             text = stringResource(R.string.checked_on_phone),
-            fontSize = 13.sp,
+            fontSize = 14.sp,
             color = FaintText,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()

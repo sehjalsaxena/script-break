@@ -104,8 +104,8 @@ fun SuccessScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier.padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DetailRow(label = "UPI Ref ID", value = state.upiRef)
                 DetailRow(label = "Time", value = state.time)
@@ -113,7 +113,7 @@ fun SuccessScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         // Optional Report line
         if (state.showReportLine) {
@@ -142,16 +142,17 @@ fun SuccessScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
                         text = stringResource(R.string.report_fraud_desc),
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         color = InkDark,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     OutlinedButton(
                         onClick = onReport,
@@ -160,7 +161,7 @@ fun SuccessScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.report_payment_btn),
-                            fontSize = 14.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = CritRed
                         )
@@ -189,13 +190,13 @@ private fun DetailRow(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             color = MutedText
         )
         Text(
             text = value,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
             color = InkDark
         )
     }
@@ -207,7 +208,7 @@ fun SuccessScreenPreview() {
     ScriptBreakTheme {
         SuccessScreen(
             state = SuccessUi(
-                amountText = "₹20,000",
+                amountText = "₹48,000",
                 payeeName = "Ramesh K.",
                 upiRef = "429810482910",
                 time = "Today, 10:45 AM",
