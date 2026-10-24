@@ -9,7 +9,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.AndroidSignals
+import com.example.scriptbreak.logic.Discovery
 import com.example.scriptbreak.logic.FamilyAlertSender
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.PaymentFlow
@@ -22,6 +24,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var signals: AndroidSignals
     private lateinit var flow: PaymentFlow
     private lateinit var judge: JudgeMode
+    private lateinit var analyst: AnalystMode
 
     // Android 15+: is this app's own window being recorded or shared right now?
     private val screenRecording = Consumer<Int> { state ->
@@ -40,10 +43,15 @@ class MainActivity : ComponentActivity() {
         // The 28 Round 1 stories (a copy of tests/cases.json) as Judge mode presets
         val stories = try { JudgeMode.parseStories(assets.open("cases.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { emptyList() }
         judge = JudgeMode(model, stories)
+        // Analyst demo: the model from BEFORE the "sent by mistake" wave, and what the AI found in the missed reports
+        val beforeModel = try { ScamModel.fromAssets(this, "scam_model_unseen_sent_by_mistake.json") } catch (e: Exception) { null }
+        val discovery = try { Discovery.parse(assets.open("discovery_unseen_sent_by_mistake.json").bufferedReader().use { it.readText() }) } catch (e: Exception) { null }
+        // Approved rules become guardrail G3 everywhere in the app
+        analyst = AnalystMode(beforeModel, discovery) { rules -> flow.approvedRules = rules }
         setContent {
             ScriptBreakTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    AppRoot(flow, signals, judge)
+                    AppRoot(flow, signals, judge, analyst)
                 }
             }
         }

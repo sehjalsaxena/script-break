@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.scriptbreak.R
+import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.JudgeMode
 import com.example.scriptbreak.logic.KitResult
 import com.example.scriptbreak.logic.PaymentFlow
@@ -37,6 +38,7 @@ import com.example.scriptbreak.ui.model.PayeeUi
 import com.example.scriptbreak.ui.model.PersonUi
 import com.example.scriptbreak.ui.model.TxnUi
 import com.example.scriptbreak.ui.screens.AmountScreen
+import com.example.scriptbreak.ui.screens.AnalystScreen
 import com.example.scriptbreak.ui.screens.CriticalScreen
 import com.example.scriptbreak.ui.screens.FamilyAlertScreen
 import com.example.scriptbreak.ui.screens.HomeScreen
@@ -57,7 +59,7 @@ import java.util.Locale
 
 /** The real app: Sehjal's screens driven by PaymentFlow (AI model + safety layer + phone signals). */
 @Composable
-fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode) {
+fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst: AnalystMode) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -228,6 +230,15 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode) {
                     onRunInApp = { flow.runJudge(judge.inputs, judge.q1, judge.q2) },
                     onPickFile = { pickFile.launch(arrayOf("application/json", "text/csv", "text/comma-separated-values", "text/plain", "application/octet-stream", "*/*")) },
                     onLoadSample = { scoreKit({ context.assets.open("sample_kit.jsonl").bufferedReader().use { it.readText() } }, "sample_kit.jsonl (400 synthetic test payments)") },
+                    onBack = { flow.back() },
+                )
+
+                Screen.Analyst -> AnalystScreen(
+                    analyst = analyst,
+                    onRunInApp = {
+                        flow.runTest(analyst.scamPayment, null, null, testModel = analyst.beforeModel,
+                            back = Screen.Analyst, payeeName = "Vikram S.")
+                    },
                     onBack = { flow.back() },
                 )
 

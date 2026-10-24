@@ -1,0 +1,151 @@
+{
+ "model": "unseen:sent_by_mistake",
+ "reports": 1200,
+ "missed_by_model": 270,
+ "missed_by_type": {
+  "digital_arrest": 15,
+  "customer_care": 42,
+  "kyc_official": 43,
+  "courier": 15,
+  "voice_clone": 9,
+  "hang_up_and_pay": 20,
+  "sent_by_mistake": 89,
+  "chat_task": 37
+ },
+ "clustering": {
+  "method": "average-linkage, Jaccard distance",
+  "cut_height": 0.6,
+  "silhouette": 0.322
+ },
+ "policy": {
+  "new_rule_budget_per_1000": 0.5,
+  "min_share_caught": 0.7,
+  "min_cluster": 20
+ },
+ "clusters": [
+  {
+   "cluster_id": "C1",
+   "size": 89,
+   "pattern": [
+    "same amount as that money",
+    "money received from an unknown sender",
+    "new payee"
+   ],
+   "ground_truth_mix_for_judges": {
+    "sent_by_mistake": 89
+   },
+   "suggestion": "approve",
+   "proposed_rule": {
+    "id": "L1",
+    "all": [
+     "amount_matches_credit",
+     "payee_new"
+    ],
+    "none": [
+     "payee_is_sender"
+    ],
+    "name": "same amount as that money + new payee, not payee is that sender",
+    "explain": "This sends back money you received from someone you have never paid, but to a different account. Real mistaken payments are reversed by the sender's bank, not by you.",
+    "catches_share_of_cluster": 1.0,
+    "added_false_alarms_per_1000": 0.05
+   }
+  },
+  {
+   "cluster_id": "C5",
+   "size": 58,
+   "pattern": [
+    "on a call now",
+    "new payee"
+   ],
+   "ground_truth_mix_for_judges": {
+    "kyc_official": 21,
+    "customer_care": 18,
+    "courier": 7,
+    "voice_clone": 6,
+    "digital_arrest": 5,
+    "chat_task": 1
+   },
+   "suggestion": "reject",
+   "cheapest_rule_reaching_70pct": {
+    "all": [
+     "call_now",
+     "payee_new"
+    ],
+    "added_false_alarms_per_1000": 24.58
+   }
+  },
+  {
+   "cluster_id": "C2",
+   "size": 50,
+   "pattern": [
+    "left and returned to the app",
+    "new payee"
+   ],
+   "ground_truth_mix_for_judges": {
+    "chat_task": 28,
+    "customer_care": 9,
+    "kyc_official": 8,
+    "digital_arrest": 4,
+    "hang_up_and_pay": 1
+   },
+   "suggestion": "reject",
+   "cheapest_rule_reaching_70pct": {
+    "all": [
+     "app_switch",
+     "payee_new"
+    ],
+    "added_false_alarms_per_1000": 28.73
+   }
+  },
+  {
+   "cluster_id": "C3",
+   "size": 30,
+   "pattern": [
+    "unusual amount",
+    "new payee"
+   ],
+   "ground_truth_mix_for_judges": {
+    "hang_up_and_pay": 13,
+    "customer_care": 5,
+    "kyc_official": 5,
+    "courier": 3,
+    "voice_clone": 2,
+    "digital_arrest": 1,
+    "chat_task": 1
+   },
+   "suggestion": "reject",
+   "cheapest_rule_reaching_70pct": {
+    "all": [
+     "amount_big",
+     "payee_new"
+    ],
+    "added_false_alarms_per_1000": 20.51
+   }
+  },
+  {
+   "cluster_id": "C4",
+   "size": 28,
+   "pattern": [
+    "new payee",
+    "payee ID pasted"
+   ],
+   "ground_truth_mix_for_judges": {
+    "hang_up_and_pay": 6,
+    "kyc_official": 5,
+    "courier": 5,
+    "chat_task": 5,
+    "customer_care": 4,
+    "digital_arrest": 2,
+    "voice_clone": 1
+   },
+   "suggestion": "reject",
+   "cheapest_rule_reaching_70pct": {
+    "all": [
+     "payee_new",
+     "payee_pasted"
+    ],
+    "added_false_alarms_per_1000": 41.88
+   }
+  }
+ ]
+}

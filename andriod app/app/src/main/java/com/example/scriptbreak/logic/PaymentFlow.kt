@@ -16,7 +16,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
-enum class Screen { UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, Judge }
+enum class Screen { UserPicker, Home, PayToUpi, Payee, Amount, Pause, Critical, Pin, Success, Waiting, FamilyAlert, Judge, Analyst }
 
 /** A payment made during this demo session (the app's own payment record). */
 data class SessionPayment(
@@ -75,13 +75,16 @@ class PaymentFlow(
     /** Judge mode "Run in app": these inputs replace the phone's signals for one payment. */
     var judgeInputs by mutableStateOf<Payment?>(null); private set
     var judgeAnswers: Pair<Boolean?, Boolean?> = null to null; private set
-    private var fromJudge = false
+    /** Where a test payment returns when it ends (Judge or Analyst), or null for a normal payment. */
+    private var returnTo: Screen? = null
+    /** Analyst demo: score this one payment with a different model (the "before the new scam wave" one). */
+    private var runModel: ScamModel? = null
 
     private var pasted = false            // payee UPI ID pasted, not typed or picked
     private var leftApp = false           // left the app and came back during this payment
     private var warnedThisPayment = false // a Pause or Critical screen was shown for this payment
 
-    val modelVersion: String get() = model?.modelVersion ?: "unavailable"
+    val modelVersion: String get() = (runModel ?: model)?.modelVersion ?: "unavailable"
     val amount: Long get() = amountDigits.toLongOrNull() ?: 0L
     val callNow: Boolean get() = signals.callNow || simulateCall
 
@@ -98,7 +101,8 @@ class PaymentFlow(
             "rohit" -> if (lastAlert != null) screen = Screen.FamilyAlert
                        else message = "No alert yet. When someone taps \"Ask Rohit to call me\", it appears here."
             "judge" -> screen = Screen.Judge
-            else -> message = "Analyst mode is being added next."
+            "analyst" -> screen = Screen.Analyst
+            else -> message = "Unknown profile"
         }
     }
 
@@ -106,9 +110,9 @@ class PaymentFlow(
     fun back(): Boolean {
         when (screen) {
             Screen.UserPicker -> return false
-            Screen.Home, Screen.FamilyAlert, Screen.Judge -> screen = Screen.UserPicker
+            Screen.Home, Screen.FamilyAlert, Screen.Judge, Screen.Analyst -> screen = Screen.UserPicker
             Screen.PayToUpi, Screen.Payee, Screen.Waiting -> finish()
-            Screen.Amount -> if (fromJudge) finish() else screen = Screen.Payee
+            Screen.Amount -> if (returnTo != null) finish() else screen = Screen.Payee
             Screen.Pause, Screen.Critical, Screen.Pin -> backToAmount()
             Screen.Success -> done()
         }
@@ -121,12 +125,17 @@ class PaymentFlow(
 
     // ---- Judge mode: run the judge's inputs through the real screens ----------------------------
     /** Opens the Amount screen with these exact inputs; Pay then shows the real Nudge/Pause/Critical. */
-    fun runJudge(p: Payment, q1: Boolean?, q2: Boolean?) {
+    fun runJudge(p: Payment, q1: Boolean?, q2: Boolean?) = runTest(p, q1, q2)
+
+    /** Analyst "Run in app": same as Judge, but scored with [testModel] and returning to the Analyst tab. */
+    fun runTest(p: Payment, q1: Boolean?, q2: Boolean?, testModel: ScamModel? = null,
+                back: Screen = Screen.Judge, payeeName: String = "Test payee") {
         resetPayment()
-        fromJudge = true
+        returnTo = back
+        runModel = testModel
         judgeInputs = p
         judgeAnswers = q1 to q2
-        payee = PayeeRecord("judge", "Test payee", "test.payee@demoupi", "TEST PAYEE", kind = p.payeeKind,
+        payee = PayeeRecord("judge", payeeName, "test.payee@demoupi", payeeName.uppercase(), kind = p.payeeKind,
             status = if (p.payeeStatus == "known") "known" else "new", initials = "TP", colorHex = "#5A2CA0")
         amountDigits = p.amount.toLong().coerceAtLeast(0).toString()
         screen = Screen.Amount
@@ -222,7 +231,7 @@ class PaymentFlow(
     fun toggleHindi() { hindi = !hindi }
 
     /** "Wait 30 minutes": the payment is cancelled, nothing leaves the account. */
-    fun wait30() { val j = fromJudge; resetPayment(); fromJudge = j; screen = Screen.Waiting }
+    fun wait30() { val r = returnTo; resetPayment(); returnTo = r; screen = Screen.Waiting }
 
     fun askFamily() {
         val p = payee ?: return
@@ -258,11 +267,11 @@ class PaymentFlow(
 
     fun done() = finish()
 
-    /** End of a payment: back to Home, or to Judge mode if the judge started it. */
+    /** End of a payment: back to Home, or to Judge/Analyst if a test payment started there. */
     private fun finish() {
-        val j = fromJudge
+        val r = returnTo
         resetPayment()
-        screen = if (j) Screen.Judge else Screen.Home
+        screen = r ?: Screen.Home
     }
     fun backToAmount() { q1 = null; q2 = null; secondsLeft = 0; screen = Screen.Amount }
 
@@ -323,7 +332,7 @@ class PaymentFlow(
 
     /** The model + safety layer, wrapped so that any failure lets the payment through (null). */
     fun assessSafely(q1: Boolean?, q2: Boolean?, refreshSignals: Boolean = true): Result? {
-        val m = model ?: return null
+        val m = runModel ?: model ?: return null
         val payment = currentPayment(refreshSignals) ?: return null
         if (payment.amount <= 0) return null
         return try {
@@ -350,7 +359,7 @@ class PaymentFlow(
         q1 = null; q2 = null; askedFamily = false; secondsLeft = 0; pinDigits = 0
         pauseResult = null; criticalResult = null
         pasted = false; leftApp = false; warnedThisPayment = false
-        judgeInputs = null; judgeAnswers = null to null; fromJudge = false
+        judgeInputs = null; judgeAnswers = null to null; returnTo = null; runModel = null
     }
 
     companion object {

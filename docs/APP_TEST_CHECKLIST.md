@@ -24,7 +24,7 @@ Demo UPI IDs: `ramesh.k@demoupi` (new), `anil.mehta@demoupi` (new), `manoj.elec@
 |---|---|---|---|
 | 1.1 | Open the app | Profile picker with 5 cards; "Demo app – no real money" visible | |
 | 1.2 | Tap **Rohit** before any alert was sent | Message "No alert yet…"; stays on picker | |
-| 1.3 | Tap **Analyst** | Message "Analyst mode is being added next" (not built yet) | |
+| 1.3 | Tap **Analyst** | Analyst console opens (see section 7b) | |
 | 1.4 | Tap **Mr. Sharma** | Home: "Mr. Sharma", people row (Rohit, Suresh, Sunita, Kirana), recent payments | |
 | 1.5 | Press the phone's Back button on Home | Back to the profile picker (no crash) | |
 
@@ -115,9 +115,21 @@ amount,median_90d,payments_90d,call_now,payee_status,payee_kind,label,q1
 18000,900,50,false,known,person,0,
 ```
 
+## 7b. Analyst console (the AI learning a new scam)
+
+| # | Steps | Expected | ✅/❌ |
+|---|---|---|---|
+| 7b.1 | Picker → **Analyst** | "A new scam wave has started": 1,200 reports, model missed 270 | |
+| 7b.2 | Scroll the groups | 5 groups; **C1 · 89 reports**, AI suggests **approve**, rule L1 "same amount as that money + new payee, not payee is that sender", catches 100%, adds 0.05 per 1,000; the others: no rule cheap enough, AI suggests reject | |
+| 7b.3 | Turn on **Show the true scam types** | C1 is 100% "sent by mistake"; other groups are mixed | |
+| 7b.4 | "Try it on a phone" before approving | Scam payment: **NONE (no warning)** | |
+| 7b.5 | Tap **Approve** on C1 | "✓ Approved…"; Try it now shows **PAUSE** (L1); genuine return to the real sender stays **NONE** | |
+| 7b.6 | **Run the scam payment in the app** → Pay | **Pause** with the reason "This sends back money you received from someone you have never paid…"; footer shows model "…-without-sent_by_mistake" → finish → back in the Analyst console | |
+| 7b.7 | Tap **Shadow mode**, then **Reject** on C1 | Try it goes back to **NONE** (only approved rules reach phones) | |
+
 ## 8. Not built yet (don't report as bugs)
 
-- Analyst tab, Results tab, report packet screen (Report opens the dialer only).
+- Results tab, report packet screen (Report opens the dialer only).
 - Family alert to a **second** phone (Firebase): for now the alert shows on the same phone under Rohit.
 - History and Balance (show a "not part of this demo" message).
 - Hindi on screens other than Critical; Priya has the same trusted contact (Rohit).
