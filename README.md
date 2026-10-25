@@ -51,7 +51,7 @@ phone signals + payment history ──► 16 facts ──► AI model (gradient 
   - night time
   - the payment history: usual amount (90-day median), new payees, money sent today
 - **Never read:** call audio, the caller's number, the call log, messages, contacts, location or clipboard contents.
-- **What's real and what's simulated:** call detection, pasting, app switching and night are real. Screen sharing is real on Android 15+ (and casting on any Android). Money from a stranger and flagged payees exist only in Judge mode. The full table, and what a production version inside a payment app would use, is in [ml/JUDGE_QA.md](ml/JUDGE_QA.md).
+- **What's real and what's simulated:** call detection, pasting, app switching and night are real. Screen sharing is real on Android 15+ (and casting on any Android). Money from a stranger and flagged payees exist only in Judge mode.
 - **Model:** trained only on synthetic data from our generator ([ml/](ml/)). It is exported to JSON (91 KB) and scored
   in Kotlin with no network and no ML library. The Kotlin scores match Python exactly on 500 test payments.
 - **Safety layer** ([ml/policy.py](ml/policy.py), same logic in Kotlin `ScamModel.assess`):

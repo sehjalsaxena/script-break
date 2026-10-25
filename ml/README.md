@@ -77,7 +77,6 @@ or the Q1/Q2 answers.
 | `android/ScamModelParityTest.kt` | Android unit test: Kotlin must match Python |
 | `round1/` | Round 1 code reused: generator, old rules (for comparison only), clustering |
 | `MODEL_CARD.md` | One-page description for judges |
-| `JUDGE_QA.md` | Questions judges may ask, with answers |
 
 ## Things you can try (and how to judge them)
 
