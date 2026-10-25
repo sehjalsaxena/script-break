@@ -98,7 +98,7 @@ Per type, hidden-type results and the 28 stories: `ml/results/REPORT.md`.
   The analyst loop then finds it as one pure cluster and proposes a rule that catches 100% of it.
 - The false-alarm rate is 7.4 per 1,000; the **upper end of its 95% range (8.4) is slightly above our budget of 8**.
 - **Fairness finding: first-time users (little payment history) are interrupted 12.5 per 1,000
-  (95% range 8.3–18.9) vs 7.0 for regular users**, and payments to a new *person* far more than to
+  (95% range 8.3–18.9) vs 7.1 for regular users**, and payments to a new *person* far more than to
   merchants. With no history, the model leans on the amount alone. We report it rather than tune it on
   test data; the fix would be a separate threshold for low-history users, set on validation data and
   checked in shadow mode. Table: `ml/results/TEST_SUMMARY.md`.
@@ -108,8 +108,9 @@ Per type, hidden-type results and the 28 stories: `ml/results/REPORT.md`.
 - Everything is synthetic. A bank pilot would retrain on consented fraud reports and run 8 weeks of
   shadow mode (scores computed, nothing shown) before showing any screen.
 
-## 6. Still being added
+## 6. Not done yet
 
 - Attack tests (split payments, hang up first, merchant accounts, removed signals).
 - Stress tests (more genuine calls, missed call detection).
-- Time per payment measured on the demo phone.
+
+Time per payment on the phone is measured live: Judge mode → Scoreboard scores 400 test payments and shows the time.

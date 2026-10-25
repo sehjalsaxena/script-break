@@ -61,7 +61,7 @@ fun CriticalScreen(
 ) {
     val h = state.hindi
 
-    // Exact copy strings from SPEC.md Section 12
+    // Exact wording from our Round 1 design (English and Hindi): do not reword
     val titleText = if (h) "रुकिए। यह एक आम धोखाधड़ी जैसा है।" else "Stop. This matches a common scam."
     val calmText = if (h) "आप किसी मुसीबत में नहीं हैं। इस भुगतान का फ़ैसला आपके हाथ में है।" else "You are not in trouble. You are in control of this payment."
     val neverText = if (h) "पुलिस, CBI, RBI और बैंक कभी भी पैसे की जाँच, सुरक्षा या उसे छुड़ाने के लिए पैसे भेजने को नहीं कहते।" else "Police, CBI, RBI and banks never ask you to move money to verify, protect or release it."

@@ -6,7 +6,7 @@ Code drafted with an AI coding assistant (Claude); trained, run and checked by t
 ## What it is
 A gradient-boosted decision-tree classifier (scikit-learn, 200 trees, depth 3) that gives one
 UPI payment a **scam probability from 0 to 1** and the **top 3 reasons**. It runs on the phone:
-exported as a 91 KB JSON file, scored by about 300 lines of Kotlin, with no network (Judge mode → Results times it live on the phone)
+exported as a 91 KB JSON file, scored by about 300 lines of Kotlin, with no network (Judge mode → Scoreboard times it live on the phone)
 and no ML library.
 
 ## Inputs (16 facts, turned into 24 numbers)
