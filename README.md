@@ -123,7 +123,7 @@ Paths below are under `andriod app/app/src/main/java/com/example/scriptbreak/` u
 
 A demo to try on one phone: log in as judge, switch on "Simulate a phone call", log out, and log in as sambhav.
 Then Pay to UPI ID `ramesh.k@demoupi` ₹20,000 → Pause → answer Yes → Critical → Ask Sehjal.
-Then log out and log in as sehjal: the alert is in Notifications (the bell on Home); tap it. For two or three phones, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+Then log out and log in as sehjal: the alert is in Notifications (the bell on Home); tap it.
 
 ## Run the tests
 

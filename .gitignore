@@ -2,3 +2,7 @@ node_modules
 dist
 .env
 /.idea/
+
+CLAUDE.md
+docs/DEMO_SCRIPT.md
+docs/APP_TEST_CHECKLIST.md
