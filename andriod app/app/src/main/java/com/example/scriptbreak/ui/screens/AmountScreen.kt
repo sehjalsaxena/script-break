@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +55,7 @@ import com.example.scriptbreak.ui.components.AppTopBar
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.components.NumericKeypad
 import com.example.scriptbreak.ui.components.UserAvatar
+import com.example.scriptbreak.ui.components.isShortScreen
 import com.example.scriptbreak.ui.model.AmountUi
 import com.example.scriptbreak.ui.theme.AppBackground
 import com.example.scriptbreak.ui.theme.AppPurple
@@ -78,196 +81,220 @@ fun AmountScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
-            .padding(16.dp)
-            .navigationBarsPadding()
     ) {
-        AppTopBar(
-            onBack = onBack,
-            showScriptBreakBadge = true
-        )
-
-        // Everything above the keypad scrolls, so the keypad and Continue never get pushed off screen
+        // Short phones (e.g. 360×640): smaller keys, and the payee moves into the top bar,
+        // so the amount, the Nudge line and the Safety check stay visible above the keypad
+        val short = isShortScreen(maxHeight)
         Column(
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = if (short) 8.dp else 16.dp)
+                .navigationBarsPadding()
         ) {
-        // Payee header preview (Avatar + Name + UPI ID)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            val initials = state.payeeName.split(" ")
-                .mapNotNull { it.firstOrNull()?.toString() }
-                .take(2)
-                .joinToString("")
-                .ifEmpty { "RK" }
-
-            UserAvatar(
-                initials = initials,
-                size = 46.dp,
-                backgroundColor = Color(0xFF6B74D6)
+            AppTopBar(
+                onBack = onBack,
+                showScriptBreakBadge = true,
+                centerContent = if (short) ({ PayeeHeader(state, avatarSize = 36.dp, compact = true) }) else null
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            // Everything above the keypad scrolls, so the keypad and Continue never get pushed off screen
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                if (!short) {
+                    PayeeHeader(state, avatarSize = 46.dp, compact = false)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-            Column {
-                Text(
-                    text = "To " + state.payeeName,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkDark
-                )
-                Text(
-                    text = state.payeeUpiId,
-                    fontSize = 14.sp,
-                    color = MutedText
+                AmountDisplay(state.amountText, fontSize = if (short) 36.sp else 44.sp)
+
+                Spacer(modifier = Modifier.height(if (short) 10.dp else 16.dp))
+
+                // Nudge line (amber inline, no extra tap)
+                if (!state.nudge.isNullOrBlank()) {
+                    Surface(
+                        color = NudgeAmberTint,
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, NudgeAmberBar),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier.padding(if (short) 10.dp else 12.dp)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.Warning,
+                                contentDescription = null,
+                                tint = NudgeAmber,
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .padding(top = 2.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = state.nudge,
+                                fontSize = if (short) 14.sp else 15.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = NudgeAmberInk,
+                                lineHeight = if (short) 19.sp else 21.sp
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(if (short) 4.dp else 8.dp))
+                }
+
+                if (state.aiLevel != null) {
+                    SafetyCheckCard(state.aiLevel, state.aiScore, state.aiFacts, state.aiReminderOnly)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                // Add note field
+                OutlinedTextField(
+                    value = state.note,
+                    onValueChange = onNoteChange,
+                    singleLine = true,
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.add_note_optional),
+                            fontSize = 16.sp,
+                            color = MutedText
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = InkDark,
+                        unfocusedTextColor = InkDark,
+                        focusedBorderColor = AppBlue,
+                        unfocusedBorderColor = LineBorder,
+                        cursorColor = AppBlue,
+                        focusedContainerColor = AppSurface,
+                        unfocusedContainerColor = AppSurface
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
+
+            Spacer(modifier = Modifier.height(if (short) 6.dp else 8.dp))
+
+            // Keypad
+            NumericKeypad(
+                onDigit = onDigit,
+                onDelete = onDelete,
+                keyHeight = if (short) 44.dp else 56.dp,
+                spacing = if (short) 6.dp else 8.dp
+            )
+
+            Spacer(modifier = Modifier.height(if (short) 8.dp else 12.dp))
+
+            // Pay Button
+            DemoPrimaryButton(
+                text = stringResource(R.string.continue_btn),
+                onClick = onPay,
+                enabled = state.payEnabled
+            )
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
+/** Payee avatar, name and UPI ID: under the top bar, or inside it on short phones ([compact]). */
+@Composable
+private fun PayeeHeader(state: AmountUi, avatarSize: androidx.compose.ui.unit.Dp, compact: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = if (compact) 0.dp else 8.dp)
+    ) {
+        val initials = state.payeeName.split(" ")
+            .mapNotNull { it.firstOrNull()?.toString() }
+            .take(2)
+            .joinToString("")
+            .ifEmpty { "RK" }
 
-        // Large Amount display with vertical blinking cursor
-        val infiniteTransition = rememberInfiniteTransition(label = "amountCursor")
-        val cursorAlpha by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 0f,
-            animationSpec = infiniteRepeatable(
-                animation = keyframes {
-                    durationMillis = 1000
-                    1f at 0
-                    1f at 499
-                    0f at 500
-                    0f at 999
-                },
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "cursorAlpha"
+        UserAvatar(
+            initials = initials,
+            size = avatarSize,
+            backgroundColor = Color(0xFF6B74D6)
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Spacer(modifier = Modifier.width(if (compact) 8.dp else 12.dp))
+
+        Column {
             Text(
-                text = "₹",
-                fontSize = 34.sp,
+                text = "To " + state.payeeName,
+                fontSize = if (compact) 16.sp else 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = InkDark,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = state.payeeUpiId,
+                fontSize = if (compact) 12.sp else 14.sp,
+                color = MutedText,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+/** Large amount with a blinking cursor, like other UPI apps. */
+@Composable
+private fun AmountDisplay(amountText: String, fontSize: androidx.compose.ui.unit.TextUnit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "amountCursor")
+    val cursorAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 1000
+                1f at 0
+                1f at 499
+                0f at 500
+                0f at 999
+            },
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "cursorAlpha"
+    )
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "₹",
+            fontSize = fontSize * 0.77f,
+            fontWeight = FontWeight.Bold,
+            color = InkDark
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        if (amountText.isNotEmpty()) {
+            Text(
+                text = amountText,
+                fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
                 color = InkDark
             )
-            Spacer(modifier = Modifier.width(6.dp))
-            if (state.amountText.isNotEmpty()) {
-                Text(
-                    text = state.amountText,
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkDark
-                )
-                Spacer(modifier = Modifier.width(3.dp))
-            }
-            // Vertical blinking cursor line like other UPI apps
-            Box(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(38.dp)
-                    .clip(RoundedCornerShape(1.5.dp))
-                    .graphicsLayer { alpha = cursorAlpha }
-                    .background(AppOrange)
-            )
+            Spacer(modifier = Modifier.width(3.dp))
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Nudge line (amber inline, no extra tap)
-        if (!state.nudge.isNullOrBlank()) {
-            Surface(
-                color = NudgeAmberTint,
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, NudgeAmberBar),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Icon(
-                        imageVector = AppIcons.Warning,
-                        contentDescription = null,
-                        tint = NudgeAmber,
-                        modifier = Modifier
-                            .size(22.dp)
-                            .padding(top = 2.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = state.nudge,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = NudgeAmberInk,
-                        lineHeight = 21.sp
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        if (state.aiLevel != null) {
-            SafetyCheckCard(state.aiLevel, state.aiScore, state.aiFacts, state.aiReminderOnly)
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // Add note field
-        OutlinedTextField(
-            value = state.note,
-            onValueChange = onNoteChange,
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.add_note_optional),
-                    fontSize = 16.sp,
-                    color = MutedText
-                )
-            },
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = InkDark,
-                unfocusedTextColor = InkDark,
-                focusedBorderColor = AppBlue,
-                unfocusedBorderColor = LineBorder,
-                cursorColor = AppBlue,
-                focusedContainerColor = AppSurface,
-                unfocusedContainerColor = AppSurface
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Keypad
-        NumericKeypad(
-            onDigit = onDigit,
-            onDelete = onDelete
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Pay Button
-        DemoPrimaryButton(
-            text = stringResource(R.string.continue_btn),
-            onClick = onPay,
-            enabled = state.payEnabled,
-            modifier = Modifier.navigationBarsPadding()
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .height((fontSize.value * 0.86f).dp)
+                .clip(RoundedCornerShape(1.5.dp))
+                .graphicsLayer { alpha = cursorAlpha }
+                .background(AppOrange)
         )
     }
 }

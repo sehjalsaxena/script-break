@@ -2,6 +2,7 @@ package com.example.scriptbreak
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.content.Intent
@@ -23,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import com.example.scriptbreak.logic.AnalystMode
 import com.example.scriptbreak.logic.AndroidSignals
 import com.example.scriptbreak.logic.Discovery
@@ -46,6 +49,15 @@ class LocalizedActivityContext(
         get() = activity.activityResultRegistry
 }
 
+/** The narrowest width the screens are designed for. */
+const val MIN_DESIGN_WIDTH_DP = 360
+
+/** Scales [system] down on phones narrower than [MIN_DESIGN_WIDTH_DP], so the layout behaves as on a 360dp phone. */
+fun fitToNarrowScreen(system: Density, screenWidthDp: Int): Density =
+    if (screenWidthDp in 1 until MIN_DESIGN_WIDTH_DP)
+        Density(system.density * screenWidthDp / MIN_DESIGN_WIDTH_DP, system.fontScale)
+    else system
+
 class MainActivity : ComponentActivity() {
     private lateinit var signals: AndroidSignals
     private lateinit var flow: PaymentFlow
@@ -60,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        uprightOnPhones(resources.configuration)
         enableEdgeToEdge()
         signals = AndroidSignals(applicationContext)
         // If the model file can't be loaded, the app still works: every payment goes straight
@@ -122,10 +135,17 @@ class MainActivity : ComponentActivity() {
             val localizedWrapper = remember(localizedContext) {
                 LocalizedActivityContext(this@MainActivity, localizedContext)
             }
+            // Very narrow phones (under 360dp) draw everything slightly smaller, as if 360dp wide,
+            // so no screen has to fit less than a normal small phone
+            val systemDensity = LocalDensity.current
+            val fittedDensity = remember(systemDensity, currentConfig.screenWidthDp) {
+                fitToNarrowScreen(systemDensity, currentConfig.screenWidthDp)
+            }
 
             CompositionLocalProvider(
                 LocalConfiguration provides localizedConfig,
                 LocalContext provides localizedWrapper,
+                LocalDensity provides fittedDensity,
                 LocalActivityResultRegistryOwner provides this@MainActivity,
                 LocalOnBackPressedDispatcherOwner provides this@MainActivity
             ) {
@@ -139,6 +159,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Phones stay upright like other UPI apps (the PIN keypad has no room sideways); tablets can turn. */
+    private fun uprightOnPhones(config: Configuration) {
+        requestedOrientation = if (config.smallestScreenWidthDp < 600) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    /** A foldable opened or closed: the screen size changed without restarting the app. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        uprightOnPhones(newConfig)
     }
 
     /** The alert notification was tapped while the app was already open in the background. */

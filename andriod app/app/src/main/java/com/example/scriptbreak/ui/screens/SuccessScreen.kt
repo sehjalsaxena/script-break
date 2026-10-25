@@ -121,7 +121,7 @@ fun SuccessScreen(
             ) {
                 DetailRow(label = "UPI Ref ID", value = state.upiRef)
                 DetailRow(label = "Time", value = state.time)
-                DetailRow(label = "From Account", value = "Demo Bank (•••• 4321)")
+                DetailRow(label = "From Account", value = "Demo Bank (•••• 4821)")
             }
         }
 

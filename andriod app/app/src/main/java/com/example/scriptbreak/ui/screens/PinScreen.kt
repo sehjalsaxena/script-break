@@ -39,6 +39,11 @@ import com.example.scriptbreak.ui.theme.MutedText
 import com.example.scriptbreak.ui.theme.ScriptBreakTheme
 
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import com.example.scriptbreak.ui.components.isShortScreen
 
 @Composable
 fun PinScreen(
@@ -51,92 +56,110 @@ fun PinScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
-            .padding(16.dp)
-            .navigationBarsPadding()
     ) {
-        AppTopBar(
-            onBack = onBack,
-            showScriptBreakBadge = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // Short phones get smaller keys; the text above the keypad scrolls, so Submit is never pushed off screen
+        val short = isShortScreen(maxHeight)
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = if (short) 8.dp else 16.dp)
+                .navigationBarsPadding()
         ) {
-            val amountFormatted = if (amountText.startsWith("₹")) amountText else "₹$amountText"
-            Text(
-                text = stringResource(R.string.sending_amount_to, amountFormatted, payeeName),
-                fontSize = 16.sp,
-                color = MutedText,
-                textAlign = TextAlign.Center
+            AppTopBar(
+                onBack = onBack,
+                showScriptBreakBadge = true
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(R.string.enter_upi_pin),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = InkDark
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 4 Pin dots
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(22.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(4) { index ->
-                    val isFilled = index < pinDigits
-                    Box(
+            BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = maxHeight)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(if (isFilled) AppBlue else Color.Transparent)
-                            .border(
-                                width = 2.dp,
-                                color = if (isFilled) AppBlue else LineBorder,
-                                shape = CircleShape
-                            )
+                            .fillMaxWidth()
+                            .padding(top = if (short) 4.dp else 16.dp)
+                    ) {
+                        val amountFormatted = if (amountText.startsWith("₹")) amountText else "₹$amountText"
+                        Text(
+                            text = stringResource(R.string.sending_amount_to, amountFormatted, payeeName),
+                            fontSize = 16.sp,
+                            color = MutedText,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(if (short) 8.dp else 12.dp))
+
+                        Text(
+                            text = stringResource(R.string.enter_upi_pin),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = InkDark
+                        )
+
+                        Spacer(modifier = Modifier.height(if (short) 14.dp else 20.dp))
+
+                        // 4 Pin dots
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(22.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            repeat(4) { index ->
+                                val isFilled = index < pinDigits
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isFilled) AppBlue else Color.Transparent)
+                                        .border(
+                                            width = 2.dp,
+                                            color = if (isFilled) AppBlue else LineBorder,
+                                            shape = CircleShape
+                                        )
+                                )
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = stringResource(R.string.pin_security_note),
+                        fontSize = if (short) 14.sp else 16.sp,
+                        color = MutedText,
+                        textAlign = TextAlign.Center,
+                        lineHeight = if (short) 19.sp else 22.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(if (short) 6.dp else 8.dp))
+
+            NumericKeypad(
+                onDigit = onDigit,
+                onDelete = onDelete,
+                keyHeight = if (short) 44.dp else 56.dp,
+                spacing = if (short) 6.dp else 8.dp
+            )
+
+            Spacer(modifier = Modifier.height(if (short) 8.dp else 12.dp))
+
+            DemoPrimaryButton(
+                text = "Submit",
+                onClick = onSubmit,
+                enabled = pinDigits >= 4
+            )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = stringResource(R.string.pin_security_note),
-            fontSize = 16.sp,
-            color = MutedText,
-            textAlign = TextAlign.Center,
-            lineHeight = 22.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        NumericKeypad(
-            onDigit = onDigit,
-            onDelete = onDelete
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        DemoPrimaryButton(
-            text = "Submit",
-            onClick = onSubmit,
-            enabled = pinDigits >= 4
-        )
     }
 }
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -181,32 +182,38 @@ fun ContactsScreen(
 
                             Spacer(modifier = Modifier.width(14.dp))
 
+                            // The UPI ID sits under the number, so names and numbers stay on one line on small phones
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = contact.name,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = InkDark
+                                    color = InkDark,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = contact.phone,
                                     fontSize = 14.sp,
-                                    color = MutedText
+                                    color = MutedText,
+                                    maxLines = 1
                                 )
-                            }
-
-                            Surface(
-                                color = AppBlueLight,
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text(
-                                    text = contact.upiId,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = AppBlue,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Surface(
+                                    color = AppBlueLight,
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        text = contact.upiId,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = AppBlue,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
                             }
                         }
                     }

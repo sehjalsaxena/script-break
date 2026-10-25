@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -72,59 +74,69 @@ fun DemoPayLogoText(
     }
 }
 
+/**
+ * [centerContent] replaces the title (the Amount screen puts the payee there on short phones).
+ * On a narrow bar that also has [trailingContent], the ScriptBreak badge shrinks to its shield so the title fits.
+ */
 @Composable
 fun AppTopBar(
     title: String = "",
     onBack: (() -> Unit)? = null,
     showScriptBreakBadge: Boolean = false,
     modifier: Modifier = Modifier,
+    centerContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (onBack != null) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = AppIcons.ArrowBack,
-                    contentDescription = "Back",
-                    tint = InkDark
-                )
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val compactBadge = maxWidth < 400.dp && (trailingContent != null || centerContent != null)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (onBack != null) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = AppIcons.ArrowBack,
+                        contentDescription = "Back",
+                        tint = InkDark
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.width(8.dp))
             }
-        } else {
-            Spacer(modifier = Modifier.width(8.dp))
-        }
 
-        if (title.isNotEmpty()) {
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = InkDark,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp)
-            )
-        } else {
-            Spacer(modifier = Modifier.weight(1f))
-        }
+            if (centerContent != null) {
+                Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) { centerContent() }
+            } else if (title.isNotEmpty()) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = InkDark,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
 
-        if (showScriptBreakBadge) {
-            ScriptBreakBadge()
-        }
+            if (showScriptBreakBadge) {
+                ScriptBreakBadge(iconOnly = compactBadge)
+            }
 
-        trailingContent?.invoke()
+            trailingContent?.invoke()
+        }
     }
 }
 
 @Composable
-fun ScriptBreakBadge(modifier: Modifier = Modifier) {
+fun ScriptBreakBadge(modifier: Modifier = Modifier, iconOnly: Boolean = false) {
     Surface(
         color = SafeGreenTint,
         shape = RoundedCornerShape(12.dp),
@@ -136,17 +148,19 @@ fun ScriptBreakBadge(modifier: Modifier = Modifier) {
         ) {
             Icon(
                 imageVector = AppIcons.Security,
-                contentDescription = null,
+                contentDescription = if (iconOnly) "Protected by ScriptBreak" else null,
                 tint = SafeGreen,
                 modifier = Modifier.size(14.dp)
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "ScriptBreak",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = SafeGreen
-            )
+            if (!iconOnly) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "ScriptBreak",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = SafeGreen
+                )
+            }
         }
     }
 }
@@ -278,16 +292,19 @@ fun CallStatusBanner(
     }
 }
 
+/** [keyHeight] and [spacing] shrink on short phones (see [isShortScreen]) so the lines above the keypad stay visible. */
 @Composable
 fun NumericKeypad(
     onDigit: (Int) -> Unit,
     onDelete: () -> Unit,
     onPeriod: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyHeight: Dp = 56.dp,
+    spacing: Dp = 8.dp,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(spacing)
     ) {
         val rows = listOf(
             listOf(1, 2, 3),
@@ -302,10 +319,10 @@ fun NumericKeypad(
             ) {
                 for (digit in row) {
                     KeypadButton(
-                        text = digit.toString(),
                         onClick = { onDigit(digit) },
+                        height = keyHeight,
                         modifier = Modifier.weight(1f)
-                    )
+                    ) { KeyText(digit.toString()) }
                 }
             }
         }
@@ -319,8 +336,8 @@ fun NumericKeypad(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(56.dp)
                     .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .height(keyHeight)
                     .clip(RoundedCornerShape(14.dp))
                     .clickable(enabled = onPeriod != null) {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -339,43 +356,44 @@ fun NumericKeypad(
             }
 
             KeypadButton(
-                text = "0",
                 onClick = { onDigit(0) },
+                height = keyHeight,
                 modifier = Modifier.weight(1f)
-            )
+            ) { KeyText("0") }
 
-            Surface(
-                color = AppSurface.copy(alpha = 0.7f),
-                shape = RoundedCornerShape(14.dp),
-                shadowElevation = 0.5.dp,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .clickable {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onDelete()
-                    }
+            // Same key as the digits (an earlier see-through background showed a white box behind the icon)
+            KeypadButton(
+                onClick = onDelete,
+                height = keyHeight,
+                modifier = Modifier.weight(1f)
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = AppIcons.Backspace,
-                        contentDescription = "Delete",
-                        tint = InkDark,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
+                Icon(
+                    imageVector = AppIcons.Backspace,
+                    contentDescription = "Delete",
+                    tint = InkDark,
+                    modifier = Modifier.size(22.dp)
+                )
             }
         }
     }
 }
 
 @Composable
+private fun KeyText(text: String) {
+    Text(
+        text = text,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = InkDark
+    )
+}
+
+@Composable
 private fun KeypadButton(
-    text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    height: Dp,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
     Surface(
@@ -384,20 +402,21 @@ private fun KeypadButton(
         shadowElevation = 0.5.dp,
         modifier = modifier
             .padding(horizontal = 4.dp, vertical = 2.dp)
-            .height(56.dp)
+            .height(height)
             .clip(RoundedCornerShape(14.dp))
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = InkDark
-            )
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            content()
         }
     }
 }
+
+/** Phones with less than this much height for a screen get the compact keypad layout (e.g. 360×640, 360×740). */
+val SHORT_SCREEN_HEIGHT = 720.dp
+
+/** True on short phones: keypad screens then use smaller keys and put the payee in the top bar. */
+fun isShortScreen(maxHeight: Dp): Boolean = maxHeight < SHORT_SCREEN_HEIGHT

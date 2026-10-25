@@ -110,7 +110,7 @@
     <string name="settings_call_monitoring">Live Call Scam Interception</string>
     <string name="settings_call_monitoring_sub">Alerts on active calls during transfer</string>
     <string name="settings_screen_shield">Screen-Share Protection</string>
-    <string name="settings_screen_shield_sub">Blocks payments during remote access</string>
+    <string name="settings_screen_shield_sub">Warns you before paying while your screen is shared</string>
     <string name="settings_adaptive_baseline">Learned Payment Baseline</string>
     <string name="settings_adaptive_baseline_sub">Nudges when amount is unusual for payee</string>
     <string name="settings_payments_group">Payments &amp; Bank Preferences</string>

@@ -74,6 +74,7 @@ fun NotificationsScreen(
     extraItems: List<NotificationItem> = emptyList(),   // e.g. money received from another demo person
     onClearAll: (List<String>) -> Unit = {},
     onRead: (String) -> Unit = {},
+    contactName: String = "Sehjal",                    // the logged-in person's trusted contact
     modifier: Modifier = Modifier
 ) {
     val blue = AppBlue
@@ -83,12 +84,13 @@ fun NotificationsScreen(
     val orangeLight = AppOrangeLight
     val greenTint = SafeGreenTint
 
-    val demoNotices = remember(blue, orange, green, blueLight, orangeLight, greenTint) {
+    val demoNotices = remember(blue, orange, green, blueLight, orangeLight, greenTint, contactName) {
         listOf(
             NotificationItem(
                 id = "1",
                 title = "ScriptBreak Shield Active",
-                description = "Real-time AI fraud detection is actively monitoring for suspicious calls and screen-sharing apps.",
+                // Signals are read only while the app is open, for the payment being made (privacy promise)
+                description = "Each payment is checked on this phone before the PIN, including whether you are on a call or sharing your screen.",
                 time = "Just now",
                 category = "Security",
                 icon = AppIcons.Security,
@@ -98,8 +100,8 @@ fun NotificationsScreen(
             ),
             NotificationItem(
                 id = "2",
-                title = "Payment Verified Safe",
-                description = "Your recent transfer to Sunita Iyer passed all safety checks with 0 risk indicators.",
+                title = "Payment Checked",
+                description = "Your recent transfer to Sunita Iyer was checked on this phone before the PIN. No warning was needed.",
                 time = "Today 10:42 AM",
                 category = "Transactions",
                 icon = AppIcons.Check,
@@ -110,7 +112,8 @@ fun NotificationsScreen(
             NotificationItem(
                 id = "3",
                 title = "Trusted Contact Protection",
-                description = "Sehjal Saxena is active as your trusted contact. High-risk payments trigger an alert.",
+                // Nothing is sent automatically: the person taps "Ask family" on a warning screen
+                description = "$contactName is your trusted contact. On a warning screen, one tap asks $contactName to call you.",
                 time = "2 hours ago",
                 category = "Security",
                 icon = AppIcons.Person,

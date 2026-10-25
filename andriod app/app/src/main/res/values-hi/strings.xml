@@ -110,7 +110,7 @@
     <string name="settings_call_monitoring">लाइव कॉल धोखाधड़ी सुरक्षा</string>
     <string name="settings_call_monitoring_sub">कॉल के दौरान भुगतान करने पर चेतावनी</string>
     <string name="settings_screen_shield">स्क्रीन-शेयर सुरक्षा</string>
-    <string name="settings_screen_shield_sub">रिमोट एक्सेस या रिकॉर्डिंग के दौरान भुगतान रोकें</string>
+    <string name="settings_screen_shield_sub">स्क्रीन शेयर होते समय भुगतान से पहले चेतावनी</string>
     <string name="settings_adaptive_baseline">भुगतान विसंगति पहचान</string>
     <string name="settings_adaptive_baseline_sub">असामान्य राशि होने पर सचेत करें</string>
     <string name="settings_payments_group">भुगतान और बैंक प्राथमिकताएं</string>

@@ -338,6 +338,7 @@ private fun InputsTab(
             ResultCard(
                 r = judge.result,
                 modelVersion = judge.modelVersion,
+                thresholds = judge.thresholds,
                 story = judge.stories.firstOrNull { it.id == judge.storyId }?.let {
                     "${it.id}: ${it.title} (Target: ${it.round1Level})"
                 },
@@ -655,6 +656,7 @@ private fun QuickPresetsRow(
 private fun ResultCard(
     r: Result?,
     modelVersion: String,
+    thresholds: Triple<Double, Double, Double>?,
     story: String?,
     onRunInApp: () -> Unit,
     onReset: () -> Unit,
@@ -685,11 +687,12 @@ private fun ResultCard(
     }
 
     val (fg, bg) = levelColors(r.level)
+    // What the person would see. ScriptBreak never blocks a payment, so no level says "blocked".
     val levelTitle = when (r.level) {
-        "CRITICAL" -> "CRITICAL SCAM BLOCKED"
-        "PAUSE" -> "PAUSE & REFLECT (10s)"
+        "CRITICAL" -> "CRITICAL WARNING"
+        "PAUSE" -> "PAUSE · TWO QUESTIONS"
         "NUDGE" -> "NUDGE ADVISORY"
-        else -> "SAFE TO PROCEED"
+        else -> "NO WARNING"
     }
     val levelIcon = when (r.level) {
         "CRITICAL" -> AppIcons.Warning
@@ -698,10 +701,10 @@ private fun ResultCard(
         else -> AppIcons.VerifiedUser
     }
     val levelDesc = when (r.level) {
-        "CRITICAL" -> "Transaction blocked by safety policies. Immediate intervention triggered."
-        "PAUSE" -> "10-second cognitive delay with psychological safety screening active."
-        "NUDGE" -> "Non-blocking contextual advisory banner presented before payment."
-        else -> "Zero high-risk signals detected. Payment processed instantly without friction."
+        "CRITICAL" -> "Full red screen before the PIN. Not blocked: \"Continue anyway\" unlocks after 10 seconds."
+        "PAUSE" -> "Full screen with two questions before the PIN. A \"Yes\" raises it to Critical."
+        "NUDGE" -> "Amber line on the Amount screen. No extra tap needed."
+        else -> "Nothing is shown: the payment goes straight to the PIN."
     }
 
     Surface(
@@ -833,15 +836,16 @@ private fun ResultCard(
 
                 Spacer(Modifier.height(4.dp))
 
-                // Threshold Markers
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("0% Safe", fontSize = 11.sp, color = FaintText)
-                    Text("30% Nudge", fontSize = 11.sp, color = FaintText)
-                    Text("65% Pause", fontSize = 11.sp, color = FaintText)
-                    Text("85% Critical", fontSize = 11.sp, color = FaintText)
+                // Threshold markers: the model's own lines (set on validation data), not round numbers
+                thresholds?.let { (nudge, pause, critical) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Nudge ${pct(nudge)}", fontSize = 11.sp, color = FaintText)
+                        Text("Pause ${pct(pause)}", fontSize = 11.sp, color = FaintText)
+                        Text("Critical ${pct(critical)}", fontSize = 11.sp, color = FaintText)
+                    }
                 }
             }
 
@@ -937,11 +941,14 @@ private fun ResultCard(
                             )
                         }
                         r.guardrails.forEach { g ->
+                            // Same meaning as ml/policy.py (the safety layer every reported number uses)
                             val expl = when (g) {
-                                "G1" -> "Rule G1: Payee is on Bank/RBI Fraud Watchlist (Mandatory Block)"
-                                "G2" -> "Rule G2: Payee was previously paid despite security warning"
-                                "G4" -> "Rule G4: User confirmed psychological coercion"
-                                else -> "$g: Safety rule approved by banking policy"
+                                "C1" -> "C1: no sign of coaching (call, screen share, paste, app switch, new payees), so at most a Nudge"
+                                "G1" -> "G1: payee flagged by the bank, always Critical"
+                                "G2" -> "G2: the bank has warned about this payee: at least Nudge, Critical during a call or screen share"
+                                "G4" -> "G4: \"Yes\" to a question at Pause or above, so Critical"
+                                "G5" -> "G5: first payment to a new person, 30× usual and ₹20,000 or more, so at least Pause"
+                                else -> "G3 ($g): matches a rule an analyst approved, so at least Pause"
                             }
                             Text("• $expl", fontSize = 12.sp, color = InkDark, lineHeight = 16.sp)
                         }
@@ -1294,7 +1301,7 @@ private fun StoriesTab(judge: JudgeMode) {
                         )
                     }
                     Text(
-                        text = "Curated real-world fraud cases withheld from model training. Tap any scenario to load its exact inputs into the sandbox and test live.",
+                        text = "Our hand-written Round 1 stories, never used for training. Tap any story to load its exact inputs into the sandbox and test live.",
                         fontSize = 13.sp,
                         color = MutedText,
                         lineHeight = 18.sp

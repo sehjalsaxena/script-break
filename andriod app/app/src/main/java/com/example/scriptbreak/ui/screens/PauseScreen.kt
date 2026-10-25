@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.scriptbreak.R
 import com.example.scriptbreak.ui.components.AppIcons
 import com.example.scriptbreak.ui.components.AppTopBar
+import com.example.scriptbreak.ui.components.isShortScreen
 import com.example.scriptbreak.ui.components.DemoPrimaryButton
 import com.example.scriptbreak.ui.model.PauseUi
 import com.example.scriptbreak.ui.theme.AppBackground
@@ -72,240 +74,249 @@ fun PauseScreen(
     onWait: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(AppBackground)
-            .padding(16.dp)
-            .navigationBarsPadding()
     ) {
-        AppTopBar(
-            title = stringResource(R.string.pause_title),
-            onBack = onBack,
-            showScriptBreakBadge = true
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        val infiniteTransition = rememberInfiniteTransition(label = "breathing")
-        val pulseScale by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 1.08f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1500),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "pulse"
-        )
-
+        // Short phones: the "Take a breath" banner is left out so the two questions come into view sooner
+        val short = isShortScreen(maxHeight)
         Column(
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = if (short) 8.dp else 16.dp)
+                .navigationBarsPadding()
         ) {
-            // Calming Breathing / Safety Header
-            Surface(
-                color = PauseOrangeTint,
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth()
+            AppTopBar(
+                title = stringResource(R.string.pause_title),
+                onBack = onBack,
+                showScriptBreakBadge = true
+            )
+
+            Spacer(modifier = Modifier.height(if (short) 4.dp else 12.dp))
+
+            val infiniteTransition = rememberInfiniteTransition(label = "breathing")
+            val pulseScale by infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = 1.08f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1500),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "pulse"
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(if (short) 12.dp else 16.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // Calming Breathing / Safety Header
+                if (!short) Surface(
+                    color = PauseOrangeTint,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .graphicsLayer(scaleX = pulseScale, scaleY = pulseScale)
-                            .clip(CircleShape)
-                            .background(PauseOrange)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = AppIcons.Security,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column {
-                        Text(
-                            text = "Take a breath · Scam protection check",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PauseOrangeInk
-                        )
-                        Text(
-                            text = "Scammers create false urgency to bypass your normal judgment",
-                            fontSize = 12.sp,
-                            color = PauseOrangeInk.copy(alpha = 0.85f)
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(28.dp)
+                                .graphicsLayer(scaleX = pulseScale, scaleY = pulseScale)
+                                .clip(CircleShape)
+                                .background(PauseOrange)
+                        ) {
+                            Icon(
+                                imageVector = AppIcons.Security,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Take a breath · Scam protection check",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PauseOrangeInk
+                            )
+                            Text(
+                                text = "Scammers create false urgency to bypass your normal judgment",
+                                fontSize = 12.sp,
+                                color = PauseOrangeInk.copy(alpha = 0.85f)
+                            )
+                        }
                     }
                 }
-            }
 
-            // Facts card (Orange border-left & tint)
-            Surface(
-                color = PauseOrangeTint,
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = PauseOrange.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(14.dp)
-                    )
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Box(
-                        modifier = Modifier
-                            .width(5.dp)
-                            .background(PauseOrange)
-                    )
-                    Column(
-                        modifier = Modifier.padding(14.dp)
-                    ) {
-                        val payeeFormatted = if (state.payeeName.endsWith(".")) state.payeeName else "${state.payeeName}."
-                        val amountFormatted = if (state.amountText.startsWith("₹")) state.amountText else "₹${state.amountText}"
-
-                        Text(
-                            text = stringResource(R.string.pause_sends, amountFormatted, payeeFormatted),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PauseOrangeInk,
-                            lineHeight = 24.sp
+                // Facts card (Orange border-left & tint)
+                Surface(
+                    color = PauseOrangeTint,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = PauseOrange.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(14.dp)
                         )
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Box(
+                            modifier = Modifier
+                                .width(5.dp)
+                                .background(PauseOrange)
+                        )
+                        Column(
+                            modifier = Modifier.padding(14.dp)
+                        ) {
+                            val payeeFormatted = if (state.payeeName.endsWith(".")) state.payeeName else "${state.payeeName}."
+                            val amountFormatted = if (state.amountText.startsWith("₹")) state.amountText else "₹${state.amountText}"
 
-                        if (state.reasons.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            state.reasons.forEach { reason ->
-                                Row(
-                                    modifier = Modifier.padding(vertical = 2.dp),
-                                    verticalAlignment = Alignment.Top
-                                ) {
-                                    Text(
-                                        text = "• ",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = PauseOrangeInk
-                                    )
-                                    Text(
-                                        text = reason,
-                                        fontSize = 16.sp,
-                                        color = PauseOrangeInk,
-                                        lineHeight = 22.sp
-                                    )
+                            Text(
+                                text = stringResource(R.string.pause_sends, amountFormatted, payeeFormatted),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PauseOrangeInk,
+                                lineHeight = 24.sp
+                            )
+
+                            if (state.reasons.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                state.reasons.forEach { reason ->
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 2.dp),
+                                        verticalAlignment = Alignment.Top
+                                    ) {
+                                        Text(
+                                            text = "• ",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PauseOrangeInk
+                                        )
+                                        Text(
+                                            text = reason,
+                                            fontSize = 16.sp,
+                                            color = PauseOrangeInk,
+                                            lineHeight = 22.sp
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            // Question 1
-            QuestionCard(
-                text = stringResource(R.string.pause_q1),
-                answer = state.q1,
-                onSelect = onQ1
-            )
+                // Question 1
+                QuestionCard(
+                    text = stringResource(R.string.pause_q1),
+                    answer = state.q1,
+                    onSelect = onQ1
+                )
 
-            // Question 2
-            QuestionCard(
-                text = stringResource(R.string.pause_q2),
-                answer = state.q2,
-                onSelect = onQ2
-            )
+                // Question 2
+                QuestionCard(
+                    text = stringResource(R.string.pause_q2),
+                    answer = state.q2,
+                    onSelect = onQ2
+                )
 
-            // Family Emergency Contact Section with live beacon dot
-            Surface(
-                color = if (state.askedFamily) SafeGreenTint else AppSurface,
-                shape = RoundedCornerShape(14.dp),
-                shadowElevation = 0.5.dp,
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    if (state.askedFamily) SafeGreen.copy(alpha = 0.3f) else PauseOrange.copy(alpha = 0.3f)
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .clickable { onAskFamily() }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // Family Emergency Contact Section with live beacon dot
+                Surface(
+                    color = if (state.askedFamily) SafeGreenTint else AppSurface,
+                    shape = RoundedCornerShape(14.dp),
+                    shadowElevation = 0.5.dp,
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (state.askedFamily) SafeGreen.copy(alpha = 0.3f) else PauseOrange.copy(alpha = 0.3f)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { onAskFamily() }
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(if (state.askedFamily) SafeGreen else PauseOrange.copy(alpha = 0.15f))
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = if (state.askedFamily) AppIcons.Check else AppIcons.Phone,
-                            contentDescription = null,
-                            tint = if (state.askedFamily) Color.White else PauseOrange,
-                            modifier = Modifier.size(18.dp)
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(if (state.askedFamily) SafeGreen else PauseOrange.copy(alpha = 0.15f))
+                        ) {
+                            Icon(
+                                imageVector = if (state.askedFamily) AppIcons.Check else AppIcons.Phone,
+                                contentDescription = null,
+                                tint = if (state.askedFamily) Color.White else PauseOrange,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                // SPEC wording: tapping alerts the contact, who then calls (it does not call them)
+                                text = if (state.askedFamily) "Alert sent to ${state.contactName}"
+                                    else stringResource(R.string.not_sure) + " " + stringResource(R.string.ask_family, state.contactName),
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (state.askedFamily) SafeGreen else PauseOrangeInk
+                            )
+                            Text(
+                                text = if (state.askedFamily) "Live protection signal sent via ScriptBreak" else "Trusted contact can verify if this payment is safe",
+                                fontSize = 12.sp,
+                                color = MutedText
+                            )
+                        }
+
+                        // Live active beacon dot
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (state.askedFamily) SafeGreen else PauseOrange)
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (state.askedFamily) "Alert sent to ${state.contactName}" else "Unsure? Call ${state.contactName}",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (state.askedFamily) SafeGreen else PauseOrangeInk
-                        )
-                        Text(
-                            text = if (state.askedFamily) "Live protection signal sent via ScriptBreak" else "Trusted contact can verify if this payment is safe",
-                            fontSize = 12.sp,
-                            color = MutedText
-                        )
-                    }
-
-                    // Live active beacon dot
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(if (state.askedFamily) SafeGreen else PauseOrange)
-                    )
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        if (onWait != null) {
-            DemoPrimaryButton(
-                text = stringResource(R.string.critical_wait),
-                onClick = onWait,
-                containerColor = SafeGreen
-            )
             Spacer(modifier = Modifier.height(8.dp))
+
+            if (onWait != null) {
+                DemoPrimaryButton(
+                    text = stringResource(R.string.critical_wait),
+                    onClick = onWait,
+                    containerColor = SafeGreen
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Next Button
+            DemoPrimaryButton(
+                text = stringResource(R.string.next),
+                onClick = onNext,
+                containerColor = PauseOrange
+            )
+
+            // No separate "Continue anyway" here: "Next" already continues to the PIN
+            // (or to the Critical screen if an answer raised the level).
+
+            Text(
+                text = stringResource(R.string.checked_on_phone, state.modelVersion),
+                fontSize = if (short) 12.sp else 14.sp,
+                color = FaintText,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+            )
         }
-
-        // Next Button
-        DemoPrimaryButton(
-            text = stringResource(R.string.next),
-            onClick = onNext,
-            containerColor = PauseOrange
-        )
-
-        // No separate "Continue anyway" here: "Next" already continues to the PIN
-        // (or to the Critical screen if an answer raised the level).
-
-        Text(
-            text = stringResource(R.string.checked_on_phone, state.modelVersion),
-            fontSize = 14.sp,
-            color = FaintText,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 

@@ -82,6 +82,8 @@ class JudgeMode(private val model: ScamModel?, val stories: List<Story>) {
     var kitLoading by mutableStateOf(false)
 
     val modelVersion: String get() = model?.modelVersion ?: "unavailable"
+    /** Nudge, Pause and Critical score lines of the model on this phone (null if it failed to load). */
+    val thresholds: Triple<Double, Double, Double>? get() = model?.thresholds
     val result: Result? get() = assess(inputs, q1, q2)
 
     fun assess(p: Payment, q1: Boolean?, q2: Boolean?): Result? =

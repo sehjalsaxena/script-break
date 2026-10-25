@@ -134,6 +134,9 @@ class ScamModel private constructor(private val m: JSONObject) {
     private val tNudge = th.getDouble("nudge")
     private val tPause = th.getDouble("pause")
     private val tCritical = th.getDouble("critical")
+
+    /** The score lines for Nudge, Pause and Critical (Judge mode shows them on the score bar). */
+    val thresholds: Triple<Double, Double, Double> get() = Triple(tNudge, tPause, tCritical)
     private val nudgeMinAmount = m.optDouble("nudge_min_amount", 1000.0)
     private val reasonText = m.getJSONObject("reasons")
     private val pre = m.getJSONObject("preprocessing")

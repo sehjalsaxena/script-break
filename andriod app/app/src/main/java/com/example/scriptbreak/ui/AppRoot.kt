@@ -28,6 +28,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -102,6 +105,9 @@ import com.example.scriptbreak.ui.theme.CritRed
 import com.example.scriptbreak.ui.theme.CritRedTint
 import java.util.Locale
 import kotlin.math.roundToLong
+
+/** Widest the screens get (tablets, unfolded phones): beyond this they are centred with a margin. */
+val MAX_CONTENT_WIDTH = 640.dp
 
 /** The real app: Sehjal's screens driven by PaymentFlow (AI model + safety layer + phone signals). */
 @Composable
@@ -196,9 +202,11 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
     val tts = rememberTextToSpeech(context)
 
-    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+    // On tablets and unfolded phones the screens keep a phone-like width, centred, instead of stretching
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
         AnimatedContent(
             targetState = flow.screen,
+            modifier = Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxSize(),
             label = "water_drop_screens",
             transitionSpec = {
                 val waveDecelerate = CubicBezierEasing(0.08f, 0.82f, 0.12f, 1.0f)
@@ -411,6 +419,7 @@ fun AppRoot(flow: PaymentFlow, signals: SignalSource, judge: JudgeMode, analyst:
 
                 Screen.Notifications -> NotificationsScreen(
                     onBack = { flow.back() },
+                    contactName = flow.contact.name,
                     clearedIds = flow.clearedNoticeIds,
                     readIds = flow.readNoticeIds,
                     extraItems = flow.myAlerts.map {
