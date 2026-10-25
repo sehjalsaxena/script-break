@@ -1,5 +1,5 @@
 {
- "when_utc": "2026-10-24 20:44",
+ "when_utc": "2026-10-25 04:43",
  "environment": {
   "python": "3.13.14",
   "platform": "Windows-11-10.0.26300-SP0",
@@ -8,13 +8,13 @@
   "scikit-learn": "1.9.1",
   "joblib": "1.6.0"
  },
- "seconds": 279,
+ "seconds": 388,
  "step_seconds": {
-  "make_dataset": 5.5,
-  "train": 45.3,
-  "export_model": 1.6,
-  "evaluate": 174.6,
-  "discovery_unseen": 33.4,
+  "make_dataset": 5.3,
+  "train": 111.1,
+  "export_model": 3.2,
+  "evaluate": 208.9,
+  "discovery_unseen": 37.6,
   "discovery": 2.7
  },
  "dataset_sha256": {
@@ -360,5 +360,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.138
+ "python_scorer_ms_per_payment": 0.226
 }
