@@ -1,6 +1,6 @@
 # ScriptBreak test summary
 
-Run 2026-10-24 20:44 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 4 min 39 s. Committed model version 20261024-0701.
+Run 2026-10-25 04:43 UTC on Windows-11-10.0.26300-SP0, Python 3.13.14, scikit-learn 1.9.1, numpy 2.5.4, scipy 1.18.1. Took 6 min 28 s. Committed model version ScriptBreak Sentinel v2.4.
 
 **21 checks passed, 0 failed.** All data synthetic (generation code in this folder); these numbers test our assumptions, not real-world accuracy.
 
@@ -79,7 +79,7 @@ Reported, not tuned: thresholds are set on validation data only. Budget: 8 per 1
 
 Negative amount: rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through).
 
-Python reference scorer: 0.138 ms per payment (the phone is measured separately).
+Python reference scorer: 0.226 ms per payment (the phone is measured separately).
 
 ## Dataset checksums (SHA-256, line endings normalised)
 

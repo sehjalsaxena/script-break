@@ -10,6 +10,7 @@ Made with ZXing (`docs/demo_qr`). They use demo UPI IDs only (`@demoupi`), so no
 | `3_rent_suresh_qr.png` | `upi://pay?pa=suresh.verma@demoupi&pn=Suresh%20Verma&am=18000&cu=INR&tn=Rent` | Usual landlord: nothing extra, straight to the PIN |
 | `4_pay_sambhav_qr.png` | `upi://pay?pa=sambhav.jain@demoupi&pn=Sambhav%20Jain&cu=INR` | Pay Sambhav (log in as deepak): the money arrives on Sambhav's phone |
 | `5_pay_deepak_qr.png` | `upi://pay?pa=deepak.rawat@demoupi&pn=Deepak%20Rawat&cu=INR` | Pay Deepak (log in as sambhav): the money arrives on Deepak's phone |
+| `7_electrician_manoj_qr.png` | `upi://pay?pa=manoj.elec@demoupi&pn=Manoj%20Electricals&am=6000&cu=INR&tn=Wiring%20repair` | Genuine electrician, new payee, ₹6,000 filled in. During a call: Pause (the false alarm a real customer gets past with Next) |
 | `6_pay_sehjal_qr.png` | `upi://pay?pa=sehjal.saxena@demoupi&pn=Sehjal%20Saxena&cu=INR` | Pay Sehjal (paid before, no warning). Sehjal's phone shows "Received ₹… from …" (Sehjal's account is for alerts, so there is no balance screen) |
 
 The same personal QR is also inside the app: Account → **My UPI QR Code** (made on the phone, no network).

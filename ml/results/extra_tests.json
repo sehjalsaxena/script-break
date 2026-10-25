@@ -1,5 +1,5 @@
 {
- "model_version": "20261024-0701",
+ "model_version": "ScriptBreak Sentinel v2.4",
  "test_file": "test.jsonl",
  "test_payments": 33600,
  "error_bars_95": {
@@ -312,5 +312,5 @@
   }
  ],
  "negative_amount": "rejected with ValueError (the app must only score amounts > 0; on any error it lets the payment through)",
- "python_scorer_ms_per_payment": 0.138
+ "python_scorer_ms_per_payment": 0.226
 }
