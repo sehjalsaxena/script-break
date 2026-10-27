@@ -190,7 +190,11 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         signals.appVisible = true   // phone signals are read only while the app is on screen
         if (Build.VERSION.SDK_INT >= 35) {
-            screenRecording.accept(windowManager.addScreenRecordingCallback(mainExecutor, screenRecording))
+            try {
+                screenRecording.accept(windowManager.addScreenRecordingCallback(mainExecutor, screenRecording))
+            } catch (e: Throwable) {
+                // Safeguard against SecurityException or OEM custom ROM API incompatibilities
+            }
         }
     }
 
@@ -204,7 +208,13 @@ class MainActivity : ComponentActivity() {
         val screenOn = getSystemService(PowerManager::class.java)?.isInteractive ?: true
         if (screenOn) flow.onAppStopped()
         signals.appVisible = false
-        if (Build.VERSION.SDK_INT >= 35) windowManager.removeScreenRecordingCallback(screenRecording)
+        if (Build.VERSION.SDK_INT >= 35) {
+            try {
+                windowManager.removeScreenRecordingCallback(screenRecording)
+            } catch (e: Throwable) {
+                // Callback might not have been registered
+            }
+        }
         super.onStop()
     }
 }
