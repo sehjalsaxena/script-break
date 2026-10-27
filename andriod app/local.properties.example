@@ -1,0 +1,13 @@
+## Example local.properties
+## Copy this to local.properties and update with your local paths and Firebase credentials.
+## local.properties is ignored by git and will never be pushed to your repository.
+
+sdk.dir=C\:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
+
+# Firebase configuration (Keep private - do NOT commit to version control)
+firebase.apiKey=YOUR_GOOGLE_API_KEY
+firebase.appId=1:363407252393:android:9f5a011387091017f102b8
+firebase.projectId=script-break-01
+firebase.senderId=363407252393
+firebase.storageBucket=script-break-01.firebasestorage.app
+firebase.databaseUrl=https://script-break-01-default-rtdb.asia-southeast1.firebasedatabase.app

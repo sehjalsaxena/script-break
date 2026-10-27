@@ -1,6 +1,16 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        FileInputStream(localPropertiesFile).use { load(it) }
+    }
 }
 
 android {
@@ -17,6 +27,34 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Inject Firebase configuration safely from local.properties or environment variables
+        // This keeps sensitive API keys private and out of version control
+        val firebaseApiKey = localProperties.getProperty("firebase.apiKey")
+            ?: System.getenv("FIREBASE_API_KEY")
+            ?: ""
+        val firebaseAppId = localProperties.getProperty("firebase.appId")
+            ?: System.getenv("FIREBASE_APP_ID")
+            ?: "1:363407252393:android:9f5a011387091017f102b8"
+        val firebaseProjectId = localProperties.getProperty("firebase.projectId")
+            ?: System.getenv("FIREBASE_PROJECT_ID")
+            ?: "script-break-01"
+        val firebaseSenderId = localProperties.getProperty("firebase.senderId")
+            ?: System.getenv("FIREBASE_SENDER_ID")
+            ?: "363407252393"
+        val firebaseStorageBucket = localProperties.getProperty("firebase.storageBucket")
+            ?: System.getenv("FIREBASE_STORAGE_BUCKET")
+            ?: "script-break-01.firebasestorage.app"
+        val firebaseDatabaseUrl = localProperties.getProperty("firebase.databaseUrl")
+            ?: System.getenv("FIREBASE_DATABASE_URL")
+            ?: "https://script-break-01-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+        resValue("string", "google_api_key", firebaseApiKey)
+        resValue("string", "google_app_id", firebaseAppId)
+        resValue("string", "project_id", firebaseProjectId)
+        resValue("string", "gcm_defaultSenderId", firebaseSenderId)
+        resValue("string", "google_storage_bucket", firebaseStorageBucket)
+        resValue("string", "firebase_database_url", firebaseDatabaseUrl)
     }
 
     buildTypes {
@@ -33,6 +71,7 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
     }
 }
 

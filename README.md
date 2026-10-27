@@ -60,7 +60,7 @@ gradlew.bat assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-The "Ask family" alert and money between the demo people go through Firebase, so for those the phones need internet.
+The "Ask family" alert and money between the demo people go through Firebase (configure your private keys in `local.properties`, see `local.properties.example`).
 Everything else, including the AI check, works offline.
 
 ### Part 2: Log in

@@ -1,6 +1,8 @@
 node_modules
 dist
 .env
+google-services.json
+firebase.xml
 /.idea/
 
 CLAUDE.md
